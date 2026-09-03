@@ -1,0 +1,15 @@
+.idea/
+.vscode/
+.env.local
+.env.*.local
+backend/vendor/
+backend/var/
+backend/.phpunit.cache/
+backend/.php-cs-fixer.cache
+backend/config/jwt/*.pem
+frontend/node_modules/
+frontend/dist/
+frontend/coverage/
+frontend/playwright-report/
+frontend/test-results/
+*.log
