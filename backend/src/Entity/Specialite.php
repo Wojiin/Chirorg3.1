@@ -47,13 +47,13 @@ class Specialite
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['specialite:list', 'specialite:read', 'chirurgien:list', 'chirurgien:read', 'materiel:list', 'materiel:read'])]
+    #[Groups(['specialite:list', 'specialite:read', 'chirurgien:list', 'chirurgien:read', 'materiel:list', 'materiel:read', 'chirurgie_modele:list', 'chirurgie_modele:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 100, unique: true)]
     #[Assert\NotBlank]
     #[Assert\Length(max: 100)]
-    #[Groups(['specialite:list', 'specialite:read', 'specialite:write', 'chirurgien:list', 'chirurgien:read', 'materiel:list', 'materiel:read'])]
+    #[Groups(['specialite:list', 'specialite:read', 'specialite:write', 'chirurgien:list', 'chirurgien:read', 'materiel:list', 'materiel:read', 'chirurgie_modele:list', 'chirurgie_modele:read'])]
     private ?string $intitule = null;
 
     /**
@@ -68,10 +68,17 @@ class Specialite
     #[ORM\OneToMany(targetEntity: Materiel::class, mappedBy: 'specialite')]
     private Collection $materiels;
 
+    /**
+     * @var Collection<int, ChirurgieModele>
+     */
+    #[ORM\OneToMany(targetEntity: ChirurgieModele::class, mappedBy: 'specialite')]
+    private Collection $chirurgiesModeles;
+
     public function __construct()
     {
         $this->chirurgiens = new ArrayCollection();
         $this->materiels = new ArrayCollection();
+        $this->chirurgiesModeles = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -145,6 +152,36 @@ class Specialite
             // set the owning side to null (unless already changed)
             if ($materiel->getSpecialite() === $this) {
                 $materiel->setSpecialite(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ChirurgieModele>
+     */
+    public function getChirurgiesModeles(): Collection
+    {
+        return $this->chirurgiesModeles;
+    }
+
+    public function addChirurgieModele(ChirurgieModele $chirurgieModele): static
+    {
+        if (!$this->chirurgiesModeles->contains($chirurgieModele)) {
+            $this->chirurgiesModeles->add($chirurgieModele);
+            $chirurgieModele->setSpecialite($this);
+        }
+
+        return $this;
+    }
+
+    public function removeChirurgieModele(ChirurgieModele $chirurgieModele): static
+    {
+        if ($this->chirurgiesModeles->removeElement($chirurgieModele)) {
+            // set the owning side to null (unless already changed)
+            if ($chirurgieModele->getSpecialite() === $this) {
+                $chirurgieModele->setSpecialite(null);
             }
         }
 

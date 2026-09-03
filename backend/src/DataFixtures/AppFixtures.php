@@ -2,6 +2,7 @@
 
 namespace App\DataFixtures;
 
+use App\Entity\ChirurgieModele;
 use App\Entity\Chirurgien;
 use App\Entity\Materiel;
 use App\Entity\Specialite;
@@ -28,6 +29,18 @@ class AppFixtures extends Fixture
                 (new Chirurgien())
                     ->setPrenom($data['prenom'])
                     ->setNom($data['nom'])
+                    ->setSpecialite($specialites[$data['specialite']]),
+            );
+        }
+
+        foreach ([
+            ['intitule' => 'Pontage coronarien', 'specialite' => 'Cardiologie'],
+            ['intitule' => 'Prothèse totale de hanche', 'specialite' => 'Orthopédie'],
+            ['intitule' => 'Urétéroscopie', 'specialite' => 'Urologie'],
+        ] as $data) {
+            $manager->persist(
+                (new ChirurgieModele())
+                    ->setIntitule($data['intitule'])
                     ->setSpecialite($specialites[$data['specialite']]),
             );
         }
