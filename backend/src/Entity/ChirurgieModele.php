@@ -70,9 +70,16 @@ class ChirurgieModele
     #[ORM\OneToMany(targetEntity: FicheTechnique::class, mappedBy: 'chirurgieModele', orphanRemoval: true)]
     private Collection $fichesTechniques;
 
+    /**
+     * @var Collection<int, ListeMateriel>
+     */
+    #[ORM\OneToMany(targetEntity: ListeMateriel::class, mappedBy: 'chirurgieModele')]
+    private Collection $listesMateriel;
+
     public function __construct()
     {
         $this->fichesTechniques = new ArrayCollection();
+        $this->listesMateriel = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -128,6 +135,36 @@ class ChirurgieModele
             // set the owning side to null (unless already changed)
             if ($ficheTechnique->getChirurgieModele() === $this) {
                 $ficheTechnique->setChirurgieModele(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ListeMateriel>
+     */
+    public function getListesMateriel(): Collection
+    {
+        return $this->listesMateriel;
+    }
+
+    public function addListeMateriel(ListeMateriel $listeMateriel): static
+    {
+        if (!$this->listesMateriel->contains($listeMateriel)) {
+            $this->listesMateriel->add($listeMateriel);
+            $listeMateriel->setChirurgieModele($this);
+        }
+
+        return $this;
+    }
+
+    public function removeListeMateriel(ListeMateriel $listeMateriel): static
+    {
+        if ($this->listesMateriel->removeElement($listeMateriel)) {
+            // set the owning side to null (unless already changed)
+            if ($listeMateriel->getChirurgieModele() === $this) {
+                $listeMateriel->setChirurgieModele(null);
             }
         }
 

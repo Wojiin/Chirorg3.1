@@ -12,6 +12,8 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\QueryParameter;
 use App\Repository\ChirurgienRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -67,6 +69,17 @@ class Chirurgien
     #[Groups(['chirurgien:list', 'chirurgien:read', 'chirurgien:write'])]
     private ?Specialite $specialite = null;
 
+    /**
+     * @var Collection<int, ListeMateriel>
+     */
+    #[ORM\OneToMany(targetEntity: ListeMateriel::class, mappedBy: 'chirurgien')]
+    private Collection $listesMateriel;
+
+    public function __construct()
+    {
+        $this->listesMateriel = new ArrayCollection();
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -104,6 +117,36 @@ class Chirurgien
     public function setSpecialite(?Specialite $specialite): static
     {
         $this->specialite = $specialite;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ListeMateriel>
+     */
+    public function getListesMateriel(): Collection
+    {
+        return $this->listesMateriel;
+    }
+
+    public function addListeMateriel(ListeMateriel $listeMateriel): static
+    {
+        if (!$this->listesMateriel->contains($listeMateriel)) {
+            $this->listesMateriel->add($listeMateriel);
+            $listeMateriel->setChirurgien($this);
+        }
+
+        return $this;
+    }
+
+    public function removeListeMateriel(ListeMateriel $listeMateriel): static
+    {
+        if ($this->listesMateriel->removeElement($listeMateriel)) {
+            // set the owning side to null (unless already changed)
+            if ($listeMateriel->getChirurgien() === $this) {
+                $listeMateriel->setChirurgien(null);
+            }
+        }
 
         return $this;
     }

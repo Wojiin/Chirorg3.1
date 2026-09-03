@@ -5,6 +5,7 @@ namespace App\DataFixtures;
 use App\Entity\ChirurgieModele;
 use App\Entity\Chirurgien;
 use App\Entity\FicheTechnique;
+use App\Entity\ListeMateriel;
 use App\Entity\Materiel;
 use App\Entity\Specialite;
 use Doctrine\Bundle\FixturesBundle\Fixture;
@@ -21,20 +22,22 @@ class AppFixtures extends Fixture
             $manager->persist($specialite);
         }
 
-        $chirurgiesModeles = [];
+        $chirurgiens = [];
         foreach ([
             ['prenom' => 'Claire', 'nom' => 'Martin', 'specialite' => 'Cardiologie'],
             ['prenom' => 'Nicolas', 'nom' => 'Bernard', 'specialite' => 'Orthopédie'],
             ['prenom' => 'Sophie', 'nom' => 'Robert', 'specialite' => 'Urologie'],
         ] as $data) {
-            $manager->persist(
-                (new Chirurgien())
-                    ->setPrenom($data['prenom'])
-                    ->setNom($data['nom'])
-                    ->setSpecialite($specialites[$data['specialite']]),
-            );
+            $chirurgien = (new Chirurgien())
+                ->setPrenom($data['prenom'])
+                ->setNom($data['nom'])
+                ->setSpecialite($specialites[$data['specialite']]);
+            $chirurgiens[$data['specialite']] = $chirurgien;
+            $manager->persist($chirurgien);
         }
 
+        $chirurgiesModeles = [];
+        $materiels = [];
         foreach ([
             ['intitule' => 'Pontage coronarien', 'specialite' => 'Cardiologie'],
             ['intitule' => 'Prothèse totale de hanche', 'specialite' => 'Orthopédie'],
@@ -66,12 +69,26 @@ class AppFixtures extends Fixture
             ['intitule' => 'Moteur orthopédique', 'adresse' => 'Arsenal B-04', 'type' => 'Équipement', 'specialite' => 'Orthopédie'],
             ['intitule' => 'Urétéroscope', 'adresse' => 'Arsenal C-02', 'type' => 'Endoscopie', 'specialite' => 'Urologie'],
         ] as $data) {
+            $materiel = (new Materiel())
+                ->setIntitule($data['intitule'])
+                ->setAdresse($data['adresse'])
+                ->setTypeMateriel($data['type'])
+                ->setSpecialite($specialites[$data['specialite']]);
+            $materiels[$data['specialite']] = $materiel;
+            $manager->persist($materiel);
+        }
+
+        foreach ([
+            ['intitule' => 'Standard pontage', 'specialite' => 'Cardiologie', 'chirurgie' => 'Pontage coronarien'],
+            ['intitule' => 'Standard hanche', 'specialite' => 'Orthopédie', 'chirurgie' => 'Prothèse totale de hanche'],
+            ['intitule' => 'Standard urétéroscopie', 'specialite' => 'Urologie', 'chirurgie' => 'Urétéroscopie'],
+        ] as $data) {
             $manager->persist(
-                (new Materiel())
+                (new ListeMateriel())
                     ->setIntitule($data['intitule'])
-                    ->setAdresse($data['adresse'])
-                    ->setTypeMateriel($data['type'])
-                    ->setSpecialite($specialites[$data['specialite']]),
+                    ->setChirurgien($chirurgiens[$data['specialite']])
+                    ->setChirurgieModele($chirurgiesModeles[$data['chirurgie']])
+                    ->addMateriel($materiels[$data['specialite']]),
             );
         }
 
