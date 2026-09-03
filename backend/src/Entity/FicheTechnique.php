@@ -22,23 +22,25 @@ use Symfony\Component\Validator\Constraints as Assert;
 )]
 #[ApiResource(
     operations: [
-        new GetCollection(normalizationContext: ['groups' => ['fiche_technique:list']]),
+        new GetCollection(uriTemplate: '/fiches-techniques', normalizationContext: ['groups' => ['fiche_technique:list']]),
         new GetCollection(
             uriTemplate: '/chirurgie-modeles/{id}/fiches-techniques',
             uriVariables: ['id' => new Link(fromClass: ChirurgieModele::class, toProperty: 'chirurgieModele')],
             normalizationContext: ['groups' => ['fiche_technique:read']],
             order: ['ordre' => 'ASC'],
         ),
-        new Get(normalizationContext: ['groups' => ['fiche_technique:read']]),
+        new Get(uriTemplate: '/fiches-techniques/{id}', normalizationContext: ['groups' => ['fiche_technique:read']]),
         new Post(
+            uriTemplate: '/fiches-techniques',
             normalizationContext: ['groups' => ['fiche_technique:read']],
             denormalizationContext: ['groups' => ['fiche_technique:write']],
         ),
         new Patch(
+            uriTemplate: '/fiches-techniques/{id}',
             normalizationContext: ['groups' => ['fiche_technique:read']],
             denormalizationContext: ['groups' => ['fiche_technique:write']],
         ),
-        new Delete(),
+        new Delete(uriTemplate: '/fiches-techniques/{id}'),
     ],
     order: ['ordre' => 'ASC'],
 )]

@@ -12,6 +12,7 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\QueryParameter;
 use App\Repository\MaterielRepository;
+use App\State\ReferenceDeleteProcessor;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -40,7 +41,7 @@ use Symfony\Component\Validator\Constraints as Assert;
             normalizationContext: ['groups' => ['materiel:read']],
             denormalizationContext: ['groups' => ['materiel:write']],
         ),
-        new Delete(),
+        new Delete(processor: ReferenceDeleteProcessor::class),
     ],
     order: ['intitule' => 'ASC'],
 )]

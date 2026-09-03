@@ -12,6 +12,7 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\QueryParameter;
 use App\Repository\ChirurgieModeleRepository;
+use App\State\ReferenceDeleteProcessor;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -25,22 +26,25 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ApiResource(
     operations: [
         new GetCollection(
+            uriTemplate: '/chirurgie-modeles',
             normalizationContext: ['groups' => ['chirurgie_modele:list']],
             parameters: [
                 'intitule' => new QueryParameter(property: 'intitule', filter: new PartialSearchFilter()),
                 'specialite' => new QueryParameter(property: 'specialite', filter: new ExactFilter()),
             ],
         ),
-        new Get(normalizationContext: ['groups' => ['chirurgie_modele:read']]),
+        new Get(uriTemplate: '/chirurgie-modeles/{id}', normalizationContext: ['groups' => ['chirurgie_modele:read']]),
         new Post(
+            uriTemplate: '/chirurgie-modeles',
             normalizationContext: ['groups' => ['chirurgie_modele:read']],
             denormalizationContext: ['groups' => ['chirurgie_modele:write']],
         ),
         new Patch(
+            uriTemplate: '/chirurgie-modeles/{id}',
             normalizationContext: ['groups' => ['chirurgie_modele:read']],
             denormalizationContext: ['groups' => ['chirurgie_modele:write']],
         ),
-        new Delete(),
+        new Delete(uriTemplate: '/chirurgie-modeles/{id}', processor: ReferenceDeleteProcessor::class),
     ],
     order: ['intitule' => 'ASC'],
 )]

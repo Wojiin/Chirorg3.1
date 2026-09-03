@@ -27,6 +27,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 #[ApiResource(
     operations: [
         new GetCollection(
+            uriTemplate: '/listes-materiel',
             normalizationContext: ['groups' => ['liste_materiel:list']],
             parameters: [
                 'chirurgien' => new QueryParameter(property: 'chirurgien', filter: new ExactFilter()),
@@ -44,16 +45,18 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
             uriVariables: ['id' => new Link(fromClass: ChirurgieModele::class, toProperty: 'chirurgieModele')],
             normalizationContext: ['groups' => ['liste_materiel:read']],
         ),
-        new Get(normalizationContext: ['groups' => ['liste_materiel:read']]),
+        new Get(uriTemplate: '/listes-materiel/{id}', normalizationContext: ['groups' => ['liste_materiel:read']]),
         new Post(
+            uriTemplate: '/listes-materiel',
             normalizationContext: ['groups' => ['liste_materiel:read']],
             denormalizationContext: ['groups' => ['liste_materiel:write']],
         ),
         new Patch(
+            uriTemplate: '/listes-materiel/{id}',
             normalizationContext: ['groups' => ['liste_materiel:read']],
             denormalizationContext: ['groups' => ['liste_materiel:write']],
         ),
-        new Delete(),
+        new Delete(uriTemplate: '/listes-materiel/{id}'),
     ],
     order: ['intitule' => 'ASC'],
 )]
