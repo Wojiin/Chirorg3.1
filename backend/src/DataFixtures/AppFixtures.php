@@ -3,6 +3,7 @@
 namespace App\DataFixtures;
 
 use App\Entity\Chirurgien;
+use App\Entity\Materiel;
 use App\Entity\Specialite;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
@@ -27,6 +28,20 @@ class AppFixtures extends Fixture
                 (new Chirurgien())
                     ->setPrenom($data['prenom'])
                     ->setNom($data['nom'])
+                    ->setSpecialite($specialites[$data['specialite']]),
+            );
+        }
+
+        foreach ([
+            ['intitule' => 'Boîte de sternotomie', 'adresse' => 'Arsenal A-01', 'type' => 'Instrumentation', 'specialite' => 'Cardiologie'],
+            ['intitule' => 'Moteur orthopédique', 'adresse' => 'Arsenal B-04', 'type' => 'Équipement', 'specialite' => 'Orthopédie'],
+            ['intitule' => 'Urétéroscope', 'adresse' => 'Arsenal C-02', 'type' => 'Endoscopie', 'specialite' => 'Urologie'],
+        ] as $data) {
+            $manager->persist(
+                (new Materiel())
+                    ->setIntitule($data['intitule'])
+                    ->setAdresse($data['adresse'])
+                    ->setTypeMateriel($data['type'])
                     ->setSpecialite($specialites[$data['specialite']]),
             );
         }
