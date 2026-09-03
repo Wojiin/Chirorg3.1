@@ -12,6 +12,8 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\QueryParameter;
 use App\Repository\ChirurgieModeleRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Attribute\Groups;
@@ -62,6 +64,17 @@ class ChirurgieModele
     #[Groups(['chirurgie_modele:list', 'chirurgie_modele:read', 'chirurgie_modele:write'])]
     private ?Specialite $specialite = null;
 
+    /**
+     * @var Collection<int, FicheTechnique>
+     */
+    #[ORM\OneToMany(targetEntity: FicheTechnique::class, mappedBy: 'chirurgieModele', orphanRemoval: true)]
+    private Collection $fichesTechniques;
+
+    public function __construct()
+    {
+        $this->fichesTechniques = new ArrayCollection();
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -87,6 +100,36 @@ class ChirurgieModele
     public function setSpecialite(?Specialite $specialite): static
     {
         $this->specialite = $specialite;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, FicheTechnique>
+     */
+    public function getFichesTechniques(): Collection
+    {
+        return $this->fichesTechniques;
+    }
+
+    public function addFicheTechnique(FicheTechnique $ficheTechnique): static
+    {
+        if (!$this->fichesTechniques->contains($ficheTechnique)) {
+            $this->fichesTechniques->add($ficheTechnique);
+            $ficheTechnique->setChirurgieModele($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFicheTechnique(FicheTechnique $ficheTechnique): static
+    {
+        if ($this->fichesTechniques->removeElement($ficheTechnique)) {
+            // set the owning side to null (unless already changed)
+            if ($ficheTechnique->getChirurgieModele() === $this) {
+                $ficheTechnique->setChirurgieModele(null);
+            }
+        }
 
         return $this;
     }

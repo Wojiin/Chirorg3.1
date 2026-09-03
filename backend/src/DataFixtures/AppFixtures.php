@@ -4,6 +4,7 @@ namespace App\DataFixtures;
 
 use App\Entity\ChirurgieModele;
 use App\Entity\Chirurgien;
+use App\Entity\FicheTechnique;
 use App\Entity\Materiel;
 use App\Entity\Specialite;
 use Doctrine\Bundle\FixturesBundle\Fixture;
@@ -20,6 +21,7 @@ class AppFixtures extends Fixture
             $manager->persist($specialite);
         }
 
+        $chirurgiesModeles = [];
         foreach ([
             ['prenom' => 'Claire', 'nom' => 'Martin', 'specialite' => 'Cardiologie'],
             ['prenom' => 'Nicolas', 'nom' => 'Bernard', 'specialite' => 'Orthopédie'],
@@ -38,10 +40,24 @@ class AppFixtures extends Fixture
             ['intitule' => 'Prothèse totale de hanche', 'specialite' => 'Orthopédie'],
             ['intitule' => 'Urétéroscopie', 'specialite' => 'Urologie'],
         ] as $data) {
+            $chirurgieModele = (new ChirurgieModele())
+                ->setIntitule($data['intitule'])
+                ->setSpecialite($specialites[$data['specialite']]);
+            $chirurgiesModeles[$data['intitule']] = $chirurgieModele;
+            $manager->persist($chirurgieModele);
+        }
+
+        foreach ([
+            ['titre' => 'Installation', 'description' => 'Installer le patient et vérifier les points d’appui.', 'chirurgie' => 'Pontage coronarien'],
+            ['titre' => 'Préparation', 'description' => 'Préparer la table d’instrumentation.', 'chirurgie' => 'Prothèse totale de hanche'],
+            ['titre' => 'Contrôle optique', 'description' => 'Vérifier l’optique et la source de lumière.', 'chirurgie' => 'Urétéroscopie'],
+        ] as $data) {
             $manager->persist(
-                (new ChirurgieModele())
-                    ->setIntitule($data['intitule'])
-                    ->setSpecialite($specialites[$data['specialite']]),
+                (new FicheTechnique())
+                    ->setTitre($data['titre'])
+                    ->setDescription($data['description'])
+                    ->setOrdre(1)
+                    ->setChirurgieModele($chirurgiesModeles[$data['chirurgie']]),
             );
         }
 
