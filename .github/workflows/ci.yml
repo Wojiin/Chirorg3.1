@@ -1,0 +1,141 @@
+name: Continuous Integration
+
+on:
+    push:
+        branches:
+            - main
+    pull_request:
+        branches:
+            - main
+    workflow_dispatch:
+
+permissions:
+    contents: read
+
+concurrency:
+    group: ci-${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
+jobs:
+    backend:
+        name: Backend quality
+        runs-on: ubuntu-latest
+        timeout-minutes: 15
+
+        defaults:
+            run:
+                working-directory: backend
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v6
+
+            - name: Setup PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: "8.4"
+                  extensions: ctype, iconv, intl, pdo_mysql, zip
+                  coverage: none
+                  tools: composer:v2
+
+            - name: Validate Composer configuration
+              run: composer validate --strict
+
+            - name: Install backend dependencies
+              run: composer install --no-interaction --prefer-dist --no-progress
+
+            - name: Validate Symfony container
+              run: php bin/console lint:container
+
+            - name: Check coding standards
+              run: composer run cs:check
+
+            - name: Run static analysis
+              run: composer run analyse
+
+            - name: Run backend tests
+              run: composer run test
+
+            - name: Audit Composer dependencies
+              run: composer audit --locked --no-interaction
+
+    frontend:
+        name: Frontend quality
+        runs-on: ubuntu-latest
+        timeout-minutes: 15
+
+        defaults:
+            run:
+                working-directory: frontend
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v6
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v7
+              with:
+                  node-version: "24"
+                  cache: npm
+                  cache-dependency-path: frontend/package-lock.json
+
+            - name: Install frontend dependencies
+              run: npm ci
+
+            - name: Run ESLint
+              run: npm run lint
+
+            - name: Check formatting
+              run: npm run format:check
+
+            - name: Run frontend tests
+              run: npm run test
+
+            - name: Build frontend
+              run: npm run build
+
+            - name: Audit npm dependencies
+              run: npm audit --audit-level=high
+
+    containers:
+        name: Container validation
+        runs-on: ubuntu-latest
+        timeout-minutes: 20
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v6
+
+            - name: Validate Docker Compose
+              run: >
+                  docker compose
+                  --env-file .env.example
+                  -f docker-compose.dev.yaml
+                  config --quiet
+
+            - name: Build backend and frontend images
+              run: >
+                  docker compose
+                  --env-file .env.example
+                  -f docker-compose.dev.yaml
+                  build backend frontend
+
+    secrets:
+        name: Secret detection
+        runs-on: ubuntu-latest
+        timeout-minutes: 10
+
+        permissions:
+            contents: read
+            pull-requests: write
+
+        steps:
+            - name: Checkout complete history
+              uses: actions/checkout@v6
+              with:
+                  fetch-depth: 0
+
+            - name: Scan Git history
+              uses: gitleaks/gitleaks-action@v3
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
