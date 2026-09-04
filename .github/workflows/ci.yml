@@ -22,6 +22,25 @@ jobs:
         runs-on: ubuntu-latest
         timeout-minutes: 15
 
+        env:
+            DATABASE_URL: mysql://chirorg:chirorg@127.0.0.1:3306/chirorg?serverVersion=8.4.0&charset=utf8mb4
+
+        services:
+            mysql:
+                image: mysql:8.4
+                env:
+                    MYSQL_DATABASE: chirorg_test
+                    MYSQL_USER: chirorg
+                    MYSQL_PASSWORD: chirorg
+                    MYSQL_ROOT_PASSWORD: root
+                ports:
+                    - 3306:3306
+                options: >-
+                    --health-cmd="mysqladmin ping -h localhost -uchirorg -pchirorg"
+                    --health-interval=5s
+                    --health-timeout=5s
+                    --health-retries=20
+
         defaults:
             run:
                 working-directory: backend
@@ -43,6 +62,11 @@ jobs:
 
             - name: Install backend dependencies
               run: composer install --no-interaction --prefer-dist --no-progress
+
+            - name: Prepare test database
+              run: php bin/console doctrine:migrations:migrate --no-interaction
+              env:
+                  APP_ENV: test
 
             - name: Validate Symfony container
               run: php bin/console lint:container
