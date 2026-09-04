@@ -24,7 +24,7 @@ jobs:
 
         env:
             APP_ENV: test
-            DATABASE_URL: mysql://chirorg:chirorg@127.0.0.1:3306/chirorg_test?serverVersion=8.4.0&charset=utf8mb4
+            DATABASE_URL: mysql://chirorg:chirorg@127.0.0.1:3306/chirorg?serverVersion=8.4.0&charset=utf8mb4
 
         services:
             mysql:
