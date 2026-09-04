@@ -2,21 +2,15 @@
 
 namespace App\Tests\Functional\Api;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
-final class ReferentielsApiTest extends ApiTestCase
+final class ReferentielsApiTest extends AuthenticatedApiTestCase
 {
-    protected static ?bool $alwaysBootKernel = true;
-
     public function testCompleteReferenceDataWorkflow(): void
     {
-        $client = static::createClient([], [
-            'headers' => [
-                'accept' => 'application/ld+json',
-                'content-type' => 'application/ld+json',
-            ],
-        ]);
+        $client = $this->createApiClient();
+        [$utilisateur, $password] = $this->persistUtilisateur();
+        $this->useBearerToken($client, $this->login($client, $utilisateur, $password));
         $suffix = bin2hex(random_bytes(4));
 
         $client->request('POST', '/api/specialites', ['json' => ['intitule' => '   ']]);
@@ -115,6 +109,10 @@ final class ReferentielsApiTest extends ApiTestCase
             $client->request('DELETE', $iri);
             self::assertResponseStatusCodeSame(204);
         }
+
+        $client->request('POST', '/api/auth/logout');
+        self::assertResponseIsSuccessful();
+        $this->removeUtilisateur($utilisateur);
     }
 
     private static function iri(ResponseInterface $response): string
