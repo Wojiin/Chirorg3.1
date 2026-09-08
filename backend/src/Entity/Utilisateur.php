@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UtilisateurRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -47,11 +49,21 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private \DateTimeImmutable $updatedAt;
 
+    /** @var Collection<int, ChirurgiePlanifiee> */
+    #[ORM\OneToMany(targetEntity: ChirurgiePlanifiee::class, mappedBy: 'validePar')]
+    private Collection $chirurgiesValidees;
+
+    /** @var Collection<int, PreparationMateriel> */
+    #[ORM\OneToMany(targetEntity: PreparationMateriel::class, mappedBy: 'cochePar')]
+    private Collection $preparationsCochees;
+
     public function __construct()
     {
         $now = new \DateTimeImmutable();
         $this->createdAt = $now;
         $this->updatedAt = $now;
+        $this->chirurgiesValidees = new ArrayCollection();
+        $this->preparationsCochees = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -173,5 +185,17 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     public function touch(): void
     {
         $this->updatedAt = new \DateTimeImmutable();
+    }
+
+    /** @return Collection<int, ChirurgiePlanifiee> */
+    public function getChirurgiesValidees(): Collection
+    {
+        return $this->chirurgiesValidees;
+    }
+
+    /** @return Collection<int, PreparationMateriel> */
+    public function getPreparationsCochees(): Collection
+    {
+        return $this->preparationsCochees;
     }
 }
