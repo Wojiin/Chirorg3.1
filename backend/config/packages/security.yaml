@@ -41,12 +41,11 @@ security:
 
     access_control:
         # Rules are evaluated from top to bottom; only the first match is applied.
-        - { path: ^/api/auth/(login|refresh)$, roles: PUBLIC_ACCESS, methods: [POST] }
+        - { path: ^/api/auth/(login|refresh|logout)$, roles: PUBLIC_ACCESS, methods: [POST] }
         - { path: ^/api/docs, roles: PUBLIC_ACCESS, methods: [GET, HEAD] }
+        - { path: ^/api/contexts, roles: PUBLIC_ACCESS, methods: [GET, HEAD] }
         - { path: ^/api, roles: PUBLIC_ACCESS, methods: [OPTIONS] }
-        - { path: ^/api/auth/logout$, roles: ROLE_USER, methods: [POST] }
-        - { path: ^/api, roles: ROLE_ADMIN, methods: [POST, PUT, PATCH, DELETE] }
-        - { path: ^/api, roles: ROLE_USER }
+        - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
 
 when@test:
     security:

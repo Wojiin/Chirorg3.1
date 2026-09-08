@@ -45,7 +45,12 @@ final class AuthentificationApiTest extends AuthenticatedApiTestCase
         self::assertNull($repository->findOneBy(['refreshToken' => $firstRefreshToken]));
         self::assertInstanceOf(RefreshToken::class, $repository->findOneBy(['refreshToken' => $rotatedCookie->getValue()]));
 
-        $this->useBearerToken($client, $refreshData['token']);
+        $client->setDefaultOptions([
+            'headers' => [
+                'accept' => 'application/ld+json',
+                'content-type' => 'application/ld+json',
+            ],
+        ]);
         $client->request('POST', '/api/auth/logout');
         self::assertResponseIsSuccessful();
         self::assertNull($client->getCookieJar()->get('refresh_token', '/api/auth/refresh'));

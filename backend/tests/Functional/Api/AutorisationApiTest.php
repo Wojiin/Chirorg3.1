@@ -20,6 +20,9 @@ final class AutorisationApiTest extends AuthenticatedApiTestCase
 
         $client->request('HEAD', '/api/docs');
         self::assertResponseIsSuccessful();
+
+        $client->request('GET', '/api/contexts/Specialite');
+        self::assertResponseIsSuccessful();
     }
 
     public function testCorsPreflightRemainsPublic(): void

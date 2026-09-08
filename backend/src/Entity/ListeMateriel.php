@@ -28,6 +28,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
     operations: [
         new GetCollection(
             uriTemplate: '/listes-materiel',
+            security: "is_granted('ROLE_USER')",
             normalizationContext: ['groups' => ['liste_materiel:list']],
             parameters: [
                 'chirurgien' => new QueryParameter(property: 'chirurgien', filter: new ExactFilter()),
@@ -38,25 +39,29 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
         new GetCollection(
             uriTemplate: '/chirurgiens/{id}/listes-materiel',
             uriVariables: ['id' => new Link(fromClass: Chirurgien::class, toProperty: 'chirurgien')],
+            security: "is_granted('ROLE_USER')",
             normalizationContext: ['groups' => ['liste_materiel:read']],
         ),
         new GetCollection(
             uriTemplate: '/chirurgie-modeles/{id}/listes-materiel',
             uriVariables: ['id' => new Link(fromClass: ChirurgieModele::class, toProperty: 'chirurgieModele')],
+            security: "is_granted('ROLE_USER')",
             normalizationContext: ['groups' => ['liste_materiel:read']],
         ),
-        new Get(uriTemplate: '/listes-materiel/{id}', normalizationContext: ['groups' => ['liste_materiel:read']]),
+        new Get(uriTemplate: '/listes-materiel/{id}', security: "is_granted('ROLE_USER')", normalizationContext: ['groups' => ['liste_materiel:read']]),
         new Post(
             uriTemplate: '/listes-materiel',
+            security: "is_granted('ROLE_ADMIN')",
             normalizationContext: ['groups' => ['liste_materiel:read']],
             denormalizationContext: ['groups' => ['liste_materiel:write']],
         ),
         new Patch(
             uriTemplate: '/listes-materiel/{id}',
+            security: "is_granted('ROLE_ADMIN')",
             normalizationContext: ['groups' => ['liste_materiel:read']],
             denormalizationContext: ['groups' => ['liste_materiel:write']],
         ),
-        new Delete(uriTemplate: '/listes-materiel/{id}'),
+        new Delete(uriTemplate: '/listes-materiel/{id}', security: "is_granted('ROLE_ADMIN')"),
     ],
     order: ['intitule' => 'ASC'],
 )]

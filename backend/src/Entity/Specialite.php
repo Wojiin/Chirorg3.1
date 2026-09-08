@@ -25,21 +25,24 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ApiResource(
     operations: [
         new GetCollection(
+            security: "is_granted('ROLE_USER')",
             normalizationContext: ['groups' => ['specialite:list']],
             parameters: [
                 'intitule' => new QueryParameter(property: 'intitule', filter: new PartialSearchFilter()),
             ],
         ),
-        new Get(normalizationContext: ['groups' => ['specialite:read']]),
+        new Get(security: "is_granted('ROLE_USER')", normalizationContext: ['groups' => ['specialite:read']]),
         new Post(
+            security: "is_granted('ROLE_ADMIN')",
             normalizationContext: ['groups' => ['specialite:read']],
             denormalizationContext: ['groups' => ['specialite:write']],
         ),
         new Patch(
+            security: "is_granted('ROLE_ADMIN')",
             normalizationContext: ['groups' => ['specialite:read']],
             denormalizationContext: ['groups' => ['specialite:write']],
         ),
-        new Delete(processor: ReferenceDeleteProcessor::class),
+        new Delete(security: "is_granted('ROLE_ADMIN')", processor: ReferenceDeleteProcessor::class),
     ],
     order: ['intitule' => 'ASC'],
 )]

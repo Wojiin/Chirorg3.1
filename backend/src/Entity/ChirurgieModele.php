@@ -27,24 +27,27 @@ use Symfony\Component\Validator\Constraints as Assert;
     operations: [
         new GetCollection(
             uriTemplate: '/chirurgie-modeles',
+            security: "is_granted('ROLE_USER')",
             normalizationContext: ['groups' => ['chirurgie_modele:list']],
             parameters: [
                 'intitule' => new QueryParameter(property: 'intitule', filter: new PartialSearchFilter()),
                 'specialite' => new QueryParameter(property: 'specialite', filter: new ExactFilter()),
             ],
         ),
-        new Get(uriTemplate: '/chirurgie-modeles/{id}', normalizationContext: ['groups' => ['chirurgie_modele:read']]),
+        new Get(uriTemplate: '/chirurgie-modeles/{id}', security: "is_granted('ROLE_USER')", normalizationContext: ['groups' => ['chirurgie_modele:read']]),
         new Post(
             uriTemplate: '/chirurgie-modeles',
+            security: "is_granted('ROLE_ADMIN')",
             normalizationContext: ['groups' => ['chirurgie_modele:read']],
             denormalizationContext: ['groups' => ['chirurgie_modele:write']],
         ),
         new Patch(
             uriTemplate: '/chirurgie-modeles/{id}',
+            security: "is_granted('ROLE_ADMIN')",
             normalizationContext: ['groups' => ['chirurgie_modele:read']],
             denormalizationContext: ['groups' => ['chirurgie_modele:write']],
         ),
-        new Delete(uriTemplate: '/chirurgie-modeles/{id}', processor: ReferenceDeleteProcessor::class),
+        new Delete(uriTemplate: '/chirurgie-modeles/{id}', security: "is_granted('ROLE_ADMIN')", processor: ReferenceDeleteProcessor::class),
     ],
     order: ['intitule' => 'ASC'],
 )]
