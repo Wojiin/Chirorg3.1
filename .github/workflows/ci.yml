@@ -140,12 +140,26 @@ jobs:
                   -f docker-compose.dev.yaml
                   config --quiet
 
+            - name: Validate production backend Compose
+              run: >
+                  docker compose
+                  --env-file .env.prod.example
+                  -f docker-compose.backend.prod.yaml
+                  config --quiet
+
             - name: Build backend and frontend images
               run: >
                   docker compose
                   --env-file .env.example
                   -f docker-compose.dev.yaml
                   build backend frontend
+
+            - name: Build production backend images
+              run: >
+                  docker compose
+                  --env-file .env.prod.example
+                  -f docker-compose.backend.prod.yaml
+                  build backend nginx
 
     secrets:
         name: Secret detection
