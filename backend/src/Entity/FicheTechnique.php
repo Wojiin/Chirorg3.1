@@ -22,25 +22,28 @@ use Symfony\Component\Validator\Constraints as Assert;
 )]
 #[ApiResource(
     operations: [
-        new GetCollection(uriTemplate: '/fiches-techniques', normalizationContext: ['groups' => ['fiche_technique:list']]),
+        new GetCollection(uriTemplate: '/fiches-techniques', security: "is_granted('ROLE_USER')", normalizationContext: ['groups' => ['fiche_technique:list']]),
         new GetCollection(
             uriTemplate: '/chirurgie-modeles/{id}/fiches-techniques',
             uriVariables: ['id' => new Link(fromClass: ChirurgieModele::class, toProperty: 'chirurgieModele')],
+            security: "is_granted('ROLE_USER')",
             normalizationContext: ['groups' => ['fiche_technique:read']],
             order: ['ordre' => 'ASC'],
         ),
-        new Get(uriTemplate: '/fiches-techniques/{id}', normalizationContext: ['groups' => ['fiche_technique:read']]),
+        new Get(uriTemplate: '/fiches-techniques/{id}', security: "is_granted('ROLE_USER')", normalizationContext: ['groups' => ['fiche_technique:read']]),
         new Post(
             uriTemplate: '/fiches-techniques',
+            security: "is_granted('ROLE_ADMIN')",
             normalizationContext: ['groups' => ['fiche_technique:read']],
             denormalizationContext: ['groups' => ['fiche_technique:write']],
         ),
         new Patch(
             uriTemplate: '/fiches-techniques/{id}',
+            security: "is_granted('ROLE_ADMIN')",
             normalizationContext: ['groups' => ['fiche_technique:read']],
             denormalizationContext: ['groups' => ['fiche_technique:write']],
         ),
-        new Delete(uriTemplate: '/fiches-techniques/{id}'),
+        new Delete(uriTemplate: '/fiches-techniques/{id}', security: "is_granted('ROLE_ADMIN')"),
     ],
     order: ['ordre' => 'ASC'],
 )]

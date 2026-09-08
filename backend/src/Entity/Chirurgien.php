@@ -24,6 +24,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ApiResource(
     operations: [
         new GetCollection(
+            security: "is_granted('ROLE_USER')",
             normalizationContext: ['groups' => ['chirurgien:list']],
             parameters: [
                 'nom' => new QueryParameter(property: 'nom', filter: new PartialSearchFilter()),
@@ -31,16 +32,18 @@ use Symfony\Component\Validator\Constraints as Assert;
                 'specialite' => new QueryParameter(property: 'specialite', filter: new ExactFilter()),
             ],
         ),
-        new Get(normalizationContext: ['groups' => ['chirurgien:read']]),
+        new Get(security: "is_granted('ROLE_USER')", normalizationContext: ['groups' => ['chirurgien:read']]),
         new Post(
+            security: "is_granted('ROLE_ADMIN')",
             normalizationContext: ['groups' => ['chirurgien:read']],
             denormalizationContext: ['groups' => ['chirurgien:write']],
         ),
         new Patch(
+            security: "is_granted('ROLE_ADMIN')",
             normalizationContext: ['groups' => ['chirurgien:read']],
             denormalizationContext: ['groups' => ['chirurgien:write']],
         ),
-        new Delete(processor: ReferenceDeleteProcessor::class),
+        new Delete(security: "is_granted('ROLE_ADMIN')", processor: ReferenceDeleteProcessor::class),
     ],
     order: ['nom' => 'ASC', 'prenom' => 'ASC'],
 )]
