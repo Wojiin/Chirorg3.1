@@ -79,9 +79,14 @@ class Chirurgien
     #[ORM\OneToMany(targetEntity: ListeMateriel::class, mappedBy: 'chirurgien')]
     private Collection $listesMateriel;
 
+    /** @var Collection<int, ChirurgiePlanifiee> */
+    #[ORM\OneToMany(targetEntity: ChirurgiePlanifiee::class, mappedBy: 'chirurgien')]
+    private Collection $chirurgiesPlanifiees;
+
     public function __construct()
     {
         $this->listesMateriel = new ArrayCollection();
+        $this->chirurgiesPlanifiees = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -151,6 +156,29 @@ class Chirurgien
                 $listeMateriel->setChirurgien(null);
             }
         }
+
+        return $this;
+    }
+
+    /** @return Collection<int, ChirurgiePlanifiee> */
+    public function getChirurgiesPlanifiees(): Collection
+    {
+        return $this->chirurgiesPlanifiees;
+    }
+
+    public function addChirurgiePlanifiee(ChirurgiePlanifiee $chirurgie): static
+    {
+        if (!$this->chirurgiesPlanifiees->contains($chirurgie)) {
+            $this->chirurgiesPlanifiees->add($chirurgie);
+            $chirurgie->setChirurgien($this);
+        }
+
+        return $this;
+    }
+
+    public function removeChirurgiePlanifiee(ChirurgiePlanifiee $chirurgie): static
+    {
+        $this->chirurgiesPlanifiees->removeElement($chirurgie);
 
         return $this;
     }

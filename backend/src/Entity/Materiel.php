@@ -84,9 +84,14 @@ class Materiel
     #[ORM\ManyToMany(targetEntity: ListeMateriel::class, mappedBy: 'materiels')]
     private Collection $listesMateriel;
 
+    /** @var Collection<int, PreparationMateriel> */
+    #[ORM\OneToMany(targetEntity: PreparationMateriel::class, mappedBy: 'materiel')]
+    private Collection $preparationsMateriel;
+
     public function __construct()
     {
         $this->listesMateriel = new ArrayCollection();
+        $this->preparationsMateriel = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -167,6 +172,29 @@ class Materiel
         if ($this->listesMateriel->removeElement($listeMateriel)) {
             $listeMateriel->removeMateriel($this);
         }
+
+        return $this;
+    }
+
+    /** @return Collection<int, PreparationMateriel> */
+    public function getPreparationsMateriel(): Collection
+    {
+        return $this->preparationsMateriel;
+    }
+
+    public function addPreparationMateriel(PreparationMateriel $preparation): static
+    {
+        if (!$this->preparationsMateriel->contains($preparation)) {
+            $this->preparationsMateriel->add($preparation);
+            $preparation->setMateriel($this);
+        }
+
+        return $this;
+    }
+
+    public function removePreparationMateriel(PreparationMateriel $preparation): static
+    {
+        $this->preparationsMateriel->removeElement($preparation);
 
         return $this;
     }
