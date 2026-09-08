@@ -32,6 +32,40 @@ final class FicheTechniqueTest extends TestCase
         self::assertCount(1, $validator->validate($fiche));
     }
 
+    public function testItRejectsNegativeOrderAndExternalImagePath(): void
+    {
+        $fiche = (new FicheTechnique())
+            ->setTitre('Installation')
+            ->setDescription('Positionner le patient')
+            ->setLienImage('https://example.com/image.jpg')
+            ->setOrdre(-1)
+            ->setChirurgieModele(new ChirurgieModele());
+        $validator = Validation::createValidatorBuilder()->enableAttributeMapping()->getValidator();
+
+        $violations = $validator->validate($fiche);
+
+        self::assertCount(2, $violations);
+        self::assertSame(['lienImage', 'ordre'], $this->propertyPaths($violations));
+    }
+
+    public function testItAcceptsDescriptionOrUploadedImage(): void
+    {
+        $validator = Validation::createValidatorBuilder()->enableAttributeMapping()->getValidator();
+        $description = (new FicheTechnique())
+            ->setTitre('Installation')
+            ->setDescription('Positionner le patient')
+            ->setOrdre(0)
+            ->setChirurgieModele(new ChirurgieModele());
+        $image = (new FicheTechnique())
+            ->setTitre('Installation')
+            ->setLienImage('/uploads/fiches-techniques/installation_1.jpg')
+            ->setOrdre(0)
+            ->setChirurgieModele(new ChirurgieModele());
+
+        self::assertCount(0, $validator->validate($description));
+        self::assertCount(0, $validator->validate($image));
+    }
+
     public function testChirurgieModeleMaintainsBothSidesOfTheRelation(): void
     {
         $chirurgieModele = new ChirurgieModele();
@@ -46,5 +80,19 @@ final class FicheTechniqueTest extends TestCase
 
         self::assertNull($fiche->getChirurgieModele());
         self::assertFalse($chirurgieModele->getFichesTechniques()->contains($fiche));
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function propertyPaths(\Symfony\Component\Validator\ConstraintViolationListInterface $violations): array
+    {
+        $paths = [];
+        foreach ($violations as $violation) {
+            $paths[] = $violation->getPropertyPath();
+        }
+        sort($paths);
+
+        return $paths;
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Tests\Unit\Entity;
 
 use App\Entity\Chirurgien;
+use App\Entity\ListeMateriel;
 use App\Entity\Specialite;
 use PHPUnit\Framework\TestCase;
 
@@ -32,5 +33,21 @@ final class ChirurgienTest extends TestCase
 
         self::assertNull($chirurgien->getSpecialite());
         self::assertFalse($specialite->getChirurgiens()->contains($chirurgien));
+    }
+
+    public function testItMaintainsListeMaterielRelationWithoutDuplicates(): void
+    {
+        $chirurgien = new Chirurgien();
+        $liste = new ListeMateriel();
+
+        $chirurgien->addListeMateriel($liste)->addListeMateriel($liste);
+
+        self::assertCount(1, $chirurgien->getListesMateriel());
+        self::assertSame($chirurgien, $liste->getChirurgien());
+
+        $chirurgien->removeListeMateriel($liste);
+
+        self::assertNull($liste->getChirurgien());
+        self::assertFalse($chirurgien->getListesMateriel()->contains($liste));
     }
 }

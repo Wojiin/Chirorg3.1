@@ -72,6 +72,7 @@ class FicheTechnique
     private ?string $lienImage = null;
 
     #[ORM\Column]
+    #[Assert\NotNull]
     #[Assert\PositiveOrZero]
     #[Groups(['fiche_technique:list', 'fiche_technique:read', 'fiche_technique:write'])]
     private ?int $ordre = null;
