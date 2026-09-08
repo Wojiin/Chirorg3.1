@@ -25,7 +25,7 @@ final class ReferenceDeletionGuardTest extends TestCase
         $specialite->addChirurgien(new Chirurgien());
 
         $this->expectException(ConflictHttpException::class);
-        $this->expectExceptionMessage('Cette ressource ne peut pas être supprimée car elle est utilisée.');
+        $this->expectExceptionMessageIs('Cette ressource ne peut pas être supprimée car elle est utilisée.');
 
         (new ReferenceDeletionGuard())->assertCanDelete($specialite);
     }
