@@ -22,13 +22,17 @@ abstract class AuthenticatedApiTestCase extends ApiTestCase
         ]);
     }
 
-    /** @return array{Utilisateur, string} */
-    protected function persistUtilisateur(bool $actif = true): array
+    /**
+     * @param list<string> $roles
+     *
+     * @return array{Utilisateur, string}
+     */
+    protected function persistUtilisateur(bool $actif = true, array $roles = ['ROLE_ADMIN']): array
     {
         $password = 'Test-password-42!';
         $utilisateur = (new Utilisateur())
             ->setEmail('test-'.bin2hex(random_bytes(6)).'@chirorg.local')
-            ->setRoles(['ROLE_ADMIN'])
+            ->setRoles($roles)
             ->setActif($actif);
         $hasher = static::getContainer()->get('test.user_password_hasher');
         self::assertInstanceOf(UserPasswordHasherInterface::class, $hasher);
