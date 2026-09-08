@@ -6,6 +6,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Patch;
 use App\Dto\PreparationMaterielInput;
 use App\Repository\PreparationMaterielRepository;
@@ -17,6 +18,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 #[ORM\UniqueConstraint(name: 'uniq_preparation_chirurgie_materiel', columns: ['chirurgie_planifiee_id', 'materiel_id'])]
 #[ApiResource(operations: [
     new GetCollection(uriTemplate: '/preparations-materiel', security: "is_granted('ROLE_USER')", normalizationContext: ['groups' => ['preparation_materiel:list']]),
+    new GetCollection(uriTemplate: '/chirurgies-planifiees/{id}/preparations-materiel', uriVariables: ['id' => new Link(fromClass: ChirurgiePlanifiee::class, toProperty: 'chirurgiePlanifiee')], security: "is_granted('ROLE_USER')", normalizationContext: ['groups' => ['preparation_materiel:list']]),
     new Get(uriTemplate: '/preparations-materiel/{id}', security: "is_granted('ROLE_USER')", normalizationContext: ['groups' => ['preparation_materiel:read']]),
     new Patch(uriTemplate: '/preparations-materiel/{id}', security: "is_granted('ROLE_USER')", read: false, input: PreparationMaterielInput::class, normalizationContext: ['groups' => ['preparation_materiel:read']], processor: PreparationMaterielCocherProcessor::class),
     new Patch(uriTemplate: '/preparations-materiel/{id}/cocher', security: "is_granted('ROLE_USER')", read: false, input: PreparationMaterielInput::class, normalizationContext: ['groups' => ['preparation_materiel:read']], processor: PreparationMaterielCocherProcessor::class),
