@@ -5,6 +5,8 @@ namespace App\Repository;
 use App\Entity\Chirurgien;
 use App\Entity\ChirurgiePlanifiee;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -18,17 +20,19 @@ class ChirurgiePlanifieeRepository extends ServiceEntityRepository
     }
 
     /** @return list<ChirurgiePlanifiee> */
-    public function findProgrammes(?\DateTimeInterface $date = null, ?string $salle = null, ?int $chirurgienId = null): array
+    public function findProgrammes(?\DateTimeInterface $date = null, ?string $salle = null, ?int $chirurgienId = null, ?\DateTimeInterface $dateDebut = null, ?\DateTimeInterface $dateFin = null, ?bool $valide = null, bool $withFichesTechniques = false): array
     {
-        $qb = $this->createQueryBuilder('c')
-            ->addSelect('chirurgien', 'modele', 'preparations', 'materiel')
-            ->join('c.chirurgien', 'chirurgien')
-            ->join('c.chirurgieModele', 'modele')
-            ->leftJoin('c.preparationsMateriel', 'preparations')
-            ->leftJoin('preparations.materiel', 'materiel')
+        $qb = $this->baseDataQuery()
             ->orderBy('c.dateProgrammee', 'ASC')->addOrderBy('c.salle', 'ASC')->addOrderBy('c.ordre', 'ASC');
         if (null !== $date) {
-            $qb->andWhere('c.dateProgrammee = :date')->setParameter('date', $date->format('Y-m-d'));
+            $qb->andWhere('c.dateProgrammee = :date')->setParameter('date', $date, Types::DATE_IMMUTABLE);
+        } else {
+            if (null !== $dateDebut) {
+                $qb->andWhere('c.dateProgrammee >= :dateDebut')->setParameter('dateDebut', $dateDebut, Types::DATE_IMMUTABLE);
+            }
+            if (null !== $dateFin) {
+                $qb->andWhere('c.dateProgrammee <= :dateFin')->setParameter('dateFin', $dateFin, Types::DATE_IMMUTABLE);
+            }
         }
         if (null !== $salle) {
             $qb->andWhere('c.salle = :salle')->setParameter('salle', $salle);
@@ -36,8 +40,28 @@ class ChirurgiePlanifieeRepository extends ServiceEntityRepository
         if (null !== $chirurgienId) {
             $qb->andWhere('chirurgien.id = :chirurgien')->setParameter('chirurgien', $chirurgienId);
         }
+        if (null !== $valide) {
+            $qb->andWhere('c.valide = :valide')->setParameter('valide', $valide);
+        }
+        if ($withFichesTechniques) {
+            $qb->leftJoin('modele.fichesTechniques', 'fiches')->addSelect('fiches');
+        }
 
         return $qb->getQuery()->getResult();
+    }
+
+    public function findPreparationData(int $id): ?ChirurgiePlanifiee
+    {
+        return $this->baseDataQuery()->where('c.id = :id')->setParameter('id', $id)
+            ->getQuery()->getOneOrNullResult();
+    }
+
+    public function findVueFinaleData(int $id): ?ChirurgiePlanifiee
+    {
+        $qb = $this->baseDataQuery()->leftJoin('modele.fichesTechniques', 'fiches')->addSelect('fiches')
+            ->where('c.id = :id')->setParameter('id', $id);
+
+        return $qb->getQuery()->getOneOrNullResult();
     }
 
     public function nextOrder(\DateTimeInterface $date, string $salle, Chirurgien $chirurgien): int
@@ -48,6 +72,17 @@ class ChirurgiePlanifieeRepository extends ServiceEntityRepository
             ->getQuery()->getSingleScalarResult();
 
         return ((int) $maximum) + 1;
+    }
+
+    private function baseDataQuery(): QueryBuilder
+    {
+        return $this->createQueryBuilder('c')
+            ->select('DISTINCT c', 'chirurgien', 'modele', 'preparations', 'materiel', 'validePar')
+            ->join('c.chirurgien', 'chirurgien')
+            ->join('c.chirurgieModele', 'modele')
+            ->leftJoin('c.preparationsMateriel', 'preparations')
+            ->leftJoin('preparations.materiel', 'materiel')
+            ->leftJoin('c.validePar', 'validePar');
     }
 
     //    /**

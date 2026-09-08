@@ -5,9 +5,10 @@ namespace App\State;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use App\Entity\ChirurgiePlanifiee;
-use App\Repository\ChirurgiePlanifieeRepository;
 use App\Service\AuthenticatedUserProvider;
 use App\Service\PreparationMaterielInitializer;
+use App\Service\ProgrammeOrderAllocator;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
@@ -15,7 +16,7 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 final readonly class ChirurgiePlanifieeWriteProcessor implements ProcessorInterface
 {
     /** @param ProcessorInterface<ChirurgiePlanifiee, ChirurgiePlanifiee> $persist */
-    public function __construct(#[Autowire(service: 'api_platform.doctrine.orm.state.persist_processor')] private ProcessorInterface $persist, private PreparationMaterielInitializer $initializer, private ChirurgiePlanifieeRepository $repository, private AuthenticatedUserProvider $authenticatedUser)
+    public function __construct(#[Autowire(service: 'api_platform.doctrine.orm.state.persist_processor')] private ProcessorInterface $persist, private PreparationMaterielInitializer $initializer, private ProgrammeOrderAllocator $orderAllocator, private AuthenticatedUserProvider $authenticatedUser, private EntityManagerInterface $entityManager)
     {
     }
 
@@ -31,8 +32,13 @@ final readonly class ChirurgiePlanifieeWriteProcessor implements ProcessorInterf
             if (null === $date || null === $salle || null === $chirurgien) {
                 throw new BadRequestHttpException('Date, salle et chirurgien sont requis.');
             }
-            $data->setOrdre($this->repository->nextOrder($date, $salle, $chirurgien))->setCreePar($actor);
-            $this->initializer->initialize($data);
+
+            return $this->entityManager->wrapInTransaction(function () use ($data, $date, $salle, $chirurgien, $actor, $operation, $uriVariables, $context): ChirurgiePlanifiee {
+                $data->setOrdre($this->orderAllocator->reserveNextOrder($date, $salle, $chirurgien))->setCreePar($actor);
+                $this->initializer->initialize($data);
+
+                return $this->persist->process($data, $operation, $uriVariables, $context);
+            });
         }
         $result = $this->persist->process($data, $operation, $uriVariables, $context);
 

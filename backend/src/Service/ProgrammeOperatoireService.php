@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Dto\ProgrammeOperatoire;
+use App\Dto\ProgrammeOperatoireResume;
 use App\Repository\ChirurgiePlanifieeRepository;
 
 final readonly class ProgrammeOperatoireService
@@ -11,20 +12,14 @@ final readonly class ProgrammeOperatoireService
     {
     }
 
-    /** @return list<ProgrammeOperatoire> */
-    public function list(?\DateTimeInterface $date = null, ?string $salle = null, ?int $chirurgienId = null): array
+    /** @return list<ProgrammeOperatoireResume> */
+    public function list(?\DateTimeInterface $date = null, ?string $salle = null, ?int $chirurgienId = null, ?\DateTimeInterface $dateDebut = null, ?\DateTimeInterface $dateFin = null): array
     {
-        $groups = [];
-        foreach ($this->repository->findProgrammes($date, $salle, $chirurgienId) as $item) {
-            $key = $item->getDateProgrammee()?->format('Y-m-d').'|'.$item->getSalle().'|'.$item->getChirurgien()?->getId();
-            $groups[$key][] = $item;
-        }
-
-        return array_values(array_filter(array_map($this->factory->create(...), $groups)));
+        return $this->factory->createSummaries($this->repository->findProgrammes($date, $salle, $chirurgienId, $dateDebut, $dateFin));
     }
 
-    public function one(\DateTimeInterface $date, string $salle, int $chirurgienId): ?ProgrammeOperatoire
+    public function one(\DateTimeInterface $date, string $salle, int $chirurgienId, bool $final = false): ?ProgrammeOperatoire
     {
-        return $this->factory->create($this->repository->findProgrammes($date, $salle, $chirurgienId));
+        return $this->factory->create($this->repository->findProgrammes($date, $salle, $chirurgienId, valide: $final ? true : null, withFichesTechniques: $final), $final);
     }
 }

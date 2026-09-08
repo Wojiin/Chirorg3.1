@@ -8,10 +8,14 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
+use App\Dto\ChirurgiePreparation;
+use App\Dto\ChirurgieVueFinale;
 use App\Repository\ChirurgiePlanifieeRepository;
 use App\State\ChirurgiePlanifieeWriteProcessor;
+use App\State\ChirurgiePreparationProvider;
 use App\State\ChirurgieValidationProcessor;
 use App\State\ReferenceDeleteProcessor;
+use App\State\VueFinaleProvider;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -27,6 +31,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ApiResource(operations: [
     new GetCollection(uriTemplate: '/chirurgies-planifiees', security: "is_granted('ROLE_USER')", normalizationContext: ['groups' => ['chirurgie_planifiee:list']]),
     new Get(uriTemplate: '/chirurgies-planifiees/{id}', security: "is_granted('ROLE_USER')", normalizationContext: ['groups' => ['chirurgie_planifiee:read']]),
+    new Get(uriTemplate: '/chirurgies-planifiees/{id}/preparation', security: "is_granted('ROLE_USER')", output: ChirurgiePreparation::class, provider: ChirurgiePreparationProvider::class),
+    new Get(uriTemplate: '/chirurgies-planifiees/{id}/vue-finale', security: "is_granted('ROLE_USER')", output: ChirurgieVueFinale::class, provider: VueFinaleProvider::class),
     new Post(uriTemplate: '/chirurgies-planifiees', security: "is_granted('ROLE_USER')", denormalizationContext: ['groups' => ['chirurgie_planifiee:write']], normalizationContext: ['groups' => ['chirurgie_planifiee:read']], processor: ChirurgiePlanifieeWriteProcessor::class),
     new Patch(uriTemplate: '/chirurgies-planifiees/{id}', security: "is_granted('ROLE_USER')", denormalizationContext: ['groups' => ['chirurgie_planifiee:write']], normalizationContext: ['groups' => ['chirurgie_planifiee:read']], processor: ChirurgiePlanifieeWriteProcessor::class),
     new Post(uriTemplate: '/chirurgies-planifiees/{id}/validation', security: "is_granted('ROLE_USER')", input: false, normalizationContext: ['groups' => ['chirurgie_planifiee:read']], processor: ChirurgieValidationProcessor::class),
