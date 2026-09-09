@@ -2,6 +2,8 @@ import { createRouter, createWebHistory } from 'vue-router'
 
 import { createNavigationGuard } from './guard.js'
 import AccessDeniedView from '../views/AccessDeniedView.vue'
+import AdminFormView from '../views/AdminFormView.vue'
+import AdminListView from '../views/AdminListView.vue'
 import AdministrationView from '../views/AdministrationView.vue'
 import HomeView from '../views/HomeView.vue'
 import LoginView from '../views/LoginView.vue'
@@ -33,6 +35,45 @@ const routes = [
       roles: ['ROLE_ADMIN'],
       shell: true,
       title: 'Administration',
+    },
+  },
+  {
+    path: '/administration/:resource',
+    name: 'admin-list',
+    component: AdminListView,
+    props: true,
+    meta: {
+      requiresAuth: true,
+      roles: ['ROLE_ADMIN'],
+      shell: true,
+      title: 'Référentiel',
+    },
+  },
+  {
+    path: '/administration/:resource/ajouter',
+    name: 'admin-create',
+    component: AdminFormView,
+    props: true,
+    meta: {
+      requiresAuth: true,
+      roles: ['ROLE_ADMIN'],
+      shell: true,
+      title: 'Ajouter',
+    },
+  },
+  {
+    path: '/administration/:resource/:id/modifier',
+    name: 'admin-edit',
+    component: AdminFormView,
+    props: (route) => ({
+      resource: route.params.resource,
+      id: Number(route.params.id),
+    }),
+    meta: {
+      requiresAuth: true,
+      roles: ['ROLE_ADMIN'],
+      shell: true,
+      title: 'Modifier',
     },
   },
   {
