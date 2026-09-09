@@ -8,13 +8,29 @@ use App\Entity\FicheTechnique;
 use App\Entity\ListeMateriel;
 use App\Entity\Materiel;
 use App\Entity\Specialite;
+use App\Entity\Utilisateur;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class AppFixtures extends Fixture
 {
+    public const ADMIN_EMAIL = 'admin@chirorg.test';
+    public const ADMIN_PASSWORD = 'AdminFixture-2026!';
+
+    public function __construct(private readonly UserPasswordHasherInterface $passwordHasher)
+    {
+    }
+
     public function load(ObjectManager $manager): void
     {
+        $admin = (new Utilisateur())
+            ->setEmail(self::ADMIN_EMAIL)
+            ->setRoles(['ROLE_ADMIN'])
+            ->setActif(true);
+        $admin->setPassword($this->passwordHasher->hashPassword($admin, self::ADMIN_PASSWORD));
+        $manager->persist($admin);
+
         $specialites = [];
         foreach (['Cardiologie', 'Orthopédie', 'Urologie'] as $intitule) {
             $specialite = (new Specialite())->setIntitule($intitule);
