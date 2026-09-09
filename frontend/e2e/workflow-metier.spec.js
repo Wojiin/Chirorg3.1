@@ -48,8 +48,10 @@ test('un utilisateur planifie puis prépare une intervention', async ({
     .first()
     .innerText()
   const boutonsPret = page.getByRole('button', { name: /Marquer pr/ })
-  for (let index = (await boutonsPret.count()) - 1; index >= 0; index -= 1) {
-    await boutonsPret.nth(index).click()
+  while ((await boutonsPret.count()) > 0) {
+    const nombreRestant = await boutonsPret.count()
+    await boutonsPret.first().click()
+    await expect(boutonsPret).toHaveCount(nombreRestant - 1)
   }
   await page.getByRole('button', { name: 'Valider la préparation' }).click()
 
