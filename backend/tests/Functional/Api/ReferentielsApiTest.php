@@ -91,6 +91,23 @@ final class ReferentielsApiTest extends AuthenticatedApiTestCase
         ]));
         self::assertResponseStatusCodeSame(201);
 
+        foreach ([
+            [$specialite, ['intitule' => 'Cardiologie adulte '.$suffix]],
+            [$chirurgien, ['nom' => 'Martin-Lefèvre '.$suffix]],
+            [$materiel, ['adresse' => 'Arsenal A-02']],
+            [$chirurgieModele, ['intitule' => 'Pontage coronarien standard '.$suffix]],
+            [$ficheTechnique, ['description' => 'Installer puis contrôler le patient.']],
+            [$listeMateriel, ['intitule' => 'Standard pontage complet '.$suffix]],
+        ] as [$iri, $payload]) {
+            $client->request('PATCH', $iri, [
+                'headers' => ['content-type' => 'application/merge-patch+json'],
+                'json' => $payload,
+            ]);
+            self::assertResponseIsSuccessful();
+            $client->request('GET', $iri);
+            self::assertResponseStatusCodeSame(200);
+        }
+
         $client->request('DELETE', $specialite);
         self::assertResponseStatusCodeSame(409);
 

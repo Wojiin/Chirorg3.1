@@ -82,6 +82,12 @@ final class UtilisateurApiTest extends AuthenticatedApiTestCase
         ]);
         self::assertResponseStatusCodeSame(409);
 
+        $client->request('PATCH', '/api/utilisateurs/'.$admin->getId(), [
+            'headers' => ['content-type' => 'application/merge-patch+json'],
+            'json' => ['roles' => ['ROLE_USER']],
+        ]);
+        self::assertResponseStatusCodeSame(409);
+
         $client->request('DELETE', '/api/utilisateurs/'.$admin->getId());
         self::assertResponseStatusCodeSame(409);
 
@@ -104,5 +110,28 @@ final class UtilisateurApiTest extends AuthenticatedApiTestCase
         $managed = $entityManager->find(Utilisateur::class, $utilisateur->getId());
         self::assertNotNull($managed);
         $this->removeUtilisateur($managed);
+    }
+
+    public function testDisablingUtilisateurRevokesEveryRefreshToken(): void
+    {
+        $adminClient = $this->createApiClient();
+        [$admin, $adminPassword] = $this->persistUtilisateur();
+        $this->useBearerToken($adminClient, $this->login($adminClient, $admin, $adminPassword));
+
+        $userClient = $this->createApiClient();
+        [$utilisateur, $password] = $this->persistUtilisateur(roles: []);
+        $this->login($userClient, $utilisateur, $password);
+
+        $adminClient->request('PATCH', '/api/utilisateurs/'.$utilisateur->getId(), [
+            'headers' => ['content-type' => 'application/merge-patch+json'],
+            'json' => ['actif' => false],
+        ]);
+        self::assertResponseIsSuccessful();
+
+        $userClient->request('POST', '/api/auth/refresh');
+        self::assertResponseStatusCodeSame(401);
+
+        $this->removeUtilisateur($utilisateur);
+        $this->removeUtilisateur($admin);
     }
 }
