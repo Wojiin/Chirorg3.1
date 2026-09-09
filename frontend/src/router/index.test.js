@@ -33,4 +33,16 @@ describe('application router', () => {
     expect(router.currentRoute.value.name).toBe(name)
     expect(document.title).toContain('ChirOrg')
   })
+
+  it.each([
+    ['/programmes', 'programmes'],
+    ['/programmes/planifier', 'planification'],
+    ['/programmes/2027-01-12/Salle%20A/2', 'programme-detail'],
+    ['/chirurgies/10/preparation', 'preparation'],
+    ['/chirurgies/10/vue-finale', 'vue-finale'],
+  ])('allows ROLE_USER to open the business route %s', async (path, name) => {
+    const router = createAppRouter(auth(['ROLE_USER']), createMemoryHistory())
+    await router.push(path)
+    expect(router.currentRoute.value.name).toBe(name)
+  })
 })

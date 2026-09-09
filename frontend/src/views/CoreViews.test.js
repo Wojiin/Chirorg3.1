@@ -39,7 +39,7 @@ describe('core views', () => {
     auth.profile = { email: 'user@chirorg.test', roles: ['ROLE_USER'] }
     auth.authenticated = false
     await nextTick()
-    expect(home.text()).not.toContain('Ouvrir')
+    expect(home.text()).not.toContain('Administration')
     expect(denied.get('a').attributes('data-to')).toBe('/connexion')
   })
 
