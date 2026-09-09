@@ -35,15 +35,26 @@ test('un utilisateur planifie puis prépare une intervention', async ({
   await page.getByRole('button', { name: 'Planifier', exact: true }).click()
 
   await expect(page.getByRole('heading', { name: 'Salle E2E' })).toBeVisible()
-  await page.getByRole('link', { name: 'Préparer' }).click()
+  const chirurgie = page
+    .getByRole('listitem')
+    .filter({ has: page.getByRole('heading', { name: /Proth/ }) })
+    .last()
+  await chirurgie.getByRole('link', { name: /parer/ }).click()
   await expect(
     page.getByRole('heading', { name: 'Prothèse totale de hanche' }),
   ).toBeVisible()
-  await page.getByRole('button', { name: 'Marquer prêt' }).click()
+  const premierMateriel = await page
+    .locator('.material-row h2')
+    .first()
+    .innerText()
+  const boutonsPret = page.getByRole('button', { name: /Marquer pr/ })
+  for (let index = (await boutonsPret.count()) - 1; index >= 0; index -= 1) {
+    await boutonsPret.nth(index).click()
+  }
   await page.getByRole('button', { name: 'Valider la préparation' }).click()
 
   await expect(page.getByText('Intervention validée')).toBeVisible()
-  await expect(page.getByText('Moteur orthopédique')).toBeVisible()
+  await expect(page.getByText(premierMateriel, { exact: true })).toBeVisible()
   await expect(
     page.getByRole('heading', { name: 'Fiches techniques' }),
   ).toBeVisible()
