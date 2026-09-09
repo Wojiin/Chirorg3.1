@@ -38,8 +38,248 @@ body {
 }
 
 button,
-input {
+input,
+select,
+textarea {
   font: inherit;
+}
+
+.resource-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 1rem;
+}
+
+.resource-card {
+  display: grid;
+  min-height: 13rem;
+  padding: 1.4rem;
+  border: 1px solid var(--line);
+  border-radius: 0.9rem;
+  background: var(--surface);
+  text-decoration: none;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s,
+    transform 0.2s;
+}
+
+.resource-card:hover {
+  border-color: #a7cdbd;
+  box-shadow: var(--shadow);
+  transform: translateY(-2px);
+}
+
+.resource-card > span {
+  color: var(--orange);
+  font-size: 0.72rem;
+  font-weight: 900;
+}
+
+.resource-card h2 {
+  margin-top: 1.5rem;
+}
+
+.resource-card p {
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.resource-card strong {
+  margin-top: auto;
+  color: var(--green);
+  font-size: 0.8rem;
+}
+
+.admin-filters,
+.admin-form-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.admin-filters {
+  max-width: 48rem;
+  margin-bottom: 1.5rem;
+}
+
+.admin-filters label,
+.admin-form label {
+  display: grid;
+  gap: 0.45rem;
+  color: var(--ink);
+  font-size: 0.8rem;
+  font-weight: 750;
+}
+
+.admin-filters input,
+.admin-filters select,
+.admin-form input:not([type='checkbox']),
+.admin-form select,
+.admin-form textarea {
+  width: 100%;
+  min-height: 2.8rem;
+  padding: 0.72rem 0.85rem;
+  border: 1px solid var(--line);
+  border-radius: 0.65rem;
+  outline: none;
+  background: white;
+}
+
+.admin-filters input:focus,
+.admin-filters select:focus,
+.admin-form input:focus,
+.admin-form select:focus,
+.admin-form textarea:focus {
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(23, 107, 80, 0.12);
+}
+
+.admin-form {
+  padding: clamp(1.25rem, 3vw, 2rem);
+  border: 1px solid var(--line);
+  border-radius: 0.9rem;
+  background: var(--surface);
+}
+
+.admin-form .field-wide {
+  grid-column: 1 / -1;
+}
+
+.admin-form select[multiple] {
+  min-height: 12rem;
+}
+
+.admin-form input[type='checkbox'] {
+  width: 1.2rem;
+  height: 1.2rem;
+  accent-color: var(--green);
+}
+
+.admin-form small {
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.admin-table-shell {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 0.9rem;
+  background: var(--surface);
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.admin-table th,
+.admin-table td {
+  padding: 1rem 1.2rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.admin-table thead th {
+  color: var(--muted);
+  background: #f8faf9;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.admin-table tbody th {
+  font-size: 0.86rem;
+}
+
+.admin-table tbody td {
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.admin-table tr:last-child th,
+.admin-table tr:last-child td {
+  border-bottom: 0;
+}
+
+.admin-actions {
+  display: flex;
+  gap: 0.8rem;
+  justify-content: flex-end;
+  white-space: nowrap;
+}
+
+.admin-actions a,
+.admin-actions button {
+  padding: 0;
+  border: 0;
+  color: var(--green);
+  background: transparent;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.admin-actions button {
+  color: var(--danger);
+}
+
+.form-actions {
+  display: flex;
+  margin-top: 1.5rem;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+
+.secondary-button,
+.danger-button {
+  display: inline-flex;
+  min-height: 2.9rem;
+  padding: 0.75rem 1.2rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line);
+  border-radius: 0.65rem;
+  background: white;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.danger-button {
+  border-color: var(--danger);
+  color: white;
+  background: var(--danger);
+}
+
+.dialog-backdrop {
+  display: grid;
+  position: fixed;
+  z-index: 20;
+  inset: 0;
+  padding: 1rem;
+  place-items: center;
+  background: rgba(10, 28, 21, 0.55);
+}
+
+.dialog {
+  width: min(100%, 30rem);
+  padding: 1.6rem;
+  border-radius: 0.9rem;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.dialog > p:not(.eyebrow) {
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
 }
 
 button,
@@ -567,6 +807,14 @@ h2 {
 }
 
 @media (max-width: 800px) {
+  .admin-filters,
+  .admin-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-form .field-wide {
+    grid-column: auto;
+  }
   .auth-page {
     grid-template-columns: 1fr;
   }
