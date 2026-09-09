@@ -1,182 +1,292 @@
 name: Continuous Integration
 
 on:
-    push:
-        branches:
-            - main
-    pull_request:
-        branches:
-            - main
-    workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
 
 permissions:
-    contents: read
+  contents: read
 
 concurrency:
-    group: ci-${{ github.workflow }}-${{ github.ref }}
-    cancel-in-progress: true
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-    backend:
-        name: Backend quality
-        runs-on: ubuntu-latest
-        timeout-minutes: 15
+  backend:
+    name: Backend quality
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
 
+    env:
+      DATABASE_URL: mysql://chirorg:chirorg@127.0.0.1:3306/chirorg?serverVersion=8.4.0&charset=utf8mb4
+
+    services:
+      mysql:
+        image: mysql:8.4
         env:
-            DATABASE_URL: mysql://chirorg:chirorg@127.0.0.1:3306/chirorg?serverVersion=8.4.0&charset=utf8mb4
+          MYSQL_DATABASE: chirorg_test
+          MYSQL_USER: chirorg
+          MYSQL_PASSWORD: chirorg
+          MYSQL_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost -uchirorg -pchirorg"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=20
 
-        services:
-            mysql:
-                image: mysql:8.4
-                env:
-                    MYSQL_DATABASE: chirorg_test
-                    MYSQL_USER: chirorg
-                    MYSQL_PASSWORD: chirorg
-                    MYSQL_ROOT_PASSWORD: root
-                ports:
-                    - 3306:3306
-                options: >-
-                    --health-cmd="mysqladmin ping -h localhost -uchirorg -pchirorg"
-                    --health-interval=5s
-                    --health-timeout=5s
-                    --health-retries=20
+    defaults:
+      run:
+        working-directory: backend
 
-        defaults:
-            run:
-                working-directory: backend
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
 
-        steps:
-            - name: Checkout repository
-              uses: actions/checkout@v6
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.4"
+          extensions: ctype, iconv, intl, pdo_mysql, zip
+          coverage: pcov
+          tools: composer:v2
 
-            - name: Setup PHP
-              uses: shivammathur/setup-php@v2
-              with:
-                  php-version: "8.4"
-                  extensions: ctype, iconv, intl, pdo_mysql, zip
-                  coverage: none
-                  tools: composer:v2
+      - name: Validate Composer configuration
+        run: composer validate --strict
 
-            - name: Validate Composer configuration
-              run: composer validate --strict
+      - name: Install backend dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
 
-            - name: Install backend dependencies
-              run: composer install --no-interaction --prefer-dist --no-progress
+      - name: Generate test JWT key pair
+        run: php bin/console lexik:jwt:generate-keypair --skip-if-exists --no-interaction
 
-            - name: Generate test JWT key pair
-              run: php bin/console lexik:jwt:generate-keypair --skip-if-exists --no-interaction
+      - name: Prepare test database
+        run: php bin/console doctrine:migrations:migrate --no-interaction
+        env:
+          APP_ENV: test
 
-            - name: Prepare test database
-              run: php bin/console doctrine:migrations:migrate --no-interaction
-              env:
-                  APP_ENV: test
+      - name: Validate Symfony container
+        run: php bin/console lint:container
 
-            - name: Validate Symfony container
-              run: php bin/console lint:container
+      - name: Check coding standards
+        run: composer run cs:check
 
-            - name: Check coding standards
-              run: composer run cs:check
+      - name: Run static analysis
+        run: composer run analyse
 
-            - name: Run static analysis
-              run: composer run analyse
+      - name: Run backend tests with coverage threshold
+        run: composer run test:coverage
 
-            - name: Run backend tests
-              run: composer run test
+      - name: Upload backend coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage
+          path: backend/build/coverage
+          if-no-files-found: warn
+          retention-days: 14
 
-            - name: Audit Composer dependencies
-              run: composer audit --locked --no-interaction
+      - name: Audit Composer dependencies
+        run: composer audit --locked --no-interaction
 
-    frontend:
-        name: Frontend quality
-        runs-on: ubuntu-latest
-        timeout-minutes: 15
+  frontend:
+    name: Frontend quality
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
 
-        defaults:
-            run:
-                working-directory: frontend
+    defaults:
+      run:
+        working-directory: frontend
 
-        steps:
-            - name: Checkout repository
-              uses: actions/checkout@v6
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
 
-            - name: Setup Node.js
-              uses: actions/setup-node@v7
-              with:
-                  node-version: "24"
-                  cache: npm
-                  cache-dependency-path: frontend/package-lock.json
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
 
-            - name: Install frontend dependencies
-              run: npm ci
+      - name: Install frontend dependencies
+        run: npm ci
 
-            - name: Run ESLint
-              run: npm run lint
+      - name: Run ESLint
+        run: npm run lint
 
-            - name: Check formatting
-              run: npm run format:check
+      - name: Check formatting
+        run: npm run format:check
 
-            - name: Run frontend tests
-              run: npm run test
+      - name: Run frontend tests with coverage thresholds
+        run: npm run test:coverage
 
-            - name: Build frontend
-              run: npm run build
+      - name: Upload frontend coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-coverage
+          path: frontend/coverage
+          if-no-files-found: warn
+          retention-days: 14
 
-            - name: Audit npm dependencies
-              run: npm audit --audit-level=high
+      - name: Build frontend
+        run: npm run build
 
-    containers:
-        name: Container validation
-        runs-on: ubuntu-latest
-        timeout-minutes: 20
+      - name: Audit npm dependencies
+        run: npm audit --audit-level=high
 
-        steps:
-            - name: Checkout repository
-              uses: actions/checkout@v6
+  containers:
+    name: Container validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
 
-            - name: Validate Docker Compose
-              run: >
-                  docker compose
-                  --env-file .env.example
-                  -f docker-compose.dev.yaml
-                  config --quiet
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
 
-            - name: Validate production backend Compose
-              run: >
-                  docker compose
-                  --env-file .env.prod.example
-                  -f docker-compose.backend.prod.yaml
-                  config --quiet
+      - name: Validate Docker Compose
+        run: >
+          docker compose
+          --env-file .env.example
+          -f docker-compose.dev.yaml
+          config --quiet
 
-            - name: Build backend and frontend images
-              run: >
-                  docker compose
-                  --env-file .env.example
-                  -f docker-compose.dev.yaml
-                  build backend frontend
+      - name: Validate production backend Compose
+        run: >
+          docker compose
+          --env-file .env.prod.example
+          -f docker-compose.backend.prod.yaml
+          config --quiet
 
-            - name: Build production backend images
-              run: >
-                  docker compose
-                  --env-file .env.prod.example
-                  -f docker-compose.backend.prod.yaml
-                  build backend nginx
+      - name: Build backend and frontend images
+        run: >
+          docker compose
+          --env-file .env.example
+          -f docker-compose.dev.yaml
+          build backend frontend
 
-    secrets:
-        name: Secret detection
-        runs-on: ubuntu-latest
-        timeout-minutes: 10
+      - name: Build production backend images
+        run: >
+          docker compose
+          --env-file .env.prod.example
+          -f docker-compose.backend.prod.yaml
+          build backend nginx
 
-        permissions:
-            contents: read
-            pull-requests: write
+      - name: Start development stack and wait for healthchecks
+        run: >
+          docker compose
+          --env-file .env.example
+          -f docker-compose.dev.yaml
+          up -d --wait --wait-timeout 180
 
-        steps:
-            - name: Checkout complete history
-              uses: actions/checkout@v6
-              with:
-                  fetch-depth: 0
+      - name: Migrate and validate an empty database
+        run: |
+          docker compose --env-file .env.example -f docker-compose.dev.yaml exec -T backend php bin/console doctrine:migrations:migrate --no-interaction
+          docker compose --env-file .env.example -f docker-compose.dev.yaml exec -T backend php bin/console doctrine:schema:validate
 
-            - name: Scan Git history
-              uses: gitleaks/gitleaks-action@v3
-              env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Smoke test API and frontend
+        run: |
+          curl --fail --retry 10 --retry-delay 2 http://127.0.0.1:8080/api/docs > /dev/null
+          curl --fail --retry 10 --retry-delay 2 http://127.0.0.1:5173/ > /dev/null
+
+      - name: Show container logs on failure
+        if: failure()
+        run: docker compose --env-file .env.example -f docker-compose.dev.yaml logs --no-color
+
+      - name: Stop development stack
+        if: always()
+        run: docker compose --env-file .env.example -f docker-compose.dev.yaml down --volumes
+
+  e2e:
+    name: End-to-end workflows
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Install Chromium
+        working-directory: frontend
+        run: npx playwright install --with-deps chromium
+
+      - name: Start isolated application stack
+        run: >
+          docker compose
+          --env-file .env.example
+          -f docker-compose.dev.yaml
+          up -d --build --wait --wait-timeout 180
+
+      - name: Prepare E2E database and accounts
+        run: |
+          docker compose --env-file .env.example -f docker-compose.dev.yaml exec -T backend php bin/console doctrine:migrations:migrate --no-interaction
+          docker compose --env-file .env.example -f docker-compose.dev.yaml exec -T backend php bin/console doctrine:fixtures:load --no-interaction
+          ADMIN_PASSWORD="Admin-$(openssl rand -hex 16)!"
+          USER_PASSWORD="User-$(openssl rand -hex 16)!"
+          printf '%s\n' "$ADMIN_PASSWORD" | docker compose --env-file .env.example -f docker-compose.dev.yaml exec -T backend php bin/console app:utilisateur:create admin.e2e@chirorg.test --admin
+          printf '%s\n' "$USER_PASSWORD" | docker compose --env-file .env.example -f docker-compose.dev.yaml exec -T backend php bin/console app:utilisateur:create user.e2e@chirorg.test
+          echo "E2E_ADMIN_EMAIL=admin.e2e@chirorg.test" >> "$GITHUB_ENV"
+          echo "E2E_ADMIN_PASSWORD=$ADMIN_PASSWORD" >> "$GITHUB_ENV"
+          echo "E2E_USER_EMAIL=user.e2e@chirorg.test" >> "$GITHUB_ENV"
+          echo "E2E_USER_PASSWORD=$USER_PASSWORD" >> "$GITHUB_ENV"
+
+      - name: Run Playwright workflows
+        working-directory: frontend
+        run: npm run test:e2e
+
+      - name: Upload Playwright diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            frontend/playwright-report
+            frontend/test-results
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Show application logs on failure
+        if: failure()
+        run: docker compose --env-file .env.example -f docker-compose.dev.yaml logs --no-color
+
+      - name: Stop E2E stack
+        if: always()
+        run: docker compose --env-file .env.example -f docker-compose.dev.yaml down --volumes
+
+  secrets:
+    name: Secret detection
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Checkout complete history
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Scan Git history
+        uses: gitleaks/gitleaks-action@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

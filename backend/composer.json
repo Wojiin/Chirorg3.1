@@ -79,6 +79,10 @@
             "@auto-scripts"
         ],
         "test": "@php bin/phpunit",
+        "test:coverage": [
+            "@php bin/phpunit --coverage-clover build/coverage/clover.xml --coverage-html build/coverage/html",
+            "@php bin/check-coverage.php build/coverage/clover.xml 70"
+        ],
         "analyse": "@php vendor/bin/phpstan analyse --memory-limit=-1",
         "cs:check": "@php vendor/bin/php-cs-fixer fix --dry-run --diff",
         "cs:fix": "@php vendor/bin/php-cs-fixer fix",

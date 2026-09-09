@@ -16,6 +16,7 @@ export default [
     languageOptions: {
       globals: {
         document: 'readonly',
+        process: 'readonly',
         window: 'readonly',
       },
     },
