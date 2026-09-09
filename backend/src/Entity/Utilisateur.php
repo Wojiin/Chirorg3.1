@@ -2,36 +2,61 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use App\Dto\ChangementMotDePasseInput;
+use App\Dto\UtilisateurInput;
 use App\Repository\UtilisateurRepository;
+use App\State\ChangementMotDePasseProcessor;
+use App\State\UtilisateurDeleteProcessor;
+use App\State\UtilisateurMeProvider;
+use App\State\UtilisateurWriteProcessor;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UtilisateurRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
 #[ORM\HasLifecycleCallbacks]
 #[UniqueEntity(fields: ['email'], message: 'Cette adresse email est déjà utilisée.')]
+#[ApiResource(operations: [
+    new GetCollection(uriTemplate: '/utilisateurs', security: "is_granted('ROLE_ADMIN')", normalizationContext: ['groups' => ['utilisateur:list']]),
+    new Get(uriTemplate: '/utilisateurs/{id}', security: "is_granted('ROLE_ADMIN')", normalizationContext: ['groups' => ['utilisateur:read']]),
+    new Post(uriTemplate: '/utilisateurs', security: "is_granted('ROLE_ADMIN')", input: UtilisateurInput::class, normalizationContext: ['groups' => ['utilisateur:read']], processor: UtilisateurWriteProcessor::class),
+    new Patch(uriTemplate: '/utilisateurs/{id}', security: "is_granted('ROLE_ADMIN')", read: false, input: UtilisateurInput::class, normalizationContext: ['groups' => ['utilisateur:read']], processor: UtilisateurWriteProcessor::class),
+    new Delete(uriTemplate: '/utilisateurs/{id}', security: "is_granted('ROLE_ADMIN')", processor: UtilisateurDeleteProcessor::class),
+    new Get(uriTemplate: '/me', security: "is_granted('ROLE_USER')", normalizationContext: ['groups' => ['utilisateur:read']], provider: UtilisateurMeProvider::class),
+    new Patch(uriTemplate: '/me/mot-de-passe', security: "is_granted('ROLE_USER')", read: false, input: ChangementMotDePasseInput::class, normalizationContext: ['groups' => ['utilisateur:read']], processor: ChangementMotDePasseProcessor::class),
+])]
 class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['utilisateur:list', 'utilisateur:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180)]
     #[Assert\NotBlank]
     #[Assert\Email]
     #[Assert\Length(max: 180)]
+    #[Groups(['utilisateur:list', 'utilisateur:read'])]
     private string $email = '';
 
     /**
      * @var list<string> The user roles
      */
     #[ORM\Column]
+    #[Groups(['utilisateur:list', 'utilisateur:read'])]
     private array $roles = [];
 
     /**
@@ -41,12 +66,15 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     private string $password = '';
 
     #[ORM\Column]
+    #[Groups(['utilisateur:list', 'utilisateur:read'])]
     private bool $actif = true;
 
     #[ORM\Column]
+    #[Groups(['utilisateur:read'])]
     private \DateTimeImmutable $createdAt;
 
     #[ORM\Column]
+    #[Groups(['utilisateur:read'])]
     private \DateTimeImmutable $updatedAt;
 
     /** @var Collection<int, ChirurgiePlanifiee> */

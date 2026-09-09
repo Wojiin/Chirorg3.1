@@ -2,16 +2,16 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\ExactFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\QueryParameter;
 use App\Dto\ChirurgiePreparation;
 use App\Dto\ChirurgieVueFinale;
 use App\Repository\ChirurgiePlanifieeRepository;
-use App\State\ChirurgiePlanifieeWriteProcessor;
 use App\State\ChirurgiePreparationProvider;
 use App\State\ChirurgieValidationProcessor;
 use App\State\ReferenceDeleteProcessor;
@@ -28,13 +28,18 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: ChirurgiePlanifieeRepository::class)]
 #[ORM\Index(name: 'idx_chirurgie_date', columns: ['date_programmee'])]
 #[ORM\Index(name: 'idx_chirurgie_programme', columns: ['date_programmee', 'salle', 'chirurgien_id'])]
+#[ORM\UniqueConstraint(name: 'uniq_chirurgie_programme_ordre', columns: ['date_programmee', 'salle', 'chirurgien_id', 'ordre'])]
 #[ApiResource(operations: [
-    new GetCollection(uriTemplate: '/chirurgies-planifiees', security: "is_granted('ROLE_USER')", normalizationContext: ['groups' => ['chirurgie_planifiee:list']]),
+    new GetCollection(uriTemplate: '/chirurgies-planifiees', security: "is_granted('ROLE_USER')", normalizationContext: ['groups' => ['chirurgie_planifiee:list']], parameters: [
+        'dateProgrammee' => new QueryParameter(property: 'dateProgrammee', filter: new ExactFilter()),
+        'salle' => new QueryParameter(property: 'salle', filter: new ExactFilter()),
+        'chirurgien' => new QueryParameter(property: 'chirurgien', filter: new ExactFilter()),
+        'chirurgieModele' => new QueryParameter(property: 'chirurgieModele', filter: new ExactFilter()),
+        'valide' => new QueryParameter(property: 'valide', filter: new ExactFilter()),
+    ]),
     new Get(uriTemplate: '/chirurgies-planifiees/{id}', security: "is_granted('ROLE_USER')", normalizationContext: ['groups' => ['chirurgie_planifiee:read']]),
     new Get(uriTemplate: '/chirurgies-planifiees/{id}/preparation', security: "is_granted('ROLE_USER')", output: ChirurgiePreparation::class, provider: ChirurgiePreparationProvider::class),
     new Get(uriTemplate: '/chirurgies-planifiees/{id}/vue-finale', security: "is_granted('ROLE_USER')", output: ChirurgieVueFinale::class, provider: VueFinaleProvider::class),
-    new Post(uriTemplate: '/chirurgies-planifiees', security: "is_granted('ROLE_USER')", denormalizationContext: ['groups' => ['chirurgie_planifiee:write']], normalizationContext: ['groups' => ['chirurgie_planifiee:read']], processor: ChirurgiePlanifieeWriteProcessor::class),
-    new Patch(uriTemplate: '/chirurgies-planifiees/{id}', security: "is_granted('ROLE_USER')", denormalizationContext: ['groups' => ['chirurgie_planifiee:write']], normalizationContext: ['groups' => ['chirurgie_planifiee:read']], processor: ChirurgiePlanifieeWriteProcessor::class),
     new Post(uriTemplate: '/chirurgies-planifiees/{id}/validation', security: "is_granted('ROLE_USER')", input: false, normalizationContext: ['groups' => ['chirurgie_planifiee:read']], processor: ChirurgieValidationProcessor::class),
     new Delete(uriTemplate: '/chirurgies-planifiees/{id}', security: "is_granted('ROLE_USER')", processor: ReferenceDeleteProcessor::class),
 ])]
