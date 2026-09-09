@@ -92,6 +92,7 @@ textarea {
 }
 
 .admin-filters,
+.programme-filters,
 .admin-form-grid {
   display: grid;
   gap: 1rem;
@@ -101,6 +102,212 @@ textarea {
 .admin-filters {
   max-width: 48rem;
   margin-bottom: 1.5rem;
+}
+
+.programme-filters {
+  display: grid;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  gap: 1rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border: 1px solid var(--line);
+  border-radius: 0.9rem;
+  background: var(--surface);
+}
+
+.programme-filters label {
+  display: grid;
+  gap: 0.45rem;
+  font-size: 0.8rem;
+  font-weight: 750;
+}
+
+.programme-filters input,
+.programme-filters select,
+.surgery-picker select {
+  width: 100%;
+  min-height: 2.8rem;
+  padding: 0.72rem 0.85rem;
+  border: 1px solid var(--line);
+  border-radius: 0.65rem;
+  background: white;
+}
+
+.programme-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+}
+
+.programme-card,
+.final-card {
+  padding: 1.4rem;
+  border: 1px solid var(--line);
+  border-radius: 0.9rem;
+  background: var(--surface);
+}
+
+.programme-card .text-link {
+  display: inline-flex;
+  margin-top: 1rem;
+}
+
+.programme-metrics {
+  display: grid;
+  margin: 1.25rem 0 0;
+  gap: 0.75rem;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.programme-metrics dt {
+  color: var(--muted);
+  font-size: 0.68rem;
+}
+
+.programme-metrics dd {
+  margin: 0.2rem 0 0;
+  font-weight: 850;
+}
+
+.page-section--narrow {
+  max-width: 52rem;
+}
+
+.surgery-picker {
+  display: grid;
+  margin-top: 1.5rem;
+  padding: 1rem;
+  gap: 0.8rem;
+  border: 1px solid var(--line);
+  border-radius: 0.75rem;
+}
+
+.surgery-picker legend {
+  padding: 0 0.4rem;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.surgery-picker__row {
+  display: grid;
+  gap: 0.7rem;
+  align-items: center;
+  grid-template-columns: 2rem 1fr auto;
+}
+
+.surgery-picker__row > span,
+.surgery-order {
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--green-dark);
+  background: var(--green-soft);
+  font-size: 0.75rem;
+  font-weight: 900;
+}
+
+.button-link {
+  width: fit-content;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.surgery-list {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  gap: 1rem;
+  list-style: none;
+}
+
+.surgery-list > li,
+.material-row {
+  display: grid;
+  padding: 1.2rem;
+  gap: 1rem;
+  align-items: center;
+  grid-template-columns: auto 1fr auto;
+  border: 1px solid var(--line);
+  border-radius: 0.9rem;
+  background: var(--surface);
+}
+
+.surgery-copy p,
+.material-row p,
+.technical-sheet p {
+  margin-bottom: 0.6rem;
+  color: var(--muted);
+}
+
+.surgery-actions,
+.material-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.status-badge--warning {
+  border-color: #efd4bd;
+  color: #8d4a1e;
+  background: #fff3e8;
+}
+
+.material-list {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.material-row--ready {
+  border-color: #acd5c3;
+  background: #f7fcf9;
+}
+
+.material-row--missing {
+  border-color: #efcccc;
+  background: var(--danger-soft);
+}
+
+.partial-notice {
+  padding: 1rem;
+  border-left: 4px solid var(--orange);
+  color: #71401f;
+  background: #fff6ee;
+}
+
+.final-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.final-card ul {
+  display: grid;
+  padding: 0;
+  gap: 0.8rem;
+  list-style: none;
+}
+
+.final-card li {
+  display: grid;
+  padding-bottom: 0.8rem;
+  gap: 0.2rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.final-card li span {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.technical-sheet + .technical-sheet {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
 }
 
 .admin-filters label,
@@ -808,6 +1015,7 @@ h2 {
 
 @media (max-width: 800px) {
   .admin-filters,
+  .programme-filters,
   .admin-form-grid {
     grid-template-columns: 1fr;
   }
@@ -882,5 +1090,16 @@ h2 {
   .feature-card__state,
   .feature-card .text-link {
     grid-column: 2;
+  }
+
+  .surgery-list > li,
+  .material-row,
+  .final-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .surgery-actions,
+  .material-actions {
+    justify-content: flex-start;
   }
 }

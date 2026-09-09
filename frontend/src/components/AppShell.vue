@@ -40,6 +40,8 @@ async function logout() {
       <nav class="navigation">
         <p class="navigation__label">Espace de travail</p>
         <RouterLink :to="{ name: 'accueil' }">Accueil</RouterLink>
+        <RouterLink :to="{ name: 'programmes' }">Programmes</RouterLink>
+        <RouterLink :to="{ name: 'planification' }">Planifier</RouterLink>
         <RouterLink v-if="auth.isAdmin" :to="{ name: 'administration' }">
           Administration
         </RouterLink>

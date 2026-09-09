@@ -21,11 +21,12 @@ const auth = useAuthStore()
         <div>
           <h2>Programmes opératoires</h2>
           <p>
-            La consultation et la planification constitueront la prochaine
-            tranche métier.
+            Consultez les programmes regroupés par date, salle et chirurgien.
           </p>
         </div>
-        <span class="feature-card__state">À venir</span>
+        <RouterLink class="text-link" :to="{ name: 'programmes' }"
+          >Ouvrir</RouterLink
+        >
       </article>
 
       <article class="feature-card">
@@ -33,10 +34,13 @@ const auth = useAuthStore()
         <div>
           <h2>Préparation du matériel</h2>
           <p>
-            Suivi de disponibilité et validation sécurisée avant intervention.
+            Planifiez les interventions et initialisez leurs checklists
+            matériel.
           </p>
         </div>
-        <span class="feature-card__state">À venir</span>
+        <RouterLink class="text-link" :to="{ name: 'planification' }"
+          >Planifier</RouterLink
+        >
       </article>
 
       <article v-if="auth.isAdmin" class="feature-card">
