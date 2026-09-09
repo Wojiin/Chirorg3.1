@@ -12,6 +12,16 @@ function testRouter() {
     routes: [
       { path: '/', name: 'accueil', component: { template: '<div />' } },
       {
+        path: '/programmes',
+        name: 'programmes',
+        component: { template: '<div />' },
+      },
+      {
+        path: '/programmes/planifier',
+        name: 'planification',
+        component: { template: '<div />' },
+      },
+      {
         path: '/administration',
         name: 'administration',
         component: { template: '<div />' },
