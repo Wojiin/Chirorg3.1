@@ -4,6 +4,22 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import AdminListView from '@/views/AdminListView.vue'
 import { adminApi } from '@/services/adminApi'
 
+const BaseComboboxStub = {
+  props: ['modelValue', 'options'],
+  emits: ['update:modelValue'],
+  template: `
+    <select
+      :value="modelValue"
+      @change="$emit('update:modelValue', $event.target.value)"
+    >
+      <option value="">Toutes</option>
+      <option v-for="option in options" :key="option.value" :value="option.value">
+        {{ option.label }}
+      </option>
+    </select>
+  `,
+}
+
 describe('AdminListView speciality filter', () => {
   beforeEach(() => {
     vi.restoreAllMocks()
@@ -37,7 +53,10 @@ describe('AdminListView speciality filter', () => {
       props: { resourceSlug: 'chirurgiens' },
       global: {
         plugins: [createPinia()],
-        stubs: { RouterLink: { template: '<a><slot /></a>' } },
+        stubs: {
+          RouterLink: { template: '<a><slot /></a>' },
+          BaseCombobox: BaseComboboxStub,
+        },
       },
     })
     await flushPromises()
@@ -97,7 +116,10 @@ describe('AdminListView speciality filter', () => {
       props: { resourceSlug: 'listes-materiel' },
       global: {
         plugins: [createPinia()],
-        stubs: { RouterLink: { template: '<a><slot /></a>' } },
+        stubs: {
+          RouterLink: { template: '<a><slot /></a>' },
+          BaseCombobox: BaseComboboxStub,
+        },
       },
     })
     await flushPromises()

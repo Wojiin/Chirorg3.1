@@ -1,5 +1,5 @@
 <script setup>
-import { computed, useId } from 'vue'
+import { computed } from 'vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import BaseModal from '@/components/ui/BaseModal.vue'
 
@@ -14,7 +14,6 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['cancel', 'confirm'])
-const titleId = `confirmation-dialog-${useId()}`
 const buttonVariant = computed(
   () =>
     ({
@@ -32,7 +31,7 @@ function cancel() {
 <template>
   <BaseModal
     :open="open"
-    :title-id="titleId"
+    :description="message"
     size="sm"
     close-label="Annuler et fermer"
     @close="cancel"
@@ -88,7 +87,9 @@ function cancel() {
           <path d="M12 11v5M12 8h.01" />
         </svg>
       </span>
-      <p class="leading-7 text-gray-700 dark:text-gray-200">{{ message }}</p>
+      <p class="leading-7 text-gray-700 dark:text-gray-200">
+        {{ message }}
+      </p>
     </div>
 
     <template #footer>

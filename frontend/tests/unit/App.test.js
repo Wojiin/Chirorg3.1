@@ -24,6 +24,7 @@ describe('application shell and routing', () => {
     const wrapper = mount(App, {
       global: {
         plugins: [createPinia(), router],
+        stubs: { Toaster: true },
       },
     })
 
@@ -72,6 +73,7 @@ describe('application shell and routing', () => {
     const wrapper = mount(App, {
       global: {
         plugins: [pinia, appRouter],
+        stubs: { Toaster: true },
       },
     })
 

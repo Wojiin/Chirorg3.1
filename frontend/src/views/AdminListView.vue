@@ -5,7 +5,8 @@ import PageContainer from '@/components/ui/PageContainer.vue'
 import PageHeading from '@/components/ui/PageHeading.vue'
 import AdminItemActions from '@/components/AdminItemActions.vue'
 import BaseInput from '@/components/ui/BaseInput.vue'
-import BaseSelect from '@/components/ui/BaseSelect.vue'
+import BaseCombobox from '@/components/ui/BaseCombobox.vue'
+import BasePagination from '@/components/ui/BasePagination.vue'
 import EmptyState from '@/components/ui/EmptyState.vue'
 import ErrorMessage from '@/components/ui/ErrorMessage.vue'
 import LoadingState from '@/components/ui/LoadingState.vue'
@@ -18,7 +19,6 @@ const props = defineProps({
 const {
   deletingId,
   displayedError,
-  filteredItems,
   getAdminItemDetails,
   getAdminItemTitle,
   hasDisplayedItems,
@@ -26,6 +26,11 @@ const {
   hasSurgeonFilter,
   isTechnicalSheetList,
   pageLoading,
+  page,
+  itemsPerPage,
+  paginatedItems,
+  paginatedTechnicalSheetGroups,
+  paginationTotal,
   pendingRemoval,
   requestRemoval,
   cancelRemoval,
@@ -36,7 +41,6 @@ const {
   specialityOptions,
   surgeonFilter,
   surgeonOptions,
-  technicalSheetGroups,
 } = useAdminListView(props)
 </script>
 
@@ -68,7 +72,7 @@ const {
         type="search"
         placeholder="Rechercher dans le référentiel…"
       />
-      <BaseSelect
+      <BaseCombobox
         v-if="hasSpecialityFilter"
         v-model="specialityFilter"
         :label="isTechnicalSheetList ? 'Spécialité de chirurgie' : 'Spécialité'"
@@ -76,7 +80,7 @@ const {
         placeholder="Toutes les spécialités"
         allow-empty
       />
-      <BaseSelect
+      <BaseCombobox
         v-if="hasSurgeonFilter"
         v-model="surgeonFilter"
         label="Chirurgien"
@@ -98,7 +102,7 @@ const {
         Fiches techniques regroupées par chirurgie
       </h2>
 
-      <article v-for="group in technicalSheetGroups" :key="group.id">
+      <article v-for="group in paginatedTechnicalSheetGroups" :key="group.id">
         <header class="mb-3 flex flex-wrap items-center justify-between gap-2">
           <div>
             <p
@@ -187,7 +191,7 @@ const {
     <section v-else-if="resource" aria-labelledby="resource-list-title">
       <h2 id="resource-list-title" class="sr-only">Liste des éléments</h2>
       <ul class="admin-mobile-list">
-        <li v-for="item in filteredItems" :key="item.id">
+        <li v-for="item in paginatedItems" :key="item.id">
           <article class="admin-mobile-card">
             <h3 class="item-title">{{ getAdminItemTitle(item) }}</h3>
             <p class="text-muted mt-1 line-clamp-2">
@@ -220,7 +224,7 @@ const {
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
-            <tr v-for="item in filteredItems" :key="item.id">
+            <tr v-for="item in paginatedItems" :key="item.id">
               <th scope="row" class="admin-table-cell item-title">
                 {{ getAdminItemTitle(item) }}
               </th>
@@ -244,6 +248,14 @@ const {
         </table>
       </div>
     </section>
+
+    <BasePagination
+      v-if="resource && hasDisplayedItems && !pageLoading"
+      v-model:page="page"
+      :total="paginationTotal"
+      :items-per-page="itemsPerPage"
+      :label="`Pagination du référentiel ${resource.label}`"
+    />
 
     <ConfirmationModal
       :open="Boolean(pendingRemoval)"

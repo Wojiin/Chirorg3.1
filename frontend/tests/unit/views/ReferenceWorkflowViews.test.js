@@ -1,4 +1,4 @@
-import { mount } from '@vue/test-utils'
+import { flushPromises, mount } from '@vue/test-utils'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const mocks = vi.hoisted(() => ({
@@ -181,6 +181,7 @@ describe('reference workflow views', () => {
       salle: surgery.salle,
       chirurgienId: 7,
     })
+    await flushPromises()
 
     expect(wrapper.text()).toContain('Détail du programme')
     expect(wrapper.text()).toContain('Intervention test')

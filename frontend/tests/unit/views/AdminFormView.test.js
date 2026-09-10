@@ -70,7 +70,7 @@ describe('AdminFormView', () => {
       props: { resourceSlug: 'specialites' },
       global: {
         plugins: [createPinia(), router],
-        stubs: { Teleport: true },
+        stubs: { DialogPortal: { template: '<div><slot /></div>' } },
       },
     })
     await flushPromises()

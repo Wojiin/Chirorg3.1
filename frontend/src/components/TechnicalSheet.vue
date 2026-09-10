@@ -61,7 +61,10 @@ function closeSheet() {
 
     <BaseModal
       :open="Boolean(selectedSheet)"
-      title-id="technical-sheet-dialog-title"
+      :description="
+        selectedSheet?.contenu ||
+        'Illustration agrandie de la fiche technique sélectionnée.'
+      "
       size="wide"
       close-label="Fermer la fiche technique"
       @close="closeSheet"

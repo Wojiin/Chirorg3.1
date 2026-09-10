@@ -10,6 +10,7 @@ import { useReferenceStore } from '@/stores/references'
 import { technicalSheetApi } from '@/services/technicalSheetApi'
 import { resolveApiAssetUrl } from '@/api/config'
 import { getApiErrorMessage } from '@/api/response'
+import { notifyError, notifySuccess } from '@/services/notifications'
 
 const acceptedImageTypes = ['image/jpeg', 'image/png', 'image/webp']
 const maximumImageSize = 5 * 1024 * 1024
@@ -158,6 +159,7 @@ export function useAdminFormView(props) {
         error,
         'L’image n’a pas pu être téléversée.',
       )
+      notifyError('Téléversement impossible', formError.value)
       return null
     } finally {
       uploading.value = false
@@ -186,6 +188,10 @@ export function useAdminFormView(props) {
     )
 
     if (savedItem) {
+      notifySuccess(
+        isEditing.value ? 'Modifications enregistrées' : 'Élément créé',
+        resource.value?.label,
+      )
       referenceStore.invalidate(props.resourceSlug)
       await router.push({
         name: 'admin-list',

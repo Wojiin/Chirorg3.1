@@ -634,6 +634,23 @@
     @apply mt-6 grid gap-4 border-t border-gray-100 pt-6 sm:grid-cols-2 dark:border-gray-700;
   }
 
+  /* Notifications globales : mêmes surfaces, rayons et contraste que les cartes ChirOrg. */
+  .chirorg-toast {
+    @apply rounded-xl border border-gray-200 bg-white text-gray-950 shadow-card dark:border-gray-700 dark:bg-gray-800 dark:text-white;
+  }
+
+  .chirorg-toast-title {
+    @apply text-sm font-bold;
+  }
+
+  .chirorg-toast-description {
+    @apply text-sm text-gray-600 dark:text-gray-300;
+  }
+
+  .pagination-button {
+    @apply grid min-h-10 min-w-10 place-items-center rounded-lg border border-gray-300 bg-white px-2 text-sm font-semibold text-gray-700 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chirorg-500 disabled:cursor-not-allowed disabled:opacity-40 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200;
+  }
+
   /* Progression */
   .progress-caption {
     @apply mb-2 flex items-center justify-between gap-3 text-xs font-medium text-gray-600 dark:text-gray-300;

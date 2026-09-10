@@ -24,7 +24,9 @@ describe('AccountView', () => {
       .spyOn(accountApi, 'changePassword')
       .mockResolvedValue()
     const wrapper = mount(AccountView, {
-      global: { stubs: { Teleport: true } },
+      global: {
+        stubs: { DialogPortal: { template: '<div><slot /></div>' } },
+      },
     })
     const inputs = wrapper.findAll('input[type="password"]')
 
