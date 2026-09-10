@@ -1,10 +1,11 @@
-import { mount } from '@vue/test-utils'
+import { DOMWrapper, mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
 import TechnicalSheet from '@/components/TechnicalSheet.vue'
 
 describe('TechnicalSheet', () => {
   it('renders image-only and text-only instructions', () => {
     const wrapper = mount(TechnicalSheet, {
+      attachTo: document.body,
       props: {
         sheets: [
           {
@@ -46,30 +47,30 @@ describe('TechnicalSheet', () => {
           },
         ],
       },
-      global: {
-        stubs: { Teleport: true },
-      },
     })
 
     await wrapper
       .get('[data-testid="technical-sheet-trigger"]')
       .trigger('click')
 
-    const dialog = wrapper.get('[role="dialog"]')
+    const dialog = new DOMWrapper(
+      document.body.querySelector('[role="dialog"]'),
+    )
     expect(dialog.text()).toContain('Positionnement du patient')
     expect(dialog.text()).toContain('Installer le patient en décubitus.')
     expect(document.body.style.overflow).toBe('hidden')
 
-    dialog.element.parentElement.dispatchEvent(
-      new KeyboardEvent('keydown', {
-        key: 'Escape',
-        bubbles: true,
-      }),
+    document.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }),
     )
     await wrapper.vm.$nextTick()
 
-    expect(wrapper.find('[role="dialog"]').exists()).toBe(false)
-    expect(document.body.style.overflow).toBe('')
+    expect(
+      document.body
+        .querySelector('[role="dialog"]')
+        ?.getAttribute('data-state'),
+    ).toBe('closed')
     wrapper.unmount()
+    expect(document.body.style.overflow).toBe('')
   })
 })

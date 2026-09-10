@@ -12,7 +12,9 @@ describe('ConfirmationModal', () => {
         message: 'Cette action est irréversible.',
         confirmLabel: 'Supprimer',
       },
-      global: { stubs: { Teleport: true } },
+      global: {
+        stubs: { DialogPortal: { template: '<div><slot /></div>' } },
+      },
     })
 
     expect(wrapper.get('[role="dialog"]').text()).toContain(
@@ -38,7 +40,9 @@ describe('ConfirmationModal', () => {
         title: 'Changer le mot de passe',
         message: 'Confirmer cette action sensible.',
       },
-      global: { stubs: { Teleport: true } },
+      global: {
+        stubs: { DialogPortal: { template: '<div><slot /></div>' } },
+      },
     })
 
     expect(wrapper.get('.confirmation-content').classes()).toContain(

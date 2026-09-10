@@ -63,10 +63,24 @@ test('un utilisateur planifie puis prépare une intervention', async ({
   const casesAbsent = page.getByLabel('Absent')
   const materialCount = await casesPret.count()
   for (let index = 0; index < materialCount - 1; index += 1) {
-    await casesPret.nth(index).check()
+    await Promise.all([
+      page.waitForResponse(
+        (response) =>
+          response.request().method() === 'PATCH' &&
+          response.url().includes('/api/preparations-materiel/'),
+      ),
+      casesPret.nth(index).check(),
+    ])
     await expect(casesPret.nth(index)).toBeChecked()
   }
-  await casesAbsent.last().check()
+  await Promise.all([
+    page.waitForResponse(
+      (response) =>
+        response.request().method() === 'PATCH' &&
+        response.url().includes('/api/preparations-materiel/'),
+    ),
+    casesAbsent.last().check(),
+  ])
   await page.getByRole('button', { name: 'Valider la chirurgie' }).click()
 
   await expect(page).toHaveURL(/\/validation-partielle$/)

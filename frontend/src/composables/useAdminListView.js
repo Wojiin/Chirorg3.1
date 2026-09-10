@@ -13,6 +13,7 @@ import { getAdminItemDetails, getAdminItemTitle } from '@/presenters/admin'
 import { groupTechnicalSheets } from '@/utils/technicalSheets'
 import { useAdminStore } from '@/stores/admin'
 import { useReferenceStore } from '@/stores/references'
+import { notifySuccess } from '@/services/notifications'
 
 /** Orchestre le chargement, les filtres et les suppressions d'une liste administrative. */
 export function useAdminListView(props) {
@@ -28,6 +29,8 @@ export function useAdminListView(props) {
   const specialityFilter = ref('')
   const surgeonFilter = ref('')
   const pendingRemoval = ref(null)
+  const page = ref(1)
+  const itemsPerPage = 10
 
   const resource = computed(() => getAdminResource(props.resourceSlug))
   const isTechnicalSheetList = computed(
@@ -72,6 +75,19 @@ export function useAdminListView(props) {
   const technicalSheetGroups = computed(() =>
     groupTechnicalSheets(filteredItems.value),
   )
+  const paginatedItems = computed(() => {
+    const start = (page.value - 1) * itemsPerPage
+    return filteredItems.value.slice(start, start + itemsPerPage)
+  })
+  const paginatedTechnicalSheetGroups = computed(() => {
+    const start = (page.value - 1) * itemsPerPage
+    return technicalSheetGroups.value.slice(start, start + itemsPerPage)
+  })
+  const paginationTotal = computed(() =>
+    isTechnicalSheetList.value
+      ? technicalSheetGroups.value.length
+      : filteredItems.value.length,
+  )
   const hasDisplayedItems = computed(() =>
     isTechnicalSheetList.value
       ? technicalSheetGroups.value.length > 0
@@ -92,7 +108,10 @@ export function useAdminListView(props) {
       props.resourceSlug,
       pendingRemoval.value.id,
     )
-    if (removed !== false) cancelRemoval()
+    if (removed !== false) {
+      notifySuccess('Élément supprimé', getAdminItemTitle(pendingRemoval.value))
+      cancelRemoval()
+    }
   }
 
   watch(
@@ -101,6 +120,7 @@ export function useAdminListView(props) {
       search.value = ''
       specialityFilter.value = ''
       surgeonFilter.value = ''
+      page.value = 1
       if (!resource.value) return
 
       adminStore.loadItems(resourceSlug)
@@ -113,6 +133,7 @@ export function useAdminListView(props) {
   )
 
   watch([specialityFilter, surgeonFilter], ([specialityId, surgeonId]) => {
+    page.value = 1
     if (!filterConfig.value.serverSide) return
     adminStore.loadItems(
       props.resourceSlug,
@@ -121,6 +142,15 @@ export function useAdminListView(props) {
         surgeonId,
       }),
     )
+  })
+
+  watch(search, () => {
+    page.value = 1
+  })
+
+  watch(paginationTotal, (total) => {
+    const lastPage = Math.max(1, Math.ceil(total / itemsPerPage))
+    if (page.value > lastPage) page.value = lastPage
   })
 
   return {
@@ -134,6 +164,11 @@ export function useAdminListView(props) {
     hasSurgeonFilter,
     isTechnicalSheetList,
     pageLoading,
+    page,
+    itemsPerPage,
+    paginatedItems,
+    paginatedTechnicalSheetGroups,
+    paginationTotal,
     pendingRemoval,
     requestRemoval,
     cancelRemoval,

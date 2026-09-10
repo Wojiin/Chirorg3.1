@@ -3,6 +3,7 @@ import { storeToRefs } from 'pinia'
 import { accountApi } from '@/services/accountApi'
 import { getApiErrorMessage } from '@/api/response'
 import { useAuthStore } from '@/stores/auth'
+import { notifyError, notifySuccess } from '@/services/notifications'
 import {
   PASSWORD_PATTERN_SOURCE,
   PASSWORD_REQUIREMENTS,
@@ -51,11 +52,13 @@ export function useAccountView() {
       form.newPassword = ''
       form.newPasswordConfirmation = ''
       success.value = 'Votre mot de passe a été modifié.'
+      notifySuccess('Mot de passe modifié', success.value)
     } catch (error) {
       apiError.value = getApiErrorMessage(
         error,
         'Le mot de passe n’a pas pu être modifié.',
       )
+      notifyError('Modification impossible', apiError.value)
     } finally {
       saving.value = false
     }
