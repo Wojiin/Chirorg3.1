@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { adminApi } from '@/services/adminApi'
 import { getApiErrorMessage } from '@/api/response'
+import { ERROR_MESSAGES } from '@/config/errorMessages'
 
 /** Porte l'état et les actions CRUD de l'écran d'administration courant. */
 export const useAdminStore = defineStore('admin', {
@@ -35,10 +36,7 @@ export const useAdminStore = defineStore('admin', {
       } catch (error) {
         if (requestId === this.listRequestId) {
           this.items = []
-          this.error = getApiErrorMessage(
-            error,
-            'Impossible de charger ce référentiel.',
-          )
+          this.error = getApiErrorMessage(error, ERROR_MESSAGES.adminListLoad)
         }
         return []
       } finally {
@@ -60,10 +58,7 @@ export const useAdminStore = defineStore('admin', {
         return item
       } catch (error) {
         if (requestId === this.itemRequestId) {
-          this.error = getApiErrorMessage(
-            error,
-            'Impossible de charger cette ressource.',
-          )
+          this.error = getApiErrorMessage(error, ERROR_MESSAGES.adminItemLoad)
         }
         return null
       } finally {
@@ -83,7 +78,7 @@ export const useAdminStore = defineStore('admin', {
         this.current = item
         return item
       } catch (error) {
-        this.error = getApiErrorMessage(error, 'L’enregistrement a échoué.')
+        this.error = getApiErrorMessage(error, ERROR_MESSAGES.adminSave)
         return null
       } finally {
         this.saving = false
@@ -100,10 +95,7 @@ export const useAdminStore = defineStore('admin', {
         this.items = this.items.filter((item) => item.id !== id)
         return true
       } catch (error) {
-        this.error = getApiErrorMessage(
-          error,
-          'Cette ressource ne peut pas être supprimée.',
-        )
+        this.error = getApiErrorMessage(error, ERROR_MESSAGES.adminDelete)
         return false
       } finally {
         this.deletingId = null

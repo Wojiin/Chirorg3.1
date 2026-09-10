@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import AppShell from '@/components/ui/AppShell.vue'
+import { ERROR_MESSAGES } from '@/config/errorMessages'
 import { installAccessGuard } from '@/router/accessGuard'
 
 /** Décrit la SPA : connexion publique, shell protégé et vues chargées à la demande. */
@@ -104,7 +105,7 @@ const routes = [
         path: ':pathMatch(.*)*',
         name: 'not-found',
         component: () => import('@/views/NotFoundView.vue'),
-        meta: { title: 'Page introuvable' },
+        meta: { title: ERROR_MESSAGES.notFoundPageTitle },
       },
     ],
   },

@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Entity\Utilisateur;
+use App\Error\ErrorMessage;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
@@ -16,6 +17,6 @@ final readonly class AuthenticatedUserProvider
     {
         $user = $this->security->getUser();
 
-        return $user instanceof Utilisateur ? $user : throw new AccessDeniedException('Utilisateur authentifié requis.');
+        return $user instanceof Utilisateur ? $user : throw new AccessDeniedException(ErrorMessage::AUTHENTICATED_USER_REQUIRED);
     }
 }

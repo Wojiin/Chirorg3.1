@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Entity\Chirurgien;
+use App\Error\ErrorMessage;
 use App\Repository\ChirurgiePlanifieeRepository;
 use Doctrine\DBAL\LockMode;
 use Doctrine\ORM\EntityManagerInterface;
@@ -16,7 +17,7 @@ final readonly class ProgrammeOrderAllocator
     public function reserveNextOrder(\DateTimeInterface $date, string $salle, Chirurgien $chirurgien): int
     {
         if (null === $chirurgien->getId()) {
-            throw new \LogicException('Le chirurgien doit être persisté avant de réserver un ordre.');
+            throw new \LogicException(ErrorMessage::CHIRURGIEN_MUST_BE_PERSISTED);
         }
         $this->entityManager->lock($chirurgien, LockMode::PESSIMISTIC_WRITE);
 

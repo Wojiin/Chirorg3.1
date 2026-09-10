@@ -11,6 +11,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\QueryParameter;
+use App\Error\ErrorMessage;
 use App\Repository\ChirurgienRepository;
 use App\State\ReferenceDeleteProcessor;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -56,20 +57,20 @@ class Chirurgien
     private ?int $id = null;
 
     #[ORM\Column(length: 100)]
-    #[Assert\NotBlank]
-    #[Assert\Length(max: 100)]
+    #[Assert\NotBlank(message: ErrorMessage::REQUIRED_FIELD)]
+    #[Assert\Length(max: 100, maxMessage: ErrorMessage::TEXT_TOO_LONG)]
     #[Groups(['chirurgien:list', 'chirurgien:read', 'chirurgien:write'])]
     private ?string $prenom = null;
 
     #[ORM\Column(length: 100)]
-    #[Assert\NotBlank]
-    #[Assert\Length(max: 100)]
+    #[Assert\NotBlank(message: ErrorMessage::REQUIRED_FIELD)]
+    #[Assert\Length(max: 100, maxMessage: ErrorMessage::TEXT_TOO_LONG)]
     #[Groups(['chirurgien:list', 'chirurgien:read', 'chirurgien:write'])]
     private ?string $nom = null;
 
     #[ORM\ManyToOne(inversedBy: 'chirurgiens')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Assert\NotNull]
+    #[Assert\NotNull(message: ErrorMessage::REQUIRED_FIELD)]
     #[Groups(['chirurgien:list', 'chirurgien:read', 'chirurgien:write'])]
     private ?Specialite $specialite = null;
 

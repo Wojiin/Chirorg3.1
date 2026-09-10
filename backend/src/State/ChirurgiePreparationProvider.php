@@ -5,6 +5,7 @@ namespace App\State;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use App\Dto\ChirurgiePreparation;
+use App\Error\ErrorMessage;
 use App\Repository\ChirurgiePlanifieeRepository;
 use App\Service\ChirurgieReadModelFactory;
 use App\Service\PreparationMaterielInitializer;
@@ -21,7 +22,7 @@ final readonly class ChirurgiePreparationProvider implements ProviderInterface
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): ChirurgiePreparation
     {
         $id = (int) ($uriVariables['id'] ?? 0);
-        $chirurgie = $this->repository->findPreparationData($id) ?? throw new NotFoundHttpException('Chirurgie planifiée introuvable.');
+        $chirurgie = $this->repository->findPreparationData($id) ?? throw new NotFoundHttpException(ErrorMessage::CHIRURGIE_PLANIFIEE_NOT_FOUND);
         if ($chirurgie->getPreparationsMateriel()->isEmpty()) {
             $this->initializer->initialize($chirurgie);
             $this->entityManager->flush();

@@ -6,6 +6,7 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use App\Dto\ChangementMotDePasseInput;
 use App\Entity\Utilisateur;
+use App\Error\ErrorMessage;
 use App\Service\AuthenticatedUserProvider;
 use App\Service\RefreshTokenRevoker;
 use Doctrine\ORM\EntityManagerInterface;
@@ -23,10 +24,10 @@ final readonly class ChangementMotDePasseProcessor implements ProcessorInterface
     {
         $utilisateur = $this->authenticatedUser->getUser();
         if (!$this->passwordHasher->isPasswordValid($utilisateur, $data->motDePasseActuel)) {
-            throw new UnprocessableEntityHttpException('Le mot de passe actuel est incorrect.');
+            throw new UnprocessableEntityHttpException(ErrorMessage::CURRENT_PASSWORD_INCORRECT);
         }
         if ($this->passwordHasher->isPasswordValid($utilisateur, $data->nouveauMotDePasse)) {
-            throw new UnprocessableEntityHttpException('Le nouveau mot de passe doit être différent du mot de passe actuel.');
+            throw new UnprocessableEntityHttpException(ErrorMessage::NEW_PASSWORD_MUST_DIFFER);
         }
         $utilisateur->setPassword($this->passwordHasher->hashPassword($utilisateur, $data->nouveauMotDePasse));
         $this->refreshTokenRevoker->revokeFor($utilisateur);

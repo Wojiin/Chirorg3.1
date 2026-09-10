@@ -3,6 +3,7 @@ import { storeToRefs } from 'pinia'
 import { useRouter } from 'vue-router'
 import { getAdminResource } from '@/config/adminResources'
 import { getAdminFormFields, referencesByResource } from '@/config/adminForms'
+import { ERROR_MESSAGES, requiredFieldMessage } from '@/config/errorMessages'
 import { getMaterialsForSurgeon } from '@/domain/adminFilters'
 import { buildAdminPayload, createAdminForm } from '@/mappers/admin'
 import { useAdminStore } from '@/stores/admin'
@@ -59,7 +60,7 @@ export function useAdminFormView(props) {
       uploading.value,
   )
   const displayedError = computed(() => {
-    if (!resource.value) return 'Ce référentiel n’existe pas.'
+    if (!resource.value) return ERROR_MESSAGES.unknownAdminResource
     return formError.value || adminError.value || referenceError.value
   })
   const currentImageUrl = computed(() => resolveApiAssetUrl(form.lienImage))
@@ -103,13 +104,13 @@ export function useAdminFormView(props) {
     const image = event.target.files?.[0] ?? null
     formError.value = ''
     if (image && !acceptedImageTypes.includes(image.type)) {
-      formError.value = 'Seules les images JPEG, PNG et WebP sont acceptées.'
+      formError.value = ERROR_MESSAGES.imageType
       event.target.value = ''
       form.imageFile = null
       return
     }
     if (image && image.size > maximumImageSize) {
-      formError.value = 'L’image ne peut pas dépasser 5 Mo.'
+      formError.value = ERROR_MESSAGES.imageSize
       event.target.value = ''
       form.imageFile = null
       return
@@ -131,15 +132,14 @@ export function useAdminFormView(props) {
           ? !form[field.key].length
           : !form[field.key]),
     )
-    if (missingField)
-      return `Le champ « ${missingField.label} » est obligatoire.`
+    if (missingField) return requiredFieldMessage(missingField.label)
     if (
       props.resourceSlug === 'fiches-techniques' &&
       !form.description?.trim() &&
       !form.imageFile &&
       !form.lienImage
     ) {
-      return 'Ajoutez une consigne écrite, une image ou les deux.'
+      return ERROR_MESSAGES.technicalSheetContent
     }
     return ''
   }
@@ -155,11 +155,8 @@ export function useAdminFormView(props) {
         lienImage: await technicalSheetApi.uploadImage(form.imageFile),
       }
     } catch (error) {
-      formError.value = getApiErrorMessage(
-        error,
-        'L’image n’a pas pu être téléversée.',
-      )
-      notifyError('Téléversement impossible', formError.value)
+      formError.value = getApiErrorMessage(error, ERROR_MESSAGES.imageUpload)
+      notifyError(ERROR_MESSAGES.uploadNotification, formError.value)
       return null
     } finally {
       uploading.value = false

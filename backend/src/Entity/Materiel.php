@@ -11,6 +11,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\QueryParameter;
+use App\Error\ErrorMessage;
 use App\Repository\MaterielRepository;
 use App\State\ReferenceDeleteProcessor;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -57,24 +58,24 @@ class Materiel
     private ?int $id = null;
 
     #[ORM\Column(length: 150)]
-    #[Assert\NotBlank]
-    #[Assert\Length(max: 150)]
+    #[Assert\NotBlank(message: ErrorMessage::REQUIRED_FIELD)]
+    #[Assert\Length(max: 150, maxMessage: ErrorMessage::TEXT_TOO_LONG)]
     #[Groups(['materiel:list', 'materiel:read', 'materiel:write'])]
     private ?string $intitule = null;
 
     #[ORM\Column(length: 150, nullable: true)]
-    #[Assert\Length(max: 150)]
+    #[Assert\Length(max: 150, maxMessage: ErrorMessage::TEXT_TOO_LONG)]
     #[Groups(['materiel:list', 'materiel:read', 'materiel:write'])]
     private ?string $adresse = null;
 
     #[ORM\Column(length: 100, nullable: true)]
-    #[Assert\Length(max: 100)]
+    #[Assert\Length(max: 100, maxMessage: ErrorMessage::TEXT_TOO_LONG)]
     #[Groups(['materiel:list', 'materiel:read', 'materiel:write'])]
     private ?string $typeMateriel = null;
 
     #[ORM\ManyToOne(inversedBy: 'materiels')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Assert\NotNull]
+    #[Assert\NotNull(message: ErrorMessage::REQUIRED_FIELD)]
     #[Groups(['materiel:list', 'materiel:read', 'materiel:write'])]
     private ?Specialite $specialite = null;
 

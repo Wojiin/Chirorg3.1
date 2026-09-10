@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Entity\ChirurgiePlanifiee;
+use App\Error\ErrorMessage;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
@@ -18,11 +19,11 @@ final readonly class ChirurgieValidationService
             return $chirurgie;
         }
         if ($chirurgie->getPreparationsMateriel()->isEmpty()) {
-            throw new UnprocessableEntityHttpException('La chirurgie ne possède aucune préparation de matériel.');
+            throw new UnprocessableEntityHttpException(ErrorMessage::VALIDATION_REQUIRES_PREPARATION);
         }
         foreach ($chirurgie->getPreparationsMateriel() as $preparation) {
             if (!$preparation->isCoche() && !$preparation->isAbsent()) {
-                throw new UnprocessableEntityHttpException('Tout le matériel doit être déclaré prêt ou absent avant la validation.');
+                throw new UnprocessableEntityHttpException(ErrorMessage::VALIDATION_REQUIRES_ALL_MATERIALS);
             }
         }
         foreach ($chirurgie->getPreparationsMateriel() as $preparation) {

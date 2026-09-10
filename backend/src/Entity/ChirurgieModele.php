@@ -11,6 +11,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\QueryParameter;
+use App\Error\ErrorMessage;
 use App\Repository\ChirurgieModeleRepository;
 use App\State\ReferenceDeleteProcessor;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -22,7 +23,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ChirurgieModeleRepository::class)]
 #[ORM\UniqueConstraint(name: 'uniq_chirurgie_modele_intitule_specialite', columns: ['intitule', 'specialite_id'])]
-#[UniqueEntity(fields: ['intitule', 'specialite'], message: 'Cette chirurgie modèle existe déjà pour cette spécialité.')]
+#[UniqueEntity(fields: ['intitule', 'specialite'], message: ErrorMessage::CHIRURGIE_MODELE_ALREADY_EXISTS)]
 #[ApiResource(
     operations: [
         new GetCollection(
@@ -60,14 +61,14 @@ class ChirurgieModele
     private ?int $id = null;
 
     #[ORM\Column(length: 150)]
-    #[Assert\NotBlank]
-    #[Assert\Length(max: 150)]
+    #[Assert\NotBlank(message: ErrorMessage::REQUIRED_FIELD)]
+    #[Assert\Length(max: 150, maxMessage: ErrorMessage::TEXT_TOO_LONG)]
     #[Groups(['chirurgie_modele:list', 'chirurgie_modele:read', 'chirurgie_modele:write'])]
     private ?string $intitule = null;
 
     #[ORM\ManyToOne(inversedBy: 'chirurgiesModeles')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Assert\NotNull]
+    #[Assert\NotNull(message: ErrorMessage::REQUIRED_FIELD)]
     #[Groups(['chirurgie_modele:list', 'chirurgie_modele:read', 'chirurgie_modele:write'])]
     private ?Specialite $specialite = null;
 

@@ -8,6 +8,7 @@ import ErrorMessage from '@/components/ui/ErrorMessage.vue'
 import LoadingState from '@/components/ui/LoadingState.vue'
 import ProgressBar from '@/components/ui/ProgressBar.vue'
 import StatusBadge from '@/components/ui/StatusBadge.vue'
+import { ERROR_MESSAGES } from '@/config/errorMessages'
 
 const props = defineProps({
   id: { type: Number, required: true },
@@ -101,7 +102,7 @@ const {
             est disponible.
           </p>
           <p v-else-if="!isResolved" class="feedback-error-soft mt-4">
-            Tout le matériel doit être déclaré prêt ou absent avant de valider.
+            {{ ERROR_MESSAGES.preparationUnresolved }}
           </p>
           <div class="mt-5 flex flex-col gap-3">
             <BaseButton

@@ -3,6 +3,7 @@ import { storeToRefs } from 'pinia'
 import { useRouter } from 'vue-router'
 import { useProgrammeStore } from '@/stores/programme'
 import { useReferenceStore } from '@/stores/references'
+import { ERROR_MESSAGES } from '@/config/errorMessages'
 import { getTomorrowDateValue } from '@/utils/date'
 
 const rooms = ['Salle A', 'Salle B', 'Salle C']
@@ -80,8 +81,7 @@ export function usePlanificationView() {
       !form.salle ||
       surgeryModelIds.some((id) => !Number.isInteger(id) || id <= 0)
     ) {
-      formError.value =
-        'La spécialité, le chirurgien, la date, la salle et chaque modèle de chirurgie sont obligatoires.'
+      formError.value = ERROR_MESSAGES.planningRequired
       return
     }
     if (
@@ -92,13 +92,11 @@ export function usePlanificationView() {
         (id) => !surgeries.value.some((item) => Number(item.value) === id),
       )
     ) {
-      formError.value =
-        'Le chirurgien et les chirurgies doivent correspondre à la spécialité sélectionnée.'
+      formError.value = ERROR_MESSAGES.planningSpecialiteMismatch
       return
     }
     if (form.dateProgrammee < minimumDate) {
-      formError.value =
-        'La date du programme doit être au minimum celle de demain.'
+      formError.value = ERROR_MESSAGES.planningDate
       return
     }
 

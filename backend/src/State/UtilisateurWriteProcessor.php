@@ -7,6 +7,7 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\State\ProcessorInterface;
 use App\Dto\UtilisateurInput;
 use App\Entity\Utilisateur;
+use App\Error\ErrorMessage;
 use App\Repository\UtilisateurRepository;
 use App\Service\AuthenticatedUserProvider;
 use App\Service\RefreshTokenRevoker;
@@ -28,21 +29,21 @@ final readonly class UtilisateurWriteProcessor implements ProcessorInterface
         $creating = $operation instanceof Post;
         $utilisateur = $creating
             ? new Utilisateur()
-            : ($this->repository->find((int) ($uriVariables['id'] ?? 0)) ?? throw new NotFoundHttpException('Utilisateur introuvable.'));
+            : ($this->repository->find((int) ($uriVariables['id'] ?? 0)) ?? throw new NotFoundHttpException(ErrorMessage::UTILISATEUR_NOT_FOUND));
 
         if ($creating && (null === $data->email || null === $data->motDePasse)) {
-            throw new BadRequestHttpException('L’email et le mot de passe sont requis.');
+            throw new BadRequestHttpException(ErrorMessage::CREDENTIALS_REQUIRED);
         }
         if (null !== $data->email) {
             $existing = $this->repository->findOneBy(['email' => mb_strtolower(trim($data->email))]);
             if (null !== $existing && $existing !== $utilisateur) {
-                throw new ConflictHttpException('Cette adresse email est déjà utilisée.');
+                throw new ConflictHttpException(ErrorMessage::EMAIL_ALREADY_USED);
             }
             $utilisateur->setEmail($data->email);
         }
         if (!$creating && $utilisateur === $this->authenticatedUser->getUser()) {
             if (false === $data->actif || (null !== $data->roles && !in_array('ROLE_ADMIN', $data->roles, true))) {
-                throw new ConflictHttpException('Un administrateur ne peut pas désactiver son compte ni retirer son propre rôle administrateur.');
+                throw new ConflictHttpException(ErrorMessage::ADMIN_SELF_UPDATE_FORBIDDEN);
             }
         }
         if (null !== $data->roles) {

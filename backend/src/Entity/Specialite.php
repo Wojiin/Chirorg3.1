@@ -10,6 +10,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\QueryParameter;
+use App\Error\ErrorMessage;
 use App\Repository\SpecialiteRepository;
 use App\State\SpecialiteDeleteProcessor;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -21,7 +22,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: SpecialiteRepository::class)]
 #[ORM\UniqueConstraint(name: 'uniq_specialite_intitule', columns: ['intitule'])]
-#[UniqueEntity(fields: ['intitule'], message: 'Cette spécialité existe déjà.')]
+#[UniqueEntity(fields: ['intitule'], message: ErrorMessage::SPECIALITE_ALREADY_EXISTS)]
 #[ApiResource(
     operations: [
         new GetCollection(
@@ -57,8 +58,8 @@ class Specialite
     private ?int $id = null;
 
     #[ORM\Column(length: 100, unique: true)]
-    #[Assert\NotBlank]
-    #[Assert\Length(max: 100)]
+    #[Assert\NotBlank(message: ErrorMessage::REQUIRED_FIELD)]
+    #[Assert\Length(max: 100, maxMessage: ErrorMessage::TEXT_TOO_LONG)]
     #[Groups(['specialite:list', 'specialite:read', 'specialite:write', 'chirurgien:list', 'chirurgien:read', 'materiel:list', 'materiel:read', 'chirurgie_modele:list', 'chirurgie_modele:read'])]
     private ?string $intitule = null;
 

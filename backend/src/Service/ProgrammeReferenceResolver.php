@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Dto\ProgrammeReference;
+use App\Error\ErrorMessage;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 final class ProgrammeReferenceResolver
@@ -13,7 +14,7 @@ final class ProgrammeReferenceResolver
         $chirurgien = filter_var($uriVariables['chirurgien'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
         $salle = trim((string) ($uriVariables['salle'] ?? ''));
         if (false === $chirurgien || '' === $salle) {
-            throw new BadRequestHttpException('La salle et un identifiant de chirurgien positif sont requis.');
+            throw new BadRequestHttpException(ErrorMessage::PROGRAMME_REFERENCE_REQUIRED);
         }
 
         return new ProgrammeReference($this->date((string) ($uriVariables['date'] ?? '')), $salle, $chirurgien);
@@ -23,7 +24,7 @@ final class ProgrammeReferenceResolver
     {
         $date = \DateTimeImmutable::createFromFormat('!Y-m-d', $value);
         if (false === $date || $date->format('Y-m-d') !== $value) {
-            throw new BadRequestHttpException('La date doit respecter le format YYYY-MM-DD.');
+            throw new BadRequestHttpException(ErrorMessage::DATE_FORMAT_INVALID);
         }
 
         return $date;

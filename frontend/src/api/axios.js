@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { apiBaseUrl } from '@/api/config'
+import { ERROR_MESSAGES } from '@/config/errorMessages'
 
 /**
  * Infrastructure HTTP commune : configure Axios, propage le JWT en mémoire et
@@ -71,7 +72,7 @@ export function refreshAccessToken() {
     .post('/auth/refresh')
     .then(({ data }) => {
       if (!data?.token) {
-        throw new Error('La réponse de renouvellement ne contient aucun token.')
+        throw new Error(ERROR_MESSAGES.refreshTokenMissing)
       }
 
       authSession.setAccessToken(data.token)

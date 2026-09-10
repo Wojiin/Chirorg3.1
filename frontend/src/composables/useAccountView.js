@@ -2,6 +2,7 @@ import { reactive, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { accountApi } from '@/services/accountApi'
 import { getApiErrorMessage } from '@/api/response'
+import { ERROR_MESSAGES } from '@/config/errorMessages'
 import { useAuthStore } from '@/stores/auth'
 import { notifyError, notifySuccess } from '@/services/notifications'
 import {
@@ -54,11 +55,8 @@ export function useAccountView() {
       success.value = 'Votre mot de passe a été modifié.'
       notifySuccess('Mot de passe modifié', success.value)
     } catch (error) {
-      apiError.value = getApiErrorMessage(
-        error,
-        'Le mot de passe n’a pas pu être modifié.',
-      )
-      notifyError('Modification impossible', apiError.value)
+      apiError.value = getApiErrorMessage(error, ERROR_MESSAGES.passwordChange)
+      notifyError(ERROR_MESSAGES.passwordChangeNotification, apiError.value)
     } finally {
       saving.value = false
     }

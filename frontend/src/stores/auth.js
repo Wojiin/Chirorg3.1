@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { authApi } from '@/services/authApi'
 import { accountApi } from '@/services/accountApi'
 import { getApiErrorMessage } from '@/api/response'
+import { ERROR_MESSAGES } from '@/config/errorMessages'
 import { getUserFromAccessToken } from '@/utils/jwt'
 
 // Empêche plusieurs gardes de route de lancer simultanément le même refresh silencieux.
@@ -77,7 +78,7 @@ export const useAuthStore = defineStore('auth', {
         this.clearSession()
         this.error = getApiErrorMessage(
           error,
-          'Email ou mot de passe incorrect.',
+          ERROR_MESSAGES.invalidCredentials,
         )
         return false
       } finally {

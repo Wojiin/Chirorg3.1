@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Utilisateur;
+use App\Error\ErrorMessage;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
@@ -25,7 +26,7 @@ class UtilisateurRepository extends ServiceEntityRepository implements PasswordU
     public function upgradePassword(PasswordAuthenticatedUserInterface $user, string $newHashedPassword): void
     {
         if (!$user instanceof Utilisateur) {
-            throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', $user::class));
+            throw new UnsupportedUserException(ErrorMessage::unsupportedUser($user::class));
         }
 
         $user->setPassword($newHashedPassword);

@@ -5,6 +5,7 @@ namespace App\State;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use App\Entity\Utilisateur;
+use App\Error\ErrorMessage;
 use App\Service\AuthenticatedUserProvider;
 use App\Service\ReferenceDeletionGuard;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -21,7 +22,7 @@ final readonly class UtilisateurDeleteProcessor implements ProcessorInterface
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): void
     {
         if ($data === $this->authenticatedUser->getUser()) {
-            throw new ConflictHttpException('Un administrateur ne peut pas supprimer son propre compte.');
+            throw new ConflictHttpException(ErrorMessage::ADMIN_SELF_DELETE_FORBIDDEN);
         }
         $this->guard->assertCanDelete($data);
         $this->remove->process($data, $operation, $uriVariables, $context);

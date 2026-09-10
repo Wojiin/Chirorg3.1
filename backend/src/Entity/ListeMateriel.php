@@ -12,6 +12,7 @@ use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\QueryParameter;
+use App\Error\ErrorMessage;
 use App\Repository\ListeMaterielRepository;
 use App\State\ReferenceDeleteProcessor;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -24,7 +25,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 #[ORM\Entity(repositoryClass: ListeMaterielRepository::class)]
 #[ORM\UniqueConstraint(name: 'uniq_liste_chirurgien_modele', columns: ['chirurgien_id', 'chirurgie_modele_id'])]
-#[UniqueEntity(fields: ['chirurgien', 'chirurgieModele'], message: 'Une liste existe déjà pour ce chirurgien et cette chirurgie modèle.')]
+#[UniqueEntity(fields: ['chirurgien', 'chirurgieModele'], message: ErrorMessage::LISTE_MATERIEL_ALREADY_EXISTS)]
 #[ApiResource(
     operations: [
         new GetCollection(
@@ -75,22 +76,22 @@ class ListeMateriel
     private ?int $id = null;
 
     #[ORM\Column(length: 150)]
-    #[Assert\NotBlank]
-    #[Assert\Length(max: 150)]
+    #[Assert\NotBlank(message: ErrorMessage::REQUIRED_FIELD)]
+    #[Assert\Length(max: 150, maxMessage: ErrorMessage::TEXT_TOO_LONG)]
     #[Groups(['liste_materiel:list', 'liste_materiel:read', 'liste_materiel:write'])]
     private ?string $intitule = null;
 
     #[ORM\ManyToOne(inversedBy: 'listesMateriel')]
     #[ORM\JoinColumn(nullable: false)]
     #[ApiProperty(readableLink: false, writableLink: false)]
-    #[Assert\NotNull]
+    #[Assert\NotNull(message: ErrorMessage::REQUIRED_FIELD)]
     #[Groups(['liste_materiel:list', 'liste_materiel:read', 'liste_materiel:write'])]
     private ?Chirurgien $chirurgien = null;
 
     #[ORM\ManyToOne(inversedBy: 'listesMateriel')]
     #[ORM\JoinColumn(nullable: false)]
     #[ApiProperty(readableLink: false, writableLink: false)]
-    #[Assert\NotNull]
+    #[Assert\NotNull(message: ErrorMessage::REQUIRED_FIELD)]
     #[Groups(['liste_materiel:list', 'liste_materiel:read', 'liste_materiel:write'])]
     private ?ChirurgieModele $chirurgieModele = null;
 
@@ -100,7 +101,7 @@ class ListeMateriel
     #[ORM\ManyToMany(targetEntity: Materiel::class, inversedBy: 'listesMateriel')]
     #[ORM\JoinTable(name: 'liste_materiel_materiel')]
     #[ApiProperty(readableLink: false, writableLink: false)]
-    #[Assert\Count(min: 1, minMessage: 'La liste doit contenir au moins un matériel.')]
+    #[Assert\Count(min: 1, minMessage: ErrorMessage::LISTE_MATERIEL_REQUIRES_ITEM)]
     #[Groups(['liste_materiel:read', 'liste_materiel:write'])]
     private Collection $materiels;
 
@@ -186,14 +187,14 @@ class ListeMateriel
         }
 
         if (null !== $this->chirurgieModele && $this->chirurgieModele->getSpecialite() !== $specialite) {
-            $context->buildViolation('La chirurgie modèle doit appartenir à la spécialité du chirurgien.')
+            $context->buildViolation(ErrorMessage::CHIRURGIE_MODELE_SPECIALITE_MISMATCH)
                 ->atPath('chirurgieModele')
                 ->addViolation();
         }
 
         foreach ($this->materiels as $materiel) {
             if ($materiel->getSpecialite() !== $specialite) {
-                $context->buildViolation('Tous les matériels doivent appartenir à la spécialité du chirurgien.')
+                $context->buildViolation(ErrorMessage::MATERIEL_SPECIALITE_MISMATCH)
                     ->atPath('materiels')
                     ->addViolation();
 
