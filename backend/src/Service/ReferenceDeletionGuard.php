@@ -7,7 +7,6 @@ use App\Entity\Chirurgien;
 use App\Entity\ChirurgiePlanifiee;
 use App\Entity\ListeMateriel;
 use App\Entity\Materiel;
-use App\Entity\Specialite;
 use App\Entity\Utilisateur;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 
@@ -16,9 +15,6 @@ final class ReferenceDeletionGuard
     public function assertCanDelete(object $resource): void
     {
         $isUsed = match (true) {
-            $resource instanceof Specialite => !$resource->getChirurgiens()->isEmpty()
-                || !$resource->getMateriels()->isEmpty()
-                || !$resource->getChirurgiesModeles()->isEmpty(),
             $resource instanceof Chirurgien => !$resource->getListesMateriel()->isEmpty()
                 || !$resource->getChirurgiesPlanifiees()->isEmpty(),
             $resource instanceof Materiel => !$resource->getListesMateriel()->isEmpty()
