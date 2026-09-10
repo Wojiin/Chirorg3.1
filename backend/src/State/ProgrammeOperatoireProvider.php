@@ -8,6 +8,7 @@ use ApiPlatform\State\ParameterNotFound;
 use ApiPlatform\State\ProviderInterface;
 use App\Dto\ProgrammeOperatoire;
 use App\Dto\ProgrammeOperatoireResume;
+use App\Error\ErrorMessage;
 use App\Service\ProgrammeOperatoireService;
 use App\Service\ProgrammeReferenceResolver;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -28,7 +29,7 @@ final readonly class ProgrammeOperatoireProvider implements ProviderInterface
             $final = $operation instanceof HttpOperation && str_ends_with($operation->getUriTemplate() ?? '', '/vue-finale');
 
             return $this->service->one($reference->date, $reference->salle, $reference->chirurgienId, $final)
-                ?? throw new NotFoundHttpException('Programme opératoire introuvable.');
+                ?? throw new NotFoundHttpException(ErrorMessage::PROGRAMME_NOT_FOUND);
         }
         $date = $this->parameter($operation, 'date');
         $dateDebut = $this->parameter($operation, 'dateDebut');
@@ -36,7 +37,7 @@ final readonly class ProgrammeOperatoireProvider implements ProviderInterface
         $start = null === $dateDebut ? null : $this->referenceResolver->date((string) $dateDebut);
         $end = null === $dateFin ? null : $this->referenceResolver->date((string) $dateFin);
         if (null !== $start && null !== $end && $end < $start) {
-            throw new BadRequestHttpException('dateFin doit être postérieure ou égale à dateDebut.');
+            throw new BadRequestHttpException(ErrorMessage::DATE_RANGE_INVALID);
         }
         $salle = $this->parameter($operation, 'salle');
         $chirurgien = $this->parameter($operation, 'chirurgien');

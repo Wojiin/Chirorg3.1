@@ -1,6 +1,7 @@
 import { computed, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { getAdminResource } from '@/config/adminResources'
+import { ERROR_MESSAGES } from '@/config/errorMessages'
 import {
   filterAdminItems,
   getAdminListFilterConfig,
@@ -49,7 +50,7 @@ export function useAdminListView(props) {
   const displayedError = computed(() =>
     resource.value
       ? error.value || (hasAdminFilters.value ? referencesError.value : '')
-      : 'Ce référentiel n’existe pas.',
+      : ERROR_MESSAGES.unknownAdminResource,
   )
   const pageLoading = computed(
     () => loading.value || (hasAdminFilters.value && referencesLoading.value),

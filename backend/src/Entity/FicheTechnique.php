@@ -9,6 +9,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
+use App\Error\ErrorMessage;
 use App\Repository\FicheTechniqueRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -18,7 +19,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: FicheTechniqueRepository::class)]
 #[Assert\Expression(
     expression: 'this.getDescription() !== null or this.getLienImage() !== null',
-    message: 'Une fiche technique doit contenir une description, une image ou les deux.',
+    message: ErrorMessage::TECHNICAL_SHEET_CONTENT_REQUIRED,
 )]
 #[ApiResource(
     operations: [
@@ -56,8 +57,8 @@ class FicheTechnique
     private ?int $id = null;
 
     #[ORM\Column(length: 150)]
-    #[Assert\NotBlank]
-    #[Assert\Length(max: 150)]
+    #[Assert\NotBlank(message: ErrorMessage::REQUIRED_FIELD)]
+    #[Assert\Length(max: 150, maxMessage: ErrorMessage::TEXT_TOO_LONG)]
     #[Groups(['fiche_technique:list', 'fiche_technique:read', 'fiche_technique:write'])]
     private ?string $titre = null;
 
@@ -66,23 +67,23 @@ class FicheTechnique
     private ?string $description = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Assert\Length(max: 255)]
+    #[Assert\Length(max: 255, maxMessage: ErrorMessage::TEXT_TOO_LONG)]
     #[Assert\Regex(
         pattern: '/^\/uploads\/fiches-techniques\/[A-Za-z0-9._-]+$/',
-        message: 'L’image doit provenir du service de téléversement ChirOrg.',
+        message: ErrorMessage::IMAGE_ORIGIN_INVALID,
     )]
     #[Groups(['fiche_technique:read', 'fiche_technique:write'])]
     private ?string $lienImage = null;
 
     #[ORM\Column]
-    #[Assert\NotNull]
-    #[Assert\PositiveOrZero]
+    #[Assert\NotNull(message: ErrorMessage::REQUIRED_FIELD)]
+    #[Assert\PositiveOrZero(message: ErrorMessage::POSITIVE_OR_ZERO_REQUIRED)]
     #[Groups(['fiche_technique:list', 'fiche_technique:read', 'fiche_technique:write'])]
     private ?int $ordre = null;
 
     #[ORM\ManyToOne(inversedBy: 'fichesTechniques')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Assert\NotNull]
+    #[Assert\NotNull(message: ErrorMessage::REQUIRED_FIELD)]
     #[Groups(['fiche_technique:list', 'fiche_technique:read', 'fiche_technique:write'])]
     private ?ChirurgieModele $chirurgieModele = null;
 

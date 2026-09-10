@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Entity\Specialite;
+use App\Error\ErrorMessage;
 use App\Repository\SpecialiteRepository;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 
@@ -16,11 +17,11 @@ final readonly class SpecialiteDeletionService
     public function reassignReferences(Specialite $specialite): void
     {
         if (Specialite::SANS_SPECIALITE === $specialite->getIntitule()) {
-            throw new ConflictHttpException('La spécialité « Sans spécialité » ne peut pas être supprimée.');
+            throw new ConflictHttpException(ErrorMessage::DEFAULT_SPECIALITE_PROTECTED);
         }
 
         $defaultSpecialite = $this->repository->findDefault()
-            ?? throw new \LogicException('La spécialité « Sans spécialité » est absente.');
+            ?? throw new \LogicException(ErrorMessage::DEFAULT_SPECIALITE_MISSING);
 
         foreach ($specialite->getChirurgiens()->toArray() as $chirurgien) {
             $chirurgien->setSpecialite($defaultSpecialite);

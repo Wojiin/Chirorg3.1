@@ -5,6 +5,7 @@ namespace App\State;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use App\Entity\Specialite;
+use App\Error\ErrorMessage;
 use App\Service\SpecialiteDeletionService;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
@@ -22,7 +23,7 @@ final readonly class SpecialiteDeleteProcessor implements ProcessorInterface
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): mixed
     {
         if (!$data instanceof Specialite) {
-            throw new \InvalidArgumentException('Une spécialité est attendue.');
+            throw new \InvalidArgumentException(ErrorMessage::SPECIALITE_EXPECTED);
         }
 
         $this->deletionService->reassignReferences($data);

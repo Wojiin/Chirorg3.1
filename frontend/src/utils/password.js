@@ -8,17 +8,17 @@ export function validatePasswordChange(form) {
   const errors = {}
 
   if (!form.currentPassword) {
-    errors.currentPassword = 'Le mot de passe actuel est obligatoire.'
+    errors.currentPassword = ERROR_MESSAGES.currentPasswordRequired
   }
   if (!PASSWORD_PATTERN.test(form.newPassword)) {
     errors.newPassword = PASSWORD_REQUIREMENTS
   }
   if (!form.newPasswordConfirmation) {
-    errors.newPasswordConfirmation = 'La confirmation est obligatoire.'
+    errors.newPasswordConfirmation = ERROR_MESSAGES.passwordConfirmationRequired
   } else if (form.newPasswordConfirmation !== form.newPassword) {
-    errors.newPasswordConfirmation =
-      'La confirmation ne correspond pas au nouveau mot de passe.'
+    errors.newPasswordConfirmation = ERROR_MESSAGES.passwordConfirmationMismatch
   }
 
   return errors
 }
+import { ERROR_MESSAGES } from '@/config/errorMessages'

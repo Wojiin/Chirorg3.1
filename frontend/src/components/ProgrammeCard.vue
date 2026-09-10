@@ -5,6 +5,7 @@ import { RouterLink } from 'vue-router'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import ProgressBar from '@/components/ui/ProgressBar.vue'
 import StatusBadge from '@/components/ui/StatusBadge.vue'
+import { ERROR_MESSAGES } from '@/config/errorMessages'
 import { formatDateTime } from '@/utils/date'
 
 const props = defineProps({
@@ -97,7 +98,7 @@ const isPartial = computed(
         :loading="deleting"
         :title="
           chirurgie.valide
-            ? 'Une chirurgie validée ne peut pas être supprimée.'
+            ? ERROR_MESSAGES.validatedSurgeryDelete
             : 'Supprimer cette chirurgie'
         "
         :aria-label="`Supprimer ${chirurgie.chirurgieModele?.intitule ?? 'la chirurgie'}`"

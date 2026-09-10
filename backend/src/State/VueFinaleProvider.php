@@ -5,6 +5,7 @@ namespace App\State;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use App\Dto\ChirurgieVueFinale;
+use App\Error\ErrorMessage;
 use App\Repository\ChirurgiePlanifieeRepository;
 use App\Service\ChirurgieReadModelFactory;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
@@ -19,9 +20,9 @@ final readonly class VueFinaleProvider implements ProviderInterface
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): ChirurgieVueFinale
     {
-        $chirurgie = $this->repository->findVueFinaleData((int) ($uriVariables['id'] ?? 0)) ?? throw new NotFoundHttpException('Chirurgie planifiée introuvable.');
+        $chirurgie = $this->repository->findVueFinaleData((int) ($uriVariables['id'] ?? 0)) ?? throw new NotFoundHttpException(ErrorMessage::CHIRURGIE_PLANIFIEE_NOT_FOUND);
         if (!$chirurgie->isValide()) {
-            throw new ConflictHttpException('La vue finale est disponible uniquement après validation.');
+            throw new ConflictHttpException(ErrorMessage::FINAL_VIEW_REQUIRES_VALIDATION);
         }
 
         return $this->factory->createFinalView($chirurgie);

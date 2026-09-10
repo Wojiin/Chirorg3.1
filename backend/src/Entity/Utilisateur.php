@@ -10,6 +10,7 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use App\Dto\ChangementMotDePasseInput;
 use App\Dto\UtilisateurInput;
+use App\Error\ErrorMessage;
 use App\Repository\UtilisateurRepository;
 use App\State\ChangementMotDePasseProcessor;
 use App\State\UtilisateurDeleteProcessor;
@@ -27,7 +28,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: UtilisateurRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
 #[ORM\HasLifecycleCallbacks]
-#[UniqueEntity(fields: ['email'], message: 'Cette adresse email est déjà utilisée.')]
+#[UniqueEntity(fields: ['email'], message: ErrorMessage::EMAIL_ALREADY_USED)]
 #[ApiResource(operations: [
     new GetCollection(uriTemplate: '/utilisateurs', security: "is_granted('ROLE_ADMIN')", normalizationContext: ['groups' => ['utilisateur:list']]),
     new Get(uriTemplate: '/utilisateurs/{id}', security: "is_granted('ROLE_ADMIN')", normalizationContext: ['groups' => ['utilisateur:read']]),
@@ -46,9 +47,9 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $id = null;
 
     #[ORM\Column(length: 180)]
-    #[Assert\NotBlank]
-    #[Assert\Email]
-    #[Assert\Length(max: 180)]
+    #[Assert\NotBlank(message: ErrorMessage::REQUIRED_FIELD)]
+    #[Assert\Email(message: ErrorMessage::EMAIL_INVALID)]
+    #[Assert\Length(max: 180, maxMessage: ErrorMessage::TEXT_TOO_LONG)]
     #[Groups(['utilisateur:list', 'utilisateur:read'])]
     private string $email = '';
 
@@ -119,7 +120,7 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     public function getUserIdentifier(): string
     {
         if ('' === $this->email) {
-            throw new \LogicException('An authenticated utilisateur must have an email address.');
+            throw new \LogicException(ErrorMessage::AUTHENTICATED_USER_WITHOUT_EMAIL);
         }
 
         return $this->email;

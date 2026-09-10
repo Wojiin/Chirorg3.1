@@ -8,6 +8,7 @@ use App\Entity\ChirurgiePlanifiee;
 use App\Entity\ListeMateriel;
 use App\Entity\Materiel;
 use App\Entity\Utilisateur;
+use App\Error\ErrorMessage;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 
 final class ReferenceDeletionGuard
@@ -30,7 +31,7 @@ final class ReferenceDeletionGuard
         };
 
         if ($isUsed) {
-            throw new ConflictHttpException('Cette ressource ne peut pas être supprimée car elle est utilisée.');
+            throw new ConflictHttpException(ErrorMessage::REFERENCE_IN_USE);
         }
     }
 

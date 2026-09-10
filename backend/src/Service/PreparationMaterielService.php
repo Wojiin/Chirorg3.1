@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\Dto\PreparationMaterielInput;
 use App\Entity\PreparationMateriel;
+use App\Error\ErrorMessage;
 use App\Repository\PreparationMaterielRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
@@ -18,15 +19,15 @@ final readonly class PreparationMaterielService
 
     public function update(int $id, PreparationMaterielInput $input): PreparationMateriel
     {
-        $preparation = $this->repository->find($id) ?? throw new NotFoundHttpException('Préparation de matériel introuvable.');
+        $preparation = $this->repository->find($id) ?? throw new NotFoundHttpException(ErrorMessage::PREPARATION_NOT_FOUND);
         $chirurgie = $preparation->getChirurgiePlanifiee();
         if ($chirurgie?->isValide()) {
-            throw new ConflictHttpException('La préparation d’une chirurgie validée est verrouillée.');
+            throw new ConflictHttpException(ErrorMessage::PREPARATION_LOCKED);
         }
         $coche = $input->coche ?? $preparation->isCoche();
         $absent = $input->absent ?? $preparation->isAbsent();
         if ($coche && $absent) {
-            throw new UnprocessableEntityHttpException('Un matériel ne peut pas être à la fois prêt et absent.');
+            throw new UnprocessableEntityHttpException(ErrorMessage::MATERIEL_STATE_CONFLICT);
         }
 
         $now = new \DateTimeImmutable();

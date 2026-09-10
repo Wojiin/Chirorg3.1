@@ -6,6 +6,7 @@ import { technicalSheetApi } from '@/services/technicalSheetApi'
 import { normalizeTechnicalSheets } from '@/mappers/preparation'
 import { getApiErrorMessage } from '@/api/response'
 import { getProgrammeDetailRoute } from '@/config/navigation'
+import { ERROR_MESSAGES } from '@/config/errorMessages'
 
 /** Orchestre la régularisation des matériels absents et la clôture automatique. */
 export function useValidationPartielleView(props) {
@@ -48,7 +49,7 @@ export function useValidationPartielleView(props) {
           if (requestId === viewLoadId) {
             technicalSheetsError.value = getApiErrorMessage(
               error,
-              'Impossible de charger les fiches techniques.',
+              ERROR_MESSAGES.technicalSheetsLoad,
             )
           }
         } finally {

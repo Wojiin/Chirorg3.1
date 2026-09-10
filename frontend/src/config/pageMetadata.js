@@ -1,4 +1,5 @@
 import { getAdminResourceLabel } from '@/config/adminResources'
+import { ERROR_MESSAGES } from '@/config/errorMessages'
 
 /** Centralise les descriptions SEO des écrans sans charger le routeur de logique d'affichage. */
 const routeDescriptions = {
@@ -20,7 +21,7 @@ const routeDescriptions = {
   'admin-edit': 'Modifier une ressource du référentiel ChirOrg.',
   'admin-list': 'Consulter et gérer un référentiel ChirOrg.',
   account: 'Consulter le compte ChirOrg connecté et modifier son mot de passe.',
-  'not-found': 'La page demandée est introuvable dans l’intranet ChirOrg.',
+  'not-found': ERROR_MESSAGES.notFoundPageDescription,
 }
 
 const defaultDescription =

@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { programmeApi } from '@/services/programmeApi'
 import { getApiErrorMessage } from '@/api/response'
+import { ERROR_MESSAGES } from '@/config/errorMessages'
 import {
   normalizeProgramme,
   normalizeProgrammeSummaries,
@@ -93,7 +94,7 @@ export const useProgrammeStore = defineStore('programme', {
         if (requestId === this.listRequestId) {
           this.error = getApiErrorMessage(
             error,
-            'Impossible de charger le programme opératoire.',
+            ERROR_MESSAGES.programmeListLoad,
           )
         }
         return []
@@ -123,7 +124,7 @@ export const useProgrammeStore = defineStore('programme', {
         if (requestId === this.detailRequestId) {
           this.error = getApiErrorMessage(
             error,
-            'Impossible de charger le détail du programme.',
+            ERROR_MESSAGES.programmeDetailLoad,
           )
         }
         return null
@@ -146,10 +147,7 @@ export const useProgrammeStore = defineStore('programme', {
         })
         return createdProgramme
       } catch (error) {
-        this.error = getApiErrorMessage(
-          error,
-          'Le programme n’a pas pu être planifié.',
-        )
+        this.error = getApiErrorMessage(error, ERROR_MESSAGES.programmePlan)
         return null
       } finally {
         this.planning = false
@@ -185,10 +183,7 @@ export const useProgrammeStore = defineStore('programme', {
         return true
       } catch (error) {
         programme.chirurgies = previousChirurgies
-        this.error = getApiErrorMessage(
-          error,
-          'Le nouvel ordre n’a pas pu être enregistré.',
-        )
+        this.error = getApiErrorMessage(error, ERROR_MESSAGES.programmeReorder)
         return false
       } finally {
         this.savingProgrammeId = null
@@ -218,10 +213,7 @@ export const useProgrammeStore = defineStore('programme', {
           .filter((item) => item.chirurgies.length > 0)
         return true
       } catch (error) {
-        this.error = getApiErrorMessage(
-          error,
-          'La chirurgie n’a pas pu être supprimée.',
-        )
+        this.error = getApiErrorMessage(error, ERROR_MESSAGES.surgeryDelete)
         return false
       } finally {
         this.deletingSurgeryId = null

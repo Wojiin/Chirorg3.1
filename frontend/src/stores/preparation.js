@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { preparationApi } from '@/services/preparationApi'
 import { getApiErrorMessage } from '@/api/response'
+import { ERROR_MESSAGES } from '@/config/errorMessages'
 import { normalizeFinalView, normalizePreparation } from '@/mappers/preparation'
 
 /** Gère la checklist, sa progression optimiste et la validation finale d'une chirurgie. */
@@ -64,10 +65,7 @@ export const usePreparationStore = defineStore('preparation', {
         return this.preparation
       } catch (error) {
         if (requestId === this.loadRequestId) {
-          this.error = getApiErrorMessage(
-            error,
-            'Impossible de charger la préparation.',
-          )
+          this.error = getApiErrorMessage(error, ERROR_MESSAGES.preparationLoad)
         }
         return null
       } finally {
@@ -97,10 +95,7 @@ export const usePreparationStore = defineStore('preparation', {
       } catch (error) {
         Object.assign(item, previous)
         this.updateProgress()
-        this.error = getApiErrorMessage(
-          error,
-          'La mise à jour du matériel a échoué.',
-        )
+        this.error = getApiErrorMessage(error, ERROR_MESSAGES.materialUpdate)
         return false
       } finally {
         this.savingId = null
@@ -129,10 +124,7 @@ export const usePreparationStore = defineStore('preparation', {
         }
         return data.valide ? 'final' : 'partial'
       } catch (error) {
-        this.error = getApiErrorMessage(
-          error,
-          'La validation de la chirurgie a échoué.',
-        )
+        this.error = getApiErrorMessage(error, ERROR_MESSAGES.surgeryValidation)
         return false
       } finally {
         this.pendingLoads -= 1
@@ -154,10 +146,7 @@ export const usePreparationStore = defineStore('preparation', {
         return finalView
       } catch (error) {
         if (requestId === this.loadRequestId) {
-          this.error = getApiErrorMessage(
-            error,
-            'Impossible de charger la vue finale.',
-          )
+          this.error = getApiErrorMessage(error, ERROR_MESSAGES.finalViewLoad)
         }
         return null
       } finally {

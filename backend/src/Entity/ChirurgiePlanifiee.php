@@ -11,6 +11,7 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\QueryParameter;
 use App\Dto\ChirurgiePreparation;
 use App\Dto\ChirurgieVueFinale;
+use App\Error\ErrorMessage;
 use App\Repository\ChirurgiePlanifieeRepository;
 use App\State\ChirurgiePreparationProvider;
 use App\State\ChirurgieValidationProcessor;
@@ -52,19 +53,19 @@ class ChirurgiePlanifiee
     private ?int $id = null;
 
     #[ORM\Column(type: Types::DATE_IMMUTABLE)]
-    #[Assert\NotNull]
+    #[Assert\NotNull(message: ErrorMessage::REQUIRED_FIELD)]
     #[Groups(['chirurgie_planifiee:list', 'chirurgie_planifiee:read', 'chirurgie_planifiee:write', 'programme:read'])]
     #[Context([DateTimeNormalizer::FORMAT_KEY => 'Y-m-d'])]
     private ?\DateTimeImmutable $dateProgrammee = null;
 
     #[ORM\Column(length: 50)]
-    #[Assert\NotBlank]
-    #[Assert\Length(max: 50)]
+    #[Assert\NotBlank(message: ErrorMessage::REQUIRED_FIELD)]
+    #[Assert\Length(max: 50, maxMessage: ErrorMessage::TEXT_TOO_LONG)]
     #[Groups(['chirurgie_planifiee:list', 'chirurgie_planifiee:read', 'chirurgie_planifiee:write', 'programme:read'])]
     private ?string $salle = null;
 
     #[ORM\Column(nullable: true)]
-    #[Assert\Positive]
+    #[Assert\Positive(message: ErrorMessage::POSITIVE_NUMBER_REQUIRED)]
     #[Groups(['chirurgie_planifiee:list', 'chirurgie_planifiee:read', 'programme:read'])]
     private ?int $ordre = null;
 
@@ -78,13 +79,13 @@ class ChirurgiePlanifiee
 
     #[ORM\ManyToOne(inversedBy: 'chirurgiesPlanifiees')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Assert\NotNull]
+    #[Assert\NotNull(message: ErrorMessage::REQUIRED_FIELD)]
     #[Groups(['chirurgie_planifiee:list', 'chirurgie_planifiee:read', 'chirurgie_planifiee:write', 'programme:read'])]
     private ?Chirurgien $chirurgien = null;
 
     #[ORM\ManyToOne(inversedBy: 'chirurgiesPlanifiees')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Assert\NotNull]
+    #[Assert\NotNull(message: ErrorMessage::REQUIRED_FIELD)]
     #[Groups(['chirurgie_planifiee:list', 'chirurgie_planifiee:read', 'chirurgie_planifiee:write', 'programme:read'])]
     private ?ChirurgieModele $chirurgieModele = null;
 

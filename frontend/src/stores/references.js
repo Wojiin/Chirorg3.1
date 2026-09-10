@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { adminApi } from '@/services/adminApi'
 import { getApiErrorMessage } from '@/api/response'
+import { ERROR_MESSAGES } from '@/config/errorMessages'
 
 /** Met en cache les petits référentiels partagés par les formulaires et la planification. */
 export const useReferenceStore = defineStore('references', {
@@ -42,10 +43,7 @@ export const useReferenceStore = defineStore('references', {
         }
         return this.collections
       } catch (error) {
-        this.error = getApiErrorMessage(
-          error,
-          'Impossible de charger les référentiels.',
-        )
+        this.error = getApiErrorMessage(error, ERROR_MESSAGES.referencesLoad)
         throw error
       } finally {
         this.pendingLoads -= 1

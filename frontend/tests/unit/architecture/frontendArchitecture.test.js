@@ -54,4 +54,14 @@ describe('frontend architecture boundaries', () => {
 
     expect(directClientImports).toEqual([])
   })
+
+  it('keeps API fallback errors out of stores and composables', () => {
+    for (const directory of ['stores', 'composables']) {
+      for (const { file, source } of sourceFiles(directory, '.js')) {
+        expect(source, `${directory}/${file}`).not.toMatch(
+          /getApiErrorMessage\([\s\S]{0,120},\s*['"`]/,
+        )
+      }
+    }
+  })
 })

@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Error\ErrorMessage;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -30,16 +31,16 @@ final readonly class TechnicalSheetImageStorage
     public function store(mixed $image): string
     {
         if (!$image instanceof UploadedFile || !$image->isValid()) {
-            throw new UnprocessableEntityHttpException('Une image valide est obligatoire.');
+            throw new UnprocessableEntityHttpException(ErrorMessage::IMAGE_REQUIRED);
         }
 
         $mimeType = (new \finfo(FILEINFO_MIME_TYPE))->file($image->getPathname());
         if (!is_string($mimeType) || !isset(self::ALLOWED_MIME_TYPES[$mimeType])) {
-            throw new UnprocessableEntityHttpException('Seules les images JPEG, PNG et WebP sont acceptées.');
+            throw new UnprocessableEntityHttpException(ErrorMessage::IMAGE_TYPE_INVALID);
         }
 
         if ($image->getSize() > self::MAX_FILE_SIZE) {
-            throw new UnprocessableEntityHttpException('L’image ne peut pas dépasser 5 Mo.');
+            throw new UnprocessableEntityHttpException(ErrorMessage::IMAGE_TOO_LARGE);
         }
 
         $targetDirectory = $this->projectDir.'/public'.self::RELATIVE_DIRECTORY;
@@ -49,7 +50,7 @@ final readonly class TechnicalSheetImageStorage
         try {
             $image->move($targetDirectory, $filename);
         } catch (FileException) {
-            throw new HttpException(500, 'L’image n’a pas pu être enregistrée.');
+            throw new HttpException(500, ErrorMessage::IMAGE_STORAGE_FAILED);
         }
 
         return self::RELATIVE_DIRECTORY.'/'.$filename;
