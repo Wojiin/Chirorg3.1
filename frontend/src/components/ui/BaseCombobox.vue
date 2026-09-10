@@ -28,6 +28,7 @@ const model = defineModel({ type: [String, Number], required: true })
 
 const id = useId()
 const errorId = computed(() => `${id}-error`)
+const hasValue = computed(() => model.value !== '' && model.value != null)
 const normalizedOptions = computed(() =>
   props.options.map((option) =>
     typeof option === 'object' ? option : { label: option, value: option },
@@ -64,9 +65,18 @@ function displayValue(value) {
           :placeholder="placeholder"
           :aria-invalid="Boolean(error)"
           :aria-describedby="error ? errorId : undefined"
-          class="field-control mt-0 pr-12"
+          class="field-control mt-0 pr-20"
           :class="{ 'field-control-invalid': error }"
         />
+        <button
+          v-if="allowEmpty && hasValue"
+          type="button"
+          class="absolute inset-y-0 right-10 grid w-9 place-items-center text-gray-500 hover:text-gray-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-chirorg-500 dark:text-gray-300 dark:hover:text-white"
+          :aria-label="`Effacer le filtre ${label}`"
+          @click="model = ''"
+        >
+          <span aria-hidden="true">×</span>
+        </button>
         <ComboboxTrigger
           class="absolute inset-y-0 right-0 grid w-11 place-items-center rounded-r-xl text-gray-500 hover:text-chirorg-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-chirorg-500 disabled:cursor-not-allowed disabled:opacity-50 dark:text-gray-300"
           :aria-label="`Afficher les options pour ${label}`"
@@ -82,20 +92,10 @@ function displayValue(value) {
         >
           <ComboboxViewport class="max-h-70 overflow-y-auto">
             <ComboboxItem
-              v-if="allowEmpty"
-              value=""
-              class="flex cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-sm text-gray-700 outline-none data-[highlighted]:bg-chirorg-100 data-[highlighted]:text-chirorg-900 dark:text-gray-200 dark:data-[highlighted]:bg-chirorg-900/50 dark:data-[highlighted]:text-white"
-            >
-              {{ placeholder }}
-              <ComboboxItemIndicator aria-hidden="true"
-                >✓</ComboboxItemIndicator
-              >
-            </ComboboxItem>
-            <ComboboxItem
               v-for="option in normalizedOptions"
               :key="option.value"
               :value="option.value"
-              class="flex cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-sm text-gray-700 outline-none data-[highlighted]:bg-chirorg-100 data-[highlighted]:text-chirorg-900 dark:text-gray-200 dark:data-[highlighted]:bg-chirorg-900/50 dark:data-[highlighted]:text-white"
+              class="flex cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-sm font-medium text-gray-800 outline-none data-[highlighted]:bg-chirorg-700 data-[highlighted]:text-white data-[state=checked]:bg-chirorg-800 data-[state=checked]:text-white dark:text-gray-100 dark:data-[highlighted]:bg-chirorg-600 dark:data-[highlighted]:text-white dark:data-[state=checked]:bg-chirorg-700"
             >
               <span>{{ option.label }}</span>
               <ComboboxItemIndicator aria-hidden="true"
