@@ -10,6 +10,7 @@ import BaseSelect from '@/components/ui/BaseSelect.vue'
 import EmptyState from '@/components/ui/EmptyState.vue'
 import ErrorMessage from '@/components/ui/ErrorMessage.vue'
 import LoadingState from '@/components/ui/LoadingState.vue'
+import BasePagination from '@/components/ui/BasePagination.vue'
 
 const {
   clearFilters,
@@ -18,6 +19,9 @@ const {
   filters,
   loading,
   loadProgrammes,
+  page,
+  itemsPerPage,
+  totalItems,
   rooms,
 } = useProgrammeOperatoireView()
 </script>
@@ -74,6 +78,12 @@ const {
           <ProgrammeSummaryCard :programme="programme" />
         </li>
       </ol>
+      <BasePagination
+        v-model:page="page"
+        :total="totalItems"
+        :items-per-page="itemsPerPage"
+        label="Pagination des programmes opératoires"
+      />
     </section>
   </PageContainer>
 </template>

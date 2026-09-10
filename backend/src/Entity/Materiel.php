@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use ApiPlatform\Doctrine\Orm\Filter\ExactFilter;
+use ApiPlatform\Doctrine\Orm\Filter\FreeTextQueryFilter;
+use ApiPlatform\Doctrine\Orm\Filter\OrFilter;
 use ApiPlatform\Doctrine\Orm\Filter\PartialSearchFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
@@ -28,6 +30,7 @@ use Symfony\Component\Validator\Constraints as Assert;
             security: "is_granted('ROLE_USER')",
             normalizationContext: ['groups' => ['materiel:list']],
             parameters: [
+                'q' => new QueryParameter(filter: new FreeTextQueryFilter(new OrFilter(new PartialSearchFilter())), properties: ['intitule', 'typeMateriel', 'adresse']),
                 'intitule' => new QueryParameter(property: 'intitule', filter: new PartialSearchFilter()),
                 'typeMateriel' => new QueryParameter(property: 'typeMateriel', filter: new ExactFilter()),
                 'adresse' => new QueryParameter(property: 'adresse', filter: new PartialSearchFilter()),

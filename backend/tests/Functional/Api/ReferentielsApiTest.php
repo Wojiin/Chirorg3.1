@@ -110,6 +110,15 @@ final class ReferentielsApiTest extends AuthenticatedApiTestCase
             self::assertResponseStatusCodeSame(200);
         }
 
+        $paginatedSearch = $client->request('GET', '/api/specialites?'.http_build_query([
+            'q' => 'Cardiologie adulte '.$suffix,
+            'page' => 1,
+            'itemsPerPage' => 1,
+        ]));
+        self::assertResponseIsSuccessful();
+        self::assertJsonContains(['totalItems' => 1]);
+        self::assertCount(1, $paginatedSearch->toArray()['member']);
+
         $client->request('DELETE', $specialite);
         self::assertResponseStatusCodeSame(204);
 

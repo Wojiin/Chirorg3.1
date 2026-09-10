@@ -3,7 +3,6 @@ import { storeToRefs } from 'pinia'
 import { getAdminResource } from '@/config/adminResources'
 import { ERROR_MESSAGES } from '@/config/errorMessages'
 import {
-  filterAdminItems,
   getAdminListFilterConfig,
   getAdminListFilterParams,
   getAdminListFilterReferences,
@@ -16,11 +15,12 @@ import { useAdminStore } from '@/stores/admin'
 import { useReferenceStore } from '@/stores/references'
 import { notifySuccess } from '@/services/notifications'
 
-/** Orchestre le chargement, les filtres et les suppressions d'une liste administrative. */
+/** Orchestre le chargement, les filtres serveur et les suppressions d'une liste administrative. */
 export function useAdminListView(props) {
   const adminStore = useAdminStore()
   const referenceStore = useReferenceStore()
-  const { items, loading, deletingId, error } = storeToRefs(adminStore)
+  const { items, totalItems, page, itemsPerPage, loading, deletingId, error } =
+    storeToRefs(adminStore)
   const {
     collections: referenceCollections,
     loading: referencesLoading,
@@ -30,8 +30,6 @@ export function useAdminListView(props) {
   const specialityFilter = ref('')
   const surgeonFilter = ref('')
   const pendingRemoval = ref(null)
-  const page = ref(1)
-  const itemsPerPage = 10
 
   const resource = computed(() => getAdminResource(props.resourceSlug))
   const isTechnicalSheetList = computed(
@@ -55,45 +53,34 @@ export function useAdminListView(props) {
   const pageLoading = computed(
     () => loading.value || (hasAdminFilters.value && referencesLoading.value),
   )
-  const filteredItems = computed(() => {
-    const needle = search.value.trim().toLocaleLowerCase('fr')
-    const searchedItems = !needle
-      ? items.value
-      : items.value.filter((item) =>
-          JSON.stringify(item).toLocaleLowerCase('fr').includes(needle),
-        )
-    return filterAdminItems(searchedItems, {
-      specialityId: specialityFilter.value,
-      surgeonId: surgeonFilter.value,
-    })
-  })
+  const filteredItems = computed(() => items.value)
   const specialityOptions = computed(() =>
     getSpecialityFilterOptions(referenceCollections.value.specialites ?? []),
   )
   const surgeonOptions = computed(() =>
     getSurgeonFilterOptions(referenceCollections.value.chirurgiens ?? []),
   )
-  const technicalSheetGroups = computed(() =>
-    groupTechnicalSheets(filteredItems.value),
+  const technicalSheetGroups = computed(() => groupTechnicalSheets(items.value))
+  const paginatedItems = computed(() => items.value)
+  const paginatedTechnicalSheetGroups = computed(
+    () => technicalSheetGroups.value,
   )
-  const paginatedItems = computed(() => {
-    const start = (page.value - 1) * itemsPerPage
-    return filteredItems.value.slice(start, start + itemsPerPage)
-  })
-  const paginatedTechnicalSheetGroups = computed(() => {
-    const start = (page.value - 1) * itemsPerPage
-    return technicalSheetGroups.value.slice(start, start + itemsPerPage)
-  })
-  const paginationTotal = computed(() =>
-    isTechnicalSheetList.value
-      ? technicalSheetGroups.value.length
-      : filteredItems.value.length,
-  )
-  const hasDisplayedItems = computed(() =>
-    isTechnicalSheetList.value
-      ? technicalSheetGroups.value.length > 0
-      : filteredItems.value.length > 0,
-  )
+  const paginationTotal = computed(() => totalItems.value)
+  const hasDisplayedItems = computed(() => items.value.length > 0)
+
+  function loadPage() {
+    if (!resource.value) return Promise.resolve([])
+
+    return adminStore.loadItems(props.resourceSlug, {
+      page: page.value,
+      itemsPerPage: itemsPerPage.value,
+      q: search.value.trim() || undefined,
+      ...getAdminListFilterParams(props.resourceSlug, {
+        specialityId: specialityFilter.value,
+        surgeonId: surgeonFilter.value,
+      }),
+    })
+  }
 
   function requestRemoval(item) {
     pendingRemoval.value = item
@@ -112,47 +99,36 @@ export function useAdminListView(props) {
     if (removed !== false) {
       notifySuccess('Élément supprimé', getAdminItemTitle(pendingRemoval.value))
       cancelRemoval()
+      if (!items.value.length && page.value > 1) page.value -= 1
+      else await loadPage()
     }
   }
 
   watch(
     () => props.resourceSlug,
     (resourceSlug) => {
+      const loadWithoutPageChange = page.value === 1
       search.value = ''
       specialityFilter.value = ''
       surgeonFilter.value = ''
       page.value = 1
       if (!resource.value) return
 
-      adminStore.loadItems(resourceSlug)
       const filterReferences = getAdminListFilterReferences(resourceSlug)
       if (filterReferences.length) {
         referenceStore.load(filterReferences, { force: true }).catch(() => {})
       }
+      if (loadWithoutPageChange) loadPage()
     },
     { immediate: true },
   )
 
-  watch([specialityFilter, surgeonFilter], ([specialityId, surgeonId]) => {
-    page.value = 1
-    if (!filterConfig.value.serverSide) return
-    adminStore.loadItems(
-      props.resourceSlug,
-      getAdminListFilterParams(props.resourceSlug, {
-        specialityId,
-        surgeonId,
-      }),
-    )
+  watch([search, specialityFilter, surgeonFilter], () => {
+    if (page.value !== 1) page.value = 1
+    else loadPage()
   })
 
-  watch(search, () => {
-    page.value = 1
-  })
-
-  watch(paginationTotal, (total) => {
-    const lastPage = Math.max(1, Math.ceil(total / itemsPerPage))
-    if (page.value > lastPage) page.value = lastPage
-  })
+  watch(page, loadPage)
 
   return {
     deletingId,

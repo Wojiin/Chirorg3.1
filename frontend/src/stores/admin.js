@@ -8,6 +8,9 @@ export const useAdminStore = defineStore('admin', {
   state: () => ({
     resource: '',
     items: [],
+    totalItems: 0,
+    page: 1,
+    itemsPerPage: 10,
     current: null,
     pendingLoads: 0,
     listRequestId: 0,
@@ -30,12 +33,24 @@ export const useAdminStore = defineStore('admin', {
       this.error = ''
 
       try {
-        const items = await adminApi.list(resource, params)
-        if (requestId === this.listRequestId) this.items = items
-        return items
+        const result = await adminApi.list(resource, {
+          page: params.page ?? this.page,
+          itemsPerPage: params.itemsPerPage ?? this.itemsPerPage,
+          ...params,
+        })
+        const collection = Array.isArray(result)
+          ? { items: result, totalItems: result.length }
+          : result
+        if (requestId === this.listRequestId) {
+          this.items = collection.items
+          this.totalItems = collection.totalItems
+          this.page = Number(params.page ?? this.page)
+        }
+        return collection.items
       } catch (error) {
         if (requestId === this.listRequestId) {
           this.items = []
+          this.totalItems = 0
           this.error = getApiErrorMessage(error, ERROR_MESSAGES.adminListLoad)
         }
         return []
@@ -93,6 +108,7 @@ export const useAdminStore = defineStore('admin', {
       try {
         await adminApi.remove(resource, id)
         this.items = this.items.filter((item) => item.id !== id)
+        this.totalItems = Math.max(0, this.totalItems - 1)
         return true
       } catch (error) {
         this.error = getApiErrorMessage(error, ERROR_MESSAGES.adminDelete)

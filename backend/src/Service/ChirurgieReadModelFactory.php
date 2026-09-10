@@ -7,10 +7,11 @@ use App\Dto\ChirurgieVueFinale;
 use App\Entity\ChirurgiePlanifiee;
 use App\Entity\FicheTechnique;
 use App\Entity\PreparationMateriel;
+use App\Repository\ChirurgiePlanifieeRepository;
 
 final readonly class ChirurgieReadModelFactory
 {
-    public function __construct(private PreparationProgressCalculator $progressCalculator)
+    public function __construct(private PreparationProgressCalculator $progressCalculator, private ChirurgiePlanifieeRepository $repository)
     {
     }
 
@@ -18,7 +19,7 @@ final readonly class ChirurgieReadModelFactory
     {
         $progress = $this->progressCalculator->calculate($chirurgie->getPreparationsMateriel());
 
-        return new ChirurgiePreparation($chirurgie->getId() ?? 0, $chirurgie->getDateProgrammee()?->format('Y-m-d') ?? '', $chirurgie->getSalle() ?? '', $chirurgie->getOrdre(), $chirurgie->isValide(), $this->progressCalculator->validationState($chirurgie->isValide(), $progress), $this->surgeonData($chirurgie), $this->modelData($chirurgie), $this->preparationRows($chirurgie), $progress);
+        return new ChirurgiePreparation($chirurgie->getId() ?? 0, $chirurgie->getDateProgrammee()?->format('Y-m-d') ?? '', $chirurgie->getSalle() ?? '', $chirurgie->getOrdre(), $this->repository->countProgrammeSurgeries($chirurgie), $chirurgie->isValide(), $this->progressCalculator->validationState($chirurgie->isValide(), $progress), $this->surgeonData($chirurgie), $this->modelData($chirurgie), $this->preparationRows($chirurgie), $progress);
     }
 
     public function createFinalView(ChirurgiePlanifiee $chirurgie): ChirurgieVueFinale

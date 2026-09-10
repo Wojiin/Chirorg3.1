@@ -2,12 +2,16 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\FreeTextQueryFilter;
+use ApiPlatform\Doctrine\Orm\Filter\OrFilter;
+use ApiPlatform\Doctrine\Orm\Filter\PartialSearchFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\QueryParameter;
 use App\Dto\ChangementMotDePasseInput;
 use App\Dto\UtilisateurInput;
 use App\Error\ErrorMessage;
@@ -30,7 +34,9 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\HasLifecycleCallbacks]
 #[UniqueEntity(fields: ['email'], message: ErrorMessage::EMAIL_ALREADY_USED)]
 #[ApiResource(operations: [
-    new GetCollection(uriTemplate: '/utilisateurs', security: "is_granted('ROLE_ADMIN')", normalizationContext: ['groups' => ['utilisateur:list']]),
+    new GetCollection(uriTemplate: '/utilisateurs', security: "is_granted('ROLE_ADMIN')", normalizationContext: ['groups' => ['utilisateur:list']], parameters: [
+        'q' => new QueryParameter(filter: new FreeTextQueryFilter(new OrFilter(new PartialSearchFilter())), properties: ['email']),
+    ]),
     new Get(uriTemplate: '/utilisateurs/{id}', security: "is_granted('ROLE_ADMIN')", normalizationContext: ['groups' => ['utilisateur:read']]),
     new Post(uriTemplate: '/utilisateurs', security: "is_granted('ROLE_ADMIN')", input: UtilisateurInput::class, normalizationContext: ['groups' => ['utilisateur:read']], processor: UtilisateurWriteProcessor::class),
     new Patch(uriTemplate: '/utilisateurs/{id}', security: "is_granted('ROLE_ADMIN')", read: false, input: UtilisateurInput::class, normalizationContext: ['groups' => ['utilisateur:read']], processor: UtilisateurWriteProcessor::class),

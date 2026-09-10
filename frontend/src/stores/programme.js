@@ -11,6 +11,9 @@ import {
 export const useProgrammeStore = defineStore('programme', {
   state: () => ({
     programmes: [],
+    totalItems: 0,
+    page: 1,
+    itemsPerPage: 10,
     selectedProgramme: null,
     filters: {
       date: '',
@@ -74,7 +77,7 @@ export const useProgrammeStore = defineStore('programme', {
     },
 
     /** Charge la liste filtrée et expose toute erreur métier à l'interface. */
-    async fetchProgrammes(filters = this.filters) {
+    async fetchProgrammes(filters = this.filters, page = this.page) {
       this.setFilters(filters)
       const requestId = ++this.listRequestId
       this.pendingLoads += 1
@@ -84,11 +87,19 @@ export const useProgrammeStore = defineStore('programme', {
         const params = {
           ...(this.filters.date ? { date: this.filters.date } : {}),
           ...(this.filters.room ? { salle: this.filters.room } : {}),
+          page,
+          itemsPerPage: this.itemsPerPage,
         }
-        const programmes = normalizeProgrammeSummaries(
-          await programmeApi.list(params),
-        )
-        if (requestId === this.listRequestId) this.programmes = programmes
+        const result = await programmeApi.list(params)
+        const collection = Array.isArray(result)
+          ? { items: result, totalItems: result.length }
+          : result
+        const programmes = normalizeProgrammeSummaries(collection.items)
+        if (requestId === this.listRequestId) {
+          this.programmes = programmes
+          this.totalItems = collection.totalItems
+          this.page = Number(page)
+        }
         return programmes
       } catch (error) {
         if (requestId === this.listRequestId) {

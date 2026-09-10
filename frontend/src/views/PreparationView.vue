@@ -53,6 +53,10 @@ const {
             <span class="text-muted"
               >{{ surgery.salle }} · {{ surgery.date }}</span
             >
+            <span class="programme-order-indicator">
+              Intervention {{ surgery.ordre ?? 1 }} sur
+              {{ surgery.nombreChirurgies ?? 1 }}
+            </span>
           </div>
           <h2 class="page-title mt-4">
             {{ surgery.chirurgieModele.intitule }}

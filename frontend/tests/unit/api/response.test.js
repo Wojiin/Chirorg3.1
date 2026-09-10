@@ -1,8 +1,17 @@
 import { describe, expect, it } from 'vitest'
-import { getApiErrorMessage } from '@/api/response'
+import { getApiErrorMessage, unwrapPaginatedCollection } from '@/api/response'
 import { ERROR_MESSAGES } from '@/config/errorMessages'
 
 describe('API error messages', () => {
+  it('preserves API Platform pagination metadata', () => {
+    expect(
+      unwrapPaginatedCollection({ member: [{ id: 1 }], totalItems: 24 }),
+    ).toEqual({ items: [{ id: 1 }], totalItems: 24 })
+    expect(unwrapPaginatedCollection([{ id: 2 }])).toEqual({
+      items: [{ id: 2 }],
+      totalItems: 1,
+    })
+  })
   it('preserves business messages returned by API Platform', () => {
     expect(
       getApiErrorMessage({

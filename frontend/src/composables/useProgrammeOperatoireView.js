@@ -9,13 +9,16 @@ export function useProgrammeOperatoireView() {
     filters: storedFilters,
     rooms,
     filteredProgrammes,
+    totalItems,
+    page,
+    itemsPerPage,
     loading,
     error,
   } = storeToRefs(programmeStore)
   const filters = reactive({ ...storedFilters.value })
 
   function loadProgrammes() {
-    return programmeStore.fetchProgrammes({ ...filters })
+    return programmeStore.fetchProgrammes({ ...filters }, page.value)
   }
 
   function clearFilters() {
@@ -24,7 +27,11 @@ export function useProgrammeOperatoireView() {
   }
 
   onMounted(loadProgrammes)
-  watch(filters, loadProgrammes)
+  watch(filters, () => {
+    if (page.value !== 1) page.value = 1
+    else loadProgrammes()
+  })
+  watch(page, loadProgrammes)
 
   return {
     clearFilters,
@@ -33,6 +40,9 @@ export function useProgrammeOperatoireView() {
     filters,
     loading,
     loadProgrammes,
+    page,
+    itemsPerPage,
+    totalItems,
     rooms,
   }
 }

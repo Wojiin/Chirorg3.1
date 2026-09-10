@@ -14,12 +14,14 @@ use App\State\ProgrammePlanificationProcessor;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(operations: [
-    new GetCollection(uriTemplate: '/programmes-operatoires', provider: ProgrammeOperatoireProvider::class, security: "is_granted('ROLE_USER')", paginationEnabled: false, strictQueryParameterValidation: true, parameters: [
+    new GetCollection(uriTemplate: '/programmes-operatoires', provider: ProgrammeOperatoireProvider::class, security: "is_granted('ROLE_USER')", strictQueryParameterValidation: true, parameters: [
         'date' => new QueryParameter(constraints: [new Assert\Date()]),
         'dateDebut' => new QueryParameter(constraints: [new Assert\Date()]),
         'dateFin' => new QueryParameter(constraints: [new Assert\Date()]),
         'salle' => new QueryParameter(constraints: [new Assert\Length(max: 50)]),
         'chirurgien' => new QueryParameter(schema: ['type' => 'integer', 'minimum' => 1], castToNativeType: true, constraints: [new Assert\Positive()]),
+        'page' => new QueryParameter(schema: ['type' => 'integer', 'minimum' => 1], castToNativeType: true, constraints: [new Assert\Positive()]),
+        'itemsPerPage' => new QueryParameter(schema: ['type' => 'integer', 'minimum' => 1, 'maximum' => 100], castToNativeType: true, constraints: [new Assert\Range(min: 1, max: 100)]),
     ]),
     new Get(uriTemplate: '/programmes-operatoires/{date}/{salle}/{chirurgien}', provider: ProgrammeOperatoireProvider::class, security: "is_granted('ROLE_USER')"),
     new Get(uriTemplate: '/programmes-operatoires/{date}/{salle}/{chirurgien}/vue-finale', provider: ProgrammeOperatoireProvider::class, security: "is_granted('ROLE_USER')"),

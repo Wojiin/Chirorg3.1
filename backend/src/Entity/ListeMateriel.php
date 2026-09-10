@@ -3,6 +3,9 @@
 namespace App\Entity;
 
 use ApiPlatform\Doctrine\Orm\Filter\ExactFilter;
+use ApiPlatform\Doctrine\Orm\Filter\FreeTextQueryFilter;
+use ApiPlatform\Doctrine\Orm\Filter\OrFilter;
+use ApiPlatform\Doctrine\Orm\Filter\PartialSearchFilter;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
@@ -33,6 +36,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
             security: "is_granted('ROLE_USER')",
             normalizationContext: ['groups' => ['liste_materiel:list']],
             parameters: [
+                'q' => new QueryParameter(filter: new FreeTextQueryFilter(new OrFilter(new PartialSearchFilter())), properties: ['intitule']),
                 'chirurgien' => new QueryParameter(property: 'chirurgien', filter: new ExactFilter()),
                 'chirurgieModele' => new QueryParameter(property: 'chirurgieModele', filter: new ExactFilter()),
                 'specialite' => new QueryParameter(property: 'chirurgieModele.specialite', filter: new ExactFilter()),

@@ -1,8 +1,10 @@
 <script setup>
 /** En-tête du shell protégé relié à son composable d'orchestration. */
 import { useAppHeader } from '@/composables/useAppHeader'
+import { useTheme } from '@/composables/useTheme'
 
 const { displayName, isAdmin, logout, title } = useAppHeader()
+const { isDark, toggleTheme } = useTheme()
 </script>
 
 <template>
@@ -12,7 +14,7 @@ const { displayName, isAdmin, logout, title } = useAppHeader()
     >
       <div class="min-w-0">
         <p
-          class="truncate text-xs font-semibold uppercase tracking-[0.18em] text-chirorg-700 md:hidden dark:text-chirorg-300"
+          class="truncate text-xs font-semibold uppercase tracking-[0.18em] text-chirorg-700 lg:hidden dark:text-chirorg-300"
         >
           ChirOrg
         </p>
@@ -31,6 +33,20 @@ const { displayName, isAdmin, logout, title } = useAppHeader()
             {{ isAdmin ? 'Administrateur' : 'Utilisateur' }}
           </p>
         </div>
+        <button
+          type="button"
+          class="header-action theme-toggle"
+          :aria-label="
+            isDark ? 'Activer le thème clair' : 'Activer le thème sombre'
+          "
+          :title="isDark ? 'Thème clair' : 'Thème sombre'"
+          @click="toggleTheme"
+        >
+          <span aria-hidden="true">{{ isDark ? '☀' : '☾' }}</span>
+          <span class="hidden md:inline">{{
+            isDark ? 'Clair' : 'Sombre'
+          }}</span>
+        </button>
         <button type="button" class="header-action" @click="logout">
           Déconnexion
         </button>
