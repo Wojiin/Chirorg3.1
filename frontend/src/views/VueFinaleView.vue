@@ -1,70 +1,58 @@
 <script setup>
-import { onMounted } from 'vue'
+/** Vue finale : son script ne relie que l'affichage au composable dédié. */
+import { useVueFinaleView } from '@/composables/useVueFinaleView'
+import PageContainer from '@/components/ui/PageContainer.vue'
+import SurgeryOverview from '@/components/SurgeryOverview.vue'
+import TechnicalSheet from '@/components/TechnicalSheet.vue'
+import ErrorMessage from '@/components/ui/ErrorMessage.vue'
+import LoadingState from '@/components/ui/LoadingState.vue'
+import BaseButton from '@/components/ui/BaseButton.vue'
 
-import AppAlert from '../components/AppAlert.vue'
-import AppLoading from '../components/AppLoading.vue'
-import { usePreparationStore } from '../stores/preparation.js'
+const props = defineProps({
+  id: { type: Number, required: true },
+})
 
-const props = defineProps({ id: { type: Number, required: true } })
-const preparationStore = usePreparationStore()
-
-onMounted(() => preparationStore.fetchFinalView(props.id))
+const { error, goBack, loading, view } = useVueFinaleView(props)
 </script>
 
 <template>
-  <section class="page-section">
-    <header class="page-header">
-      <div>
-        <p class="eyebrow">Vue finale en lecture seule</p>
-        <h1>
-          {{ preparationStore.finalView?.chirurgie.chirurgieModele?.intitule }}
-        </h1>
-        <p v-if="preparationStore.finalView">
-          Validée par
-          {{ preparationStore.finalView.validePar?.email || 'un utilisateur' }}
-        </p>
-      </div>
-      <span class="status-badge"><i></i> Intervention validée</span>
-    </header>
+  <PageContainer>
+    <LoadingState v-if="loading" label="Chargement de la vue finale…" />
+    <ErrorMessage v-else-if="error" :message="error" />
+    <template v-else-if="view">
+      <p class="feedback-info">
+        Cette vue est en lecture seule une fois la préparation validée.
+      </p>
 
-    <AppAlert v-if="preparationStore.error" :message="preparationStore.error" />
-    <AppLoading
-      v-if="preparationStore.loading"
-      message="Chargement de la synthèse…"
-    />
+      <SurgeryOverview
+        :surgery="view.chirurgie"
+        status="Validée"
+        :validated-at="view.chirurgie.valideLe"
+      >
+        <template #action>
+          <BaseButton variant="secondary" @click="goBack">Retour</BaseButton>
+        </template>
+      </SurgeryOverview>
 
-    <div v-else-if="preparationStore.finalView" class="final-grid">
-      <section class="final-card">
-        <h2>Matériel validé</h2>
-        <ul>
+      <section aria-labelledby="validated-materials-title">
+        <h2 id="validated-materials-title" class="section-title">
+          Matériel validé
+        </h2>
+        <ul class="validated-material-list">
           <li
-            v-for="item in preparationStore.finalView.materiels"
+            v-for="item in view.materiels"
             :key="item.id"
+            class="validated-material"
           >
-            <strong>{{ item.intitule }}</strong>
-            <span>{{ item.typeMateriel }} · {{ item.adresse }}</span>
+            <p class="item-title">{{ item.materiel.intitule }}</p>
+            <p class="text-muted mt-1">
+              {{ item.materiel.adresse }} · {{ item.materiel.type }}
+            </p>
           </li>
         </ul>
       </section>
-      <section class="final-card">
-        <h2>Fiches techniques</h2>
-        <article
-          v-for="fiche in preparationStore.finalView.fichesTechniques"
-          :key="fiche.id"
-          class="technical-sheet"
-        >
-          <h3>{{ fiche.titre }}</h3>
-          <p>{{ fiche.description }}</p>
-          <a
-            v-if="fiche.lienImage"
-            :href="fiche.lienImage"
-            target="_blank"
-            rel="noreferrer"
-          >
-            Voir l’illustration
-          </a>
-        </article>
-      </section>
-    </div>
-  </section>
+
+      <TechnicalSheet :sheets="view.fichesTechniques" />
+    </template>
+  </PageContainer>
 </template>

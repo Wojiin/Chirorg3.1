@@ -1,3 +1,4 @@
+/** Liste déclarative des référentiels administrables et de leur intention métier. */
 export const adminResources = [
   {
     slug: 'specialites',
@@ -22,7 +23,7 @@ export const adminResources = [
   {
     slug: 'fiches-techniques',
     label: 'Fiches techniques',
-    description: 'Consignes opératoires ordonnées',
+    description: 'Consignes opératoires',
   },
   {
     slug: 'listes-materiel',
@@ -30,16 +31,22 @@ export const adminResources = [
     description: 'Listes par chirurgien et intervention',
   },
   {
-    slug: 'utilisateurs',
+    slug: 'users',
     label: 'Utilisateurs',
-    description: 'Comptes, rôles et états d’accès',
+    description: 'Comptes et rôles applicatifs',
   },
 ]
 
-const resourcesBySlug = new Map(
+const adminResourcesBySlug = new Map(
   adminResources.map((resource) => [resource.slug, resource]),
 )
 
+/** Retourne la définition unique d'un référentiel à partir de son segment d'URL. */
 export function getAdminResource(slug) {
-  return resourcesBySlug.get(slug) ?? null
+  return adminResourcesBySlug.get(slug) ?? null
+}
+
+/** Produit le libellé d'un référentiel sans dupliquer les titres dans les vues. */
+export function getAdminResourceLabel(slug, fallback = 'Référentiel') {
+  return getAdminResource(slug)?.label ?? fallback
 }

@@ -1,0 +1,649 @@
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: Inter, ui-sans-serif, system-ui, sans-serif;
+  --color-chirorg-50: #f0fdf4;
+  --color-chirorg-100: #dcfce7;
+  --color-chirorg-200: #bbf7d0;
+  --color-chirorg-300: #86efac;
+  --color-chirorg-500: #22c55e;
+  --color-chirorg-600: #16a34a;
+  --color-chirorg-700: #15803d;
+  --color-chirorg-800: #166534;
+  --shadow-card:
+    0 1px 2px rgb(15 23 42 / 0.04), 0 12px 32px rgb(15 23 42 / 0.06);
+}
+
+@layer base {
+  :root {
+    font-family: var(--font-sans);
+    color-scheme: light dark;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+  }
+
+  html {
+    min-width: 320px;
+    background: #f3f4f6;
+  }
+
+  body {
+    min-width: 320px;
+    min-height: 100vh;
+    margin: 0;
+    background: #f3f4f6;
+    color: #111827;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+  }
+
+  button,
+  a {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  :focus-visible {
+    outline: 3px solid rgb(34 197 94 / 0.4);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    html,
+    body {
+      background: #111827;
+      color: #f9fafb;
+    }
+  }
+}
+
+@layer components {
+  /* Structure des pages */
+  .page-heading {
+    @apply flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between;
+  }
+
+  .page-eyebrow {
+    @apply text-sm font-semibold text-chirorg-700 dark:text-chirorg-500;
+  }
+
+  .page-title {
+    @apply mt-1 text-2xl font-bold tracking-tight text-gray-950 dark:text-white;
+  }
+
+  .page-description {
+    @apply mt-2 text-sm text-gray-600 dark:text-gray-300;
+  }
+
+  .section-title {
+    @apply text-xl font-bold text-gray-950 dark:text-white;
+  }
+
+  :where(
+    .surface-panel,
+    .content-panel,
+    .form-panel,
+    .programme-card,
+    .programme-group,
+    .programme-summary-card,
+    .resource-card,
+    .technical-card,
+    .admin-mobile-card,
+    .admin-table-shell,
+    .login-panel,
+    .account-panel,
+    .preparation-overview,
+    .validation-panel,
+    .final-overview,
+    .programme-filters
+  ) {
+    @apply rounded-2xl border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800;
+  }
+
+  .content-panel {
+    @apply p-5 shadow-card sm:p-7;
+  }
+
+  .form-panel {
+    @apply max-w-4xl space-y-6 p-5 shadow-card sm:p-7;
+  }
+
+  .form-grid {
+    @apply grid gap-5 md:grid-cols-2;
+  }
+
+  .form-actions {
+    @apply flex flex-col-reverse gap-3 border-t border-gray-100 pt-5 sm:flex-row sm:justify-end dark:border-gray-700;
+  }
+
+  .programme-filters {
+    @apply grid gap-4 p-5 sm:grid-cols-2 lg:max-w-2xl;
+  }
+
+  .programme-form-section {
+    @apply rounded-2xl border border-gray-200 p-4 sm:p-5 dark:border-gray-700;
+  }
+
+  .surgery-model-list {
+    @apply mt-5 grid gap-4;
+  }
+
+  .surgery-model-row {
+    @apply grid items-end gap-3 rounded-xl bg-gray-50 p-3 sm:grid-cols-[minmax(0,1fr)_auto] dark:bg-gray-900/50;
+  }
+
+  .surgery-remove-button {
+    @apply mb-0.5;
+  }
+
+  .text-muted {
+    @apply text-sm text-gray-600 dark:text-gray-300;
+  }
+
+  .item-title {
+    @apply font-semibold text-gray-950 dark:text-white;
+  }
+
+  /* Actions */
+  .button-base {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl border font-semibold transition disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .button-primary {
+    @apply border-transparent bg-chirorg-700 text-white hover:bg-chirorg-800;
+  }
+
+  .button-secondary {
+    @apply border-gray-300 bg-white text-gray-800 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700;
+  }
+
+  .button-danger {
+    @apply border-transparent bg-red-600 text-white hover:bg-red-700;
+  }
+
+  .button-success {
+    @apply border-transparent bg-green-600 text-white hover:bg-green-700;
+  }
+
+  .button-warning {
+    @apply border-transparent bg-amber-500 text-gray-950 hover:bg-amber-600;
+  }
+
+  .button-ghost {
+    @apply border-transparent bg-transparent text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700;
+  }
+
+  .button-sm {
+    @apply min-h-9 px-3 py-1.5 text-sm;
+  }
+
+  .button-md {
+    @apply min-h-11 px-4 py-2.5 text-sm;
+  }
+
+  .button-lg {
+    @apply min-h-12 px-5 py-3 text-base;
+  }
+
+  .confirmation-content {
+    @apply flex items-start gap-4 rounded-xl border p-4;
+  }
+
+  .confirmation-icon {
+    @apply grid size-11 shrink-0 place-items-center rounded-full;
+  }
+
+  .confirmation-icon svg {
+    @apply size-5;
+  }
+
+  .confirmation-danger {
+    @apply border-red-200 bg-red-50 dark:border-red-900 dark:bg-red-950/60;
+  }
+
+  .confirmation-danger .confirmation-icon {
+    @apply bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-200;
+  }
+
+  .confirmation-success {
+    @apply border-green-200 bg-green-50 dark:border-green-900 dark:bg-green-950/60;
+  }
+
+  .confirmation-success .confirmation-icon {
+    @apply bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-200;
+  }
+
+  .confirmation-warning {
+    @apply border-amber-200 bg-amber-50 dark:border-amber-900 dark:bg-amber-950/60;
+  }
+
+  .confirmation-warning .confirmation-icon {
+    @apply bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-200;
+  }
+
+  .confirmation-info {
+    @apply border-blue-200 bg-blue-50 dark:border-blue-900 dark:bg-blue-950/60;
+  }
+
+  .confirmation-info .confirmation-icon {
+    @apply bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-200;
+  }
+
+  .confirmation-text-danger {
+    @apply text-red-700 dark:text-red-300;
+  }
+  .confirmation-text-success {
+    @apply text-green-700 dark:text-green-300;
+  }
+  .confirmation-text-warning {
+    @apply text-amber-700 dark:text-amber-300;
+  }
+  .confirmation-text-info {
+    @apply text-blue-700 dark:text-blue-300;
+  }
+
+  :where(.primary-link, .compact-primary-link) {
+    @apply inline-flex items-center justify-center rounded-xl bg-chirorg-500 text-sm font-semibold text-gray-950 transition hover:bg-chirorg-300;
+  }
+
+  .primary-link {
+    @apply min-h-11 px-4 py-2.5;
+  }
+
+  .compact-primary-link {
+    @apply min-h-10 flex-1 px-3 py-2;
+  }
+
+  .secondary-link {
+    @apply inline-flex min-h-9 items-center rounded-lg border border-gray-300 px-3 text-sm font-semibold dark:border-gray-600;
+  }
+
+  .loading-spinner {
+    @apply animate-spin rounded-full border-2 border-current border-r-transparent;
+  }
+
+  /* Formulaires */
+  .field-label {
+    @apply mb-2 block text-sm font-semibold text-gray-800 dark:text-gray-100;
+  }
+
+  .field-required {
+    @apply text-red-600;
+  }
+
+  .field-control {
+    @apply min-h-11 w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-gray-950 placeholder:text-gray-400 transition focus:border-chirorg-600 focus:ring-3 focus:ring-chirorg-100 dark:border-gray-600 dark:bg-gray-900 dark:text-white dark:placeholder:text-gray-500 dark:focus:ring-gray-700;
+  }
+
+  .field-control-invalid {
+    @apply border-red-500;
+  }
+
+  .field-error {
+    @apply mt-1.5 text-sm text-red-700 dark:text-red-400;
+  }
+
+  /* Messages et états */
+  .feedback-info {
+    @apply rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800 dark:border-blue-900 dark:bg-blue-950 dark:text-blue-200;
+  }
+
+  .feedback-error {
+    @apply rounded-xl border border-red-300 bg-red-50 px-4 py-3 text-sm font-medium text-red-800 dark:border-red-800 dark:bg-red-950 dark:text-red-200;
+  }
+
+  .feedback-error-soft {
+    @apply rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-800 dark:border-red-900 dark:bg-red-950 dark:text-red-200;
+  }
+
+  .feedback-success {
+    @apply rounded-xl border border-green-300 bg-green-50 px-4 py-3 text-sm font-medium text-green-800 dark:border-green-800 dark:bg-green-950 dark:text-green-200;
+  }
+
+  .empty-state {
+    @apply rounded-2xl border border-dashed border-gray-300 bg-white px-6 py-12 text-center dark:border-gray-600 dark:bg-gray-800;
+  }
+
+  .loading-state {
+    @apply flex min-h-40 items-center justify-center gap-3 rounded-2xl border border-gray-200 bg-white text-sm text-gray-600 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300;
+  }
+
+  /* Cartes métier */
+  :where(.programme-card, .resource-card) {
+    @apply shadow-card transition hover:-translate-y-0.5;
+  }
+
+  .programme-card {
+    @apply flex h-full flex-col p-5 hover:border-gray-300 dark:hover:border-gray-600;
+  }
+
+  .programme-summary-list {
+    @apply grid gap-3;
+  }
+
+  .programme-summary-card {
+    @apply flex flex-col gap-5 p-5 shadow-card sm:flex-row sm:items-center sm:justify-between;
+  }
+
+  .programme-summary-data {
+    @apply mt-3 flex flex-wrap gap-x-8 gap-y-2 text-sm;
+  }
+
+  .programme-summary-data div {
+    @apply flex gap-2;
+  }
+
+  .programme-summary-data dt {
+    @apply text-gray-500 dark:text-gray-400;
+  }
+
+  .programme-summary-data dd {
+    @apply font-semibold text-gray-800 dark:text-gray-100;
+  }
+
+  .programme-group {
+    @apply overflow-hidden shadow-card;
+  }
+
+  .programme-group-header {
+    @apply flex flex-col gap-3 border-b border-gray-100 p-5 sm:flex-row sm:items-center sm:justify-between dark:border-gray-700;
+  }
+
+  .programme-group-count {
+    @apply rounded-full bg-chirorg-50 px-3 py-1.5 text-sm font-semibold text-chirorg-800 dark:bg-chirorg-800/30 dark:text-chirorg-300;
+  }
+
+  .programme-order-help {
+    @apply flex flex-wrap justify-between gap-2 bg-gray-50 px-5 py-3 text-xs text-gray-500 dark:bg-gray-900/50 dark:text-gray-400;
+  }
+
+  .programme-surgery-list {
+    @apply grid gap-3 p-4 sm:p-5;
+  }
+
+  .draggable-programme-item {
+    @apply flex flex-col items-stretch gap-3 rounded-2xl border border-transparent transition sm:flex-row sm:cursor-grab sm:active:cursor-grabbing;
+  }
+
+  .draggable-programme-item-active {
+    @apply scale-[0.99] opacity-50;
+  }
+
+  .drag-handle {
+    @apply flex w-full shrink-0 items-center justify-between gap-3 rounded-xl border border-gray-200 bg-gray-50 p-2 text-gray-400 dark:border-gray-700 dark:bg-gray-900 sm:w-16 sm:flex-col sm:justify-center;
+  }
+
+  .drag-handle strong {
+    @apply text-sm text-gray-700 dark:text-gray-200;
+  }
+
+  .drag-move-actions {
+    @apply grid grid-cols-2 gap-2 sm:mt-2 sm:grid-cols-1;
+  }
+
+  .drag-move-actions button {
+    @apply flex min-h-11 min-w-11 touch-manipulation items-center justify-center gap-2 rounded-lg border border-gray-200 bg-white px-4 text-base font-bold text-gray-700 shadow-sm transition hover:border-chirorg-300 hover:bg-chirorg-50 focus-visible:ring-3 focus-visible:ring-chirorg-200 disabled:cursor-not-allowed disabled:opacity-25 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:border-chirorg-700 dark:hover:bg-gray-700 sm:size-10 sm:min-h-10 sm:min-w-10 sm:px-0;
+  }
+
+  .drag-move-label {
+    @apply text-xs sm:sr-only;
+  }
+
+  .draggable-programme-item-before {
+    @apply border-t-chirorg-500;
+  }
+
+  .draggable-programme-item-after {
+    @apply border-b-chirorg-500;
+  }
+
+  .resource-card {
+    @apply flex min-h-28 items-center justify-between gap-4 p-5 hover:border-chirorg-300 dark:hover:border-chirorg-700;
+  }
+
+  .preparation-item {
+    @apply flex flex-col gap-4 rounded-2xl border border-gray-200 bg-white p-4 transition dark:border-gray-700 dark:bg-gray-800 sm:flex-row sm:items-center;
+  }
+
+  .preparation-item-ready {
+    @apply border-green-300 bg-green-50/50 dark:border-green-800 dark:bg-green-950/20;
+  }
+
+  .preparation-item-absent {
+    @apply border-red-400 bg-red-50 dark:border-red-800 dark:bg-red-950/30;
+  }
+
+  .preparation-item-actions {
+    @apply grid shrink-0 grid-cols-2 overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700;
+  }
+
+  .preparation-choice {
+    @apply flex min-h-12 cursor-pointer items-center gap-2 border border-transparent px-4 text-sm font-bold transition has-[:disabled]:cursor-not-allowed has-[:disabled]:opacity-50 has-[:focus-visible]:ring-3 has-[:focus-visible]:ring-inset;
+  }
+
+  .preparation-choice input {
+    @apply size-5;
+  }
+
+  .preparation-choice-ready {
+    @apply bg-green-50 text-green-800 hover:border-green-400 hover:bg-green-50/40 has-[:checked]:bg-green-600 has-[:checked]:text-white dark:bg-green-950 dark:text-green-200 dark:hover:border-green-600 dark:hover:bg-green-900/60 dark:has-[:checked]:bg-green-700;
+  }
+
+  .preparation-choice-absent {
+    @apply border-l border-red-200 bg-red-50 text-red-800 hover:border-red-400 hover:bg-red-50/40 has-[:checked]:bg-red-600 has-[:checked]:text-white dark:border-red-800 dark:bg-red-950 dark:text-red-200 dark:hover:border-red-600 dark:hover:bg-red-900/60 dark:has-[:checked]:bg-red-700;
+  }
+
+  .validated-material {
+    @apply rounded-xl border border-green-200 bg-green-50 p-4 dark:border-green-900 dark:bg-green-950/60;
+  }
+
+  .validated-material-list {
+    @apply mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3;
+  }
+
+  .absent-material-list {
+    @apply mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3;
+  }
+
+  .absent-material-action {
+    @apply flex h-full w-full items-center justify-between gap-4 rounded-xl border border-red-300 bg-red-50 p-4 text-left text-red-900 transition hover:border-green-400 hover:bg-green-50 hover:text-green-900 focus-visible:ring-3 focus-visible:ring-green-200 disabled:cursor-not-allowed disabled:opacity-50 dark:border-red-800 dark:bg-red-950/60 dark:text-red-100 dark:hover:border-green-700 dark:hover:bg-green-950/50 dark:hover:text-green-100;
+  }
+
+  .absent-material-ready-label {
+    @apply shrink-0 rounded-lg bg-white/80 px-3 py-2 text-xs font-bold text-green-700 shadow-sm dark:bg-gray-900/70 dark:text-green-300;
+  }
+
+  .preparation-overview {
+    @apply grid gap-5 p-5 shadow-card sm:p-7 lg:grid-cols-[1fr_22rem];
+  }
+
+  .preparation-progress {
+    @apply self-center rounded-xl bg-gray-50 p-4 dark:bg-gray-900/60;
+  }
+
+  .preparation-layout {
+    @apply grid gap-6 xl:grid-cols-[minmax(0,1fr)_22rem];
+  }
+
+  .validation-panel {
+    @apply h-fit p-5 xl:sticky xl:top-24;
+  }
+
+  .final-overview {
+    @apply p-5 shadow-card sm:p-7;
+  }
+
+  .final-overview-heading {
+    @apply flex flex-col gap-5 md:flex-row md:items-start md:justify-between;
+  }
+
+  .final-metadata {
+    @apply grid grid-cols-2 gap-x-8 gap-y-3 text-sm;
+  }
+
+  .final-metadata dt,
+  .account-metadata dt {
+    @apply text-gray-500 dark:text-gray-400;
+  }
+
+  .final-metadata dd,
+  .account-metadata dd {
+    @apply mt-1 font-semibold;
+  }
+
+  .technical-card {
+    @apply p-5;
+  }
+
+  /* Badges */
+  .status-badge {
+    @apply inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold;
+  }
+
+  .badge-success {
+    @apply bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-300;
+  }
+
+  .badge-info {
+    @apply bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300;
+  }
+
+  .badge-warning {
+    @apply bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300;
+  }
+
+  .badge-admin {
+    @apply bg-violet-100 text-violet-800 dark:bg-violet-950 dark:text-violet-300;
+  }
+
+  .badge-neutral {
+    @apply bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-200;
+  }
+
+  /* Administration */
+  .admin-mobile-card {
+    @apply p-4;
+  }
+
+  .admin-mobile-list {
+    @apply grid gap-3 md:hidden;
+  }
+
+  .admin-item-actions {
+    @apply mt-4 flex gap-2;
+  }
+
+  .admin-table-shell {
+    @apply hidden overflow-hidden md:block;
+  }
+
+  .admin-table-head {
+    @apply bg-gray-50 text-xs uppercase tracking-wider text-gray-500 dark:bg-gray-900/60 dark:text-gray-400;
+  }
+
+  .admin-table-cell {
+    @apply px-5 py-4;
+  }
+
+  /* Navigation et structure applicative */
+  .app-shell {
+    @apply min-h-screen bg-gray-100 text-gray-900 dark:bg-gray-900 dark:text-gray-50;
+  }
+
+  .app-header {
+    @apply sticky top-0 z-30 h-19 border-b border-gray-200 bg-white/95 backdrop-blur dark:border-gray-700 dark:bg-gray-800/95;
+  }
+
+  .app-sidebar {
+    @apply fixed inset-y-0 left-0 z-40 hidden w-56 border-r border-gray-200 bg-white md:flex md:flex-col dark:border-gray-700 dark:bg-gray-800;
+  }
+
+  .sidebar-link {
+    @apply flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium text-gray-600 transition hover:bg-gray-100 hover:text-gray-950 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white;
+  }
+
+  .bottom-navigation {
+    @apply fixed inset-x-0 bottom-0 z-40 border-t border-gray-200 bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden dark:border-gray-700 dark:bg-gray-800/95;
+  }
+
+  .bottom-navigation-link {
+    @apply flex min-w-0 flex-1 flex-col items-center justify-center gap-1 px-1 text-[0.65rem] font-medium text-gray-500 dark:text-gray-400;
+  }
+
+  .header-action {
+    @apply rounded-lg border border-gray-300 px-3 py-2 text-sm font-semibold text-gray-700 transition hover:border-gray-400 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700;
+  }
+
+  .page-container {
+    @apply mx-auto w-full max-w-7xl space-y-6 px-5 py-6 sm:px-7 sm:py-8 lg:px-10;
+  }
+
+  .login-page {
+    @apply grid min-h-screen place-items-center bg-gray-100 px-5 py-10 dark:bg-gray-900;
+  }
+
+  .login-container {
+    @apply w-full max-w-md;
+  }
+
+  .login-brand {
+    @apply mb-8 text-center;
+  }
+
+  .login-logo {
+    @apply mx-auto mb-5 grid size-20 place-items-center rounded-3xl bg-chirorg-600 text-3xl font-bold text-white shadow-lg shadow-green-600/20;
+  }
+
+  .login-title {
+    @apply text-4xl font-bold tracking-tight text-gray-950 dark:text-white;
+  }
+
+  .login-title span {
+    @apply text-chirorg-700 dark:text-chirorg-300;
+  }
+
+  .login-panel {
+    @apply space-y-5 p-6 shadow-card sm:p-8;
+  }
+
+  .account-panel {
+    @apply w-full max-w-none p-6 shadow-card;
+  }
+
+  .account-layout {
+    @apply mx-auto grid w-full max-w-3xl gap-6;
+  }
+
+  .account-password-panel {
+    @apply w-full max-w-none;
+  }
+
+  .account-heading {
+    @apply flex items-center gap-4;
+  }
+
+  .account-avatar {
+    @apply grid size-14 place-items-center rounded-2xl bg-chirorg-100 text-xl font-bold text-chirorg-700 dark:bg-gray-700 dark:text-chirorg-500;
+  }
+
+  .account-metadata {
+    @apply mt-6 grid gap-4 border-t border-gray-100 pt-6 sm:grid-cols-2 dark:border-gray-700;
+  }
+
+  /* Progression */
+  .progress-caption {
+    @apply mb-2 flex items-center justify-between gap-3 text-xs font-medium text-gray-600 dark:text-gray-300;
+  }
+
+  .progress-track {
+    @apply h-2.5 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700;
+  }
+
+  .progress-value {
+    @apply h-full rounded-full bg-chirorg-600 transition-all duration-300;
+  }
+}

@@ -1,165 +1,259 @@
 <script setup>
-import { computed, ref, watch } from 'vue'
+/** Vue de liste administrative : son script ne relie que l'affichage au composable dédié. */
+import { useAdminListView } from '@/composables/useAdminListView'
+import PageContainer from '@/components/ui/PageContainer.vue'
+import PageHeading from '@/components/ui/PageHeading.vue'
+import AdminItemActions from '@/components/AdminItemActions.vue'
+import BaseInput from '@/components/ui/BaseInput.vue'
+import BaseSelect from '@/components/ui/BaseSelect.vue'
+import EmptyState from '@/components/ui/EmptyState.vue'
+import ErrorMessage from '@/components/ui/ErrorMessage.vue'
+import LoadingState from '@/components/ui/LoadingState.vue'
+import ConfirmationModal from '@/components/ui/ConfirmationModal.vue'
 
-import AppAlert from '../components/AppAlert.vue'
-import AppLoading from '../components/AppLoading.vue'
-import ConfirmDialog from '../components/admin/ConfirmDialog.vue'
-import { getAdminResource } from '../config/adminResources.js'
-import { itemDetails, itemSpecialityId, itemTitle } from '../domain/admin.js'
-import { adminApi } from '../services/admin.js'
-import { useAdminStore } from '../stores/admin.js'
-
-const props = defineProps({ resource: { type: String, required: true } })
-const store = useAdminStore()
-const search = ref('')
-const speciality = ref('')
-const specialities = ref([])
-const pendingRemoval = ref(null)
-
-const definition = computed(() => getAdminResource(props.resource))
-const supportsSpeciality = computed(() =>
-  [
-    'chirurgiens',
-    'chirurgie-modeles',
-    'materiels',
-    'fiches-techniques',
-    'listes-materiel',
-  ].includes(props.resource),
-)
-const displayedItems = computed(() => {
-  const needle = search.value.trim().toLocaleLowerCase('fr')
-  return store.items.filter((item) => {
-    const matchesSearch =
-      !needle || JSON.stringify(item).toLocaleLowerCase('fr').includes(needle)
-    const matchesSpeciality =
-      !speciality.value || String(itemSpecialityId(item)) === speciality.value
-    return matchesSearch && matchesSpeciality
-  })
+const props = defineProps({
+  resourceSlug: { type: String, required: true },
 })
 
-async function load() {
-  search.value = ''
-  speciality.value = ''
-  if (!definition.value) return
-  const requests = [store.loadItems(props.resource)]
-  if (supportsSpeciality.value) {
-    requests.push(
-      adminApi
-        .list('specialites')
-        .then((items) => (specialities.value = items)),
-    )
-  }
-  await Promise.all(requests)
-}
-
-async function confirmRemoval() {
-  if (!pendingRemoval.value) return
-  if (await store.removeItem(props.resource, pendingRemoval.value.id))
-    pendingRemoval.value = null
-}
-
-watch(() => props.resource, load, { immediate: true })
+const {
+  deletingId,
+  displayedError,
+  filteredItems,
+  getAdminItemDetails,
+  getAdminItemTitle,
+  hasDisplayedItems,
+  hasSpecialityFilter,
+  hasSurgeonFilter,
+  isTechnicalSheetList,
+  pageLoading,
+  pendingRemoval,
+  requestRemoval,
+  cancelRemoval,
+  confirmRemoval,
+  resource,
+  search,
+  specialityFilter,
+  specialityOptions,
+  surgeonFilter,
+  surgeonOptions,
+  technicalSheetGroups,
+} = useAdminListView(props)
 </script>
 
 <template>
-  <section class="page-section">
-    <header class="page-header">
-      <div>
-        <p class="eyebrow">Administration</p>
-        <h1>{{ definition?.label ?? 'Référentiel inconnu' }}</h1>
-        <p>{{ definition?.description }}</p>
-      </div>
-      <RouterLink
-        v-if="definition"
-        class="primary-button"
-        :to="{ name: 'admin-create', params: { resource } }"
-      >
-        Ajouter
-      </RouterLink>
-    </header>
+  <PageContainer>
+    <PageHeading
+      eyebrow="Administration"
+      :title="resource?.label ?? 'Référentiel'"
+      :description="resource?.description"
+    >
+      <template #action>
+        <RouterLink
+          v-if="resource"
+          :to="{ name: 'admin-new', params: { resource: resourceSlug } }"
+          class="primary-link"
+        >
+          + Ajouter dans {{ resource.label }}
+        </RouterLink>
+      </template>
+    </PageHeading>
 
-    <AppAlert v-if="!definition" message="Ce référentiel n’existe pas." />
-    <template v-else>
-      <div class="admin-filters">
-        <label>
-          <span>Rechercher</span>
-          <input
-            v-model="search"
-            type="search"
-            placeholder="Nom, intitulé, email…"
-          />
-        </label>
-        <label v-if="supportsSpeciality">
-          <span>Spécialité</span>
-          <select v-model="speciality">
-            <option value="">Toutes les spécialités</option>
-            <option
-              v-for="option in specialities"
-              :key="option.id"
-              :value="String(option.id)"
+    <div
+      v-if="resource"
+      class="grid max-w-6xl gap-4 md:grid-cols-2 lg:grid-cols-3"
+    >
+      <BaseInput
+        v-model="search"
+        label="Rechercher"
+        type="search"
+        placeholder="Rechercher dans le référentiel…"
+      />
+      <BaseSelect
+        v-if="hasSpecialityFilter"
+        v-model="specialityFilter"
+        :label="isTechnicalSheetList ? 'Spécialité de chirurgie' : 'Spécialité'"
+        :options="specialityOptions"
+        placeholder="Toutes les spécialités"
+        allow-empty
+      />
+      <BaseSelect
+        v-if="hasSurgeonFilter"
+        v-model="surgeonFilter"
+        label="Chirurgien"
+        :options="surgeonOptions"
+        placeholder="Tous les chirurgiens"
+        allow-empty
+      />
+    </div>
+    <ErrorMessage v-if="displayedError" :message="displayedError" />
+    <LoadingState v-if="pageLoading" />
+    <EmptyState v-else-if="resource && !hasDisplayedItems" />
+
+    <section
+      v-else-if="resource && isTechnicalSheetList"
+      aria-labelledby="resource-list-title"
+      class="space-y-8"
+    >
+      <h2 id="resource-list-title" class="sr-only">
+        Fiches techniques regroupées par chirurgie
+      </h2>
+
+      <article v-for="group in technicalSheetGroups" :key="group.id">
+        <header class="mb-3 flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <p
+              class="text-xs font-semibold uppercase tracking-wide text-chirorg-700 dark:text-chirorg-300"
             >
-              {{ option.intitule }}
-            </option>
-          </select>
-        </label>
-      </div>
+              {{ group.speciality }}
+            </p>
+            <h3 class="text-lg font-bold text-gray-950 dark:text-white">
+              {{ group.title }}
+            </h3>
+          </div>
+          <span class="status-badge status-neutral">
+            {{ group.items.length }} fiche{{
+              group.items.length > 1 ? 's' : ''
+            }}
+          </span>
+        </header>
 
-      <AppAlert v-if="store.error" :message="store.error" />
-      <AppLoading v-if="store.loading" message="Chargement du référentiel…" />
-      <div v-else-if="displayedItems.length" class="admin-table-shell">
-        <table class="admin-table">
+        <ul class="admin-mobile-list">
+          <li v-for="item in group.items" :key="item.id">
+            <article class="admin-mobile-card">
+              <p
+                class="text-xs font-semibold text-chirorg-700 dark:text-chirorg-300"
+              >
+                Étape {{ item.ordre }}
+              </p>
+              <h4 class="item-title mt-1">{{ getAdminItemTitle(item) }}</h4>
+              <p class="text-muted mt-1 line-clamp-2">
+                {{ getAdminItemDetails(item) }}
+              </p>
+              <AdminItemActions
+                :resource-slug="resourceSlug"
+                :item="item"
+                :title="getAdminItemTitle(item)"
+                :deleting="deletingId === item.id"
+                @remove="requestRemoval(item)"
+              />
+            </article>
+          </li>
+        </ul>
+
+        <div class="admin-table-shell">
+          <table class="w-full text-left text-sm">
+            <caption class="sr-only">
+              Fiches techniques de
+              {{
+                group.title
+              }}
+            </caption>
+            <thead class="admin-table-head">
+              <tr>
+                <th scope="col" class="px-5 py-4">Ordre</th>
+                <th scope="col" class="px-5 py-4">Intitulé</th>
+                <th scope="col" class="px-5 py-4">Consigne</th>
+                <th scope="col" class="px-5 py-4 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
+              <tr v-for="item in group.items" :key="item.id">
+                <td class="admin-table-cell font-semibold">{{ item.ordre }}</td>
+                <th scope="row" class="admin-table-cell item-title">
+                  {{ getAdminItemTitle(item) }}
+                </th>
+                <td
+                  class="admin-table-cell max-w-lg text-gray-500 dark:text-gray-400"
+                >
+                  {{ getAdminItemDetails(item) }}
+                </td>
+                <td class="admin-table-cell">
+                  <AdminItemActions
+                    :resource-slug="resourceSlug"
+                    :item="item"
+                    :title="getAdminItemTitle(item)"
+                    :deleting="deletingId === item.id"
+                    align-end
+                    @remove="requestRemoval(item)"
+                  />
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+    </section>
+
+    <section v-else-if="resource" aria-labelledby="resource-list-title">
+      <h2 id="resource-list-title" class="sr-only">Liste des éléments</h2>
+      <ul class="admin-mobile-list">
+        <li v-for="item in filteredItems" :key="item.id">
+          <article class="admin-mobile-card">
+            <h3 class="item-title">{{ getAdminItemTitle(item) }}</h3>
+            <p class="text-muted mt-1 line-clamp-2">
+              {{ getAdminItemDetails(item) }}
+            </p>
+            <AdminItemActions
+              :resource-slug="resourceSlug"
+              :item="item"
+              :title="getAdminItemTitle(item)"
+              :deleting="deletingId === item.id"
+              @remove="requestRemoval(item)"
+            />
+          </article>
+        </li>
+      </ul>
+
+      <div class="admin-table-shell">
+        <table class="w-full text-left text-sm">
           <caption class="sr-only">
+            Éléments du référentiel
             {{
-              definition.label
+              resource.label
             }}
           </caption>
-          <thead>
+          <thead class="admin-table-head">
             <tr>
-              <th>Intitulé</th>
-              <th>Informations</th>
-              <th>Actions</th>
+              <th scope="col" class="px-5 py-4">Intitulé</th>
+              <th scope="col" class="px-5 py-4">Informations</th>
+              <th scope="col" class="px-5 py-4 text-right">Actions</th>
             </tr>
           </thead>
-          <tbody>
-            <tr v-for="item in displayedItems" :key="item.id">
-              <th scope="row">{{ itemTitle(item) }}</th>
-              <td>{{ itemDetails(item) }}</td>
-              <td class="admin-actions">
-                <RouterLink
-                  :to="{
-                    name: 'admin-edit',
-                    params: { resource, id: item.id },
-                  }"
-                  >Modifier</RouterLink
-                >
-                <button
-                  type="button"
-                  :disabled="store.deletingId === item.id"
-                  @click="pendingRemoval = item"
-                >
-                  Supprimer
-                </button>
+          <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
+            <tr v-for="item in filteredItems" :key="item.id">
+              <th scope="row" class="admin-table-cell item-title">
+                {{ getAdminItemTitle(item) }}
+              </th>
+              <td
+                class="admin-table-cell max-w-lg text-gray-500 dark:text-gray-400"
+              >
+                {{ getAdminItemDetails(item) }}
+              </td>
+              <td class="admin-table-cell">
+                <AdminItemActions
+                  :resource-slug="resourceSlug"
+                  :item="item"
+                  :title="getAdminItemTitle(item)"
+                  :deleting="deletingId === item.id"
+                  align-end
+                  @remove="requestRemoval(item)"
+                />
               </td>
             </tr>
           </tbody>
         </table>
       </div>
-      <div v-else class="empty-state">
-        <span>Aucun résultat</span>
-        <h2>Ce référentiel est vide</h2>
-        <p>Ajoutez un élément ou modifiez les filtres.</p>
-      </div>
-    </template>
+    </section>
 
-    <ConfirmDialog
+    <ConfirmationModal
       :open="Boolean(pendingRemoval)"
+      variant="danger"
       title="Confirmer la suppression"
-      :message="`Supprimer « ${pendingRemoval ? itemTitle(pendingRemoval) : ''} » ? Cette action est définitive.`"
+      :message="`Voulez-vous vraiment supprimer « ${pendingRemoval ? getAdminItemTitle(pendingRemoval) : ''} » ? Cette action est irréversible.`"
       confirm-label="Supprimer"
-      :busy="store.deletingId !== null"
-      danger
-      @cancel="pendingRemoval = null"
+      :loading="deletingId === pendingRemoval?.id"
+      @cancel="cancelRemoval"
       @confirm="confirmRemoval"
     />
-  </section>
+  </PageContainer>
 </template>

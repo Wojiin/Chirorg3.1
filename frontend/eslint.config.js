@@ -15,13 +15,21 @@ export default [
   {
     languageOptions: {
       globals: {
+        atob: 'readonly',
+        btoa: 'readonly',
         document: 'readonly',
+        File: 'readonly',
+        FormData: 'readonly',
+        KeyboardEvent: 'readonly',
         process: 'readonly',
+        Storage: 'readonly',
+        URL: 'readonly',
         window: 'readonly',
       },
     },
     rules: {
       'vue/multi-word-component-names': 'off',
+      'vue/valid-template-root': 'off',
     },
   },
 ]

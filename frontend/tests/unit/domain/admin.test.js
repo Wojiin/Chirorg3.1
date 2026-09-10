@@ -1,0 +1,56 @@
+import { describe, expect, it } from 'vitest'
+import { filterAdminItems, getMaterialsForSurgeon } from '@/domain/adminFilters'
+import { getAdminFormFields } from '@/config/adminForms'
+import { buildAdminPayload, createAdminForm } from '@/mappers/admin'
+
+describe('speciality filters and material-list form', () => {
+  it('filters direct and surgery-related specialities', () => {
+    const items = [
+      { id: 1, specialite: { id: 4, intitule: 'Digestif' } },
+      {
+        id: 2,
+        chirurgieModele: { specialite: { id: 7, intitule: 'Orthopédie' } },
+      },
+    ]
+
+    expect(filterAdminItems(items, { specialityId: '7' })).toEqual([items[1]])
+  })
+
+  it('normalizes selected material names into API relations', () => {
+    const fields = getAdminFormFields('listes-materiel', {
+      materiels: [
+        { id: 8, intitule: 'Pince', specialite: { intitule: 'Digestif' } },
+      ],
+    })
+    const form = createAdminForm(fields, {
+      intitule: 'Liste test',
+      chirurgien: { id: 2 },
+      chirurgieModele: { id: 3 },
+      materiels: [{ id: 8, intitule: 'Pince' }],
+    })
+
+    expect(form.materiels).toEqual([8])
+    expect(buildAdminPayload(form).materiels).toEqual(['/api/materiels/8'])
+  })
+
+  it('only offers materials from the selected surgeon speciality', () => {
+    const surgeons = [{ id: 5, specialite: { id: 12, intitule: 'Orthopédie' } }]
+    const materials = [
+      {
+        id: 1,
+        intitule: 'Broche',
+        specialite: { id: 12, intitule: 'Orthopédie' },
+      },
+      {
+        id: 2,
+        intitule: 'Valve',
+        specialite: { id: 13, intitule: 'Cardiologie' },
+      },
+    ]
+
+    expect(getMaterialsForSurgeon(materials, surgeons, '5')).toEqual([
+      materials[0],
+    ])
+    expect(getMaterialsForSurgeon(materials, surgeons, '')).toEqual([])
+  })
+})

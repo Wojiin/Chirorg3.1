@@ -1,204 +1,142 @@
 <script setup>
-import { computed, onMounted, reactive, ref, watch } from 'vue'
-import { useRouter } from 'vue-router'
+/** Vue de planification : son script ne relie que l'affichage au composable dédié. */
+import { usePlanificationView } from '@/composables/usePlanificationView'
+import PageContainer from '@/components/ui/PageContainer.vue'
+import PageHeading from '@/components/ui/PageHeading.vue'
+import BaseButton from '@/components/ui/BaseButton.vue'
+import BaseInput from '@/components/ui/BaseInput.vue'
+import BaseSelect from '@/components/ui/BaseSelect.vue'
+import ErrorMessage from '@/components/ui/ErrorMessage.vue'
 
-import AppAlert from '../components/AppAlert.vue'
-import AppLoading from '../components/AppLoading.vue'
-import { programmeDetailRoute } from '../domain/programme.js'
-import { adminApi } from '../services/admin.js'
-import { useProgrammeStore } from '../stores/programme.js'
-
-const router = useRouter()
-const programmeStore = useProgrammeStore()
-const referencesLoading = ref(true)
-const referenceError = ref(null)
-const specialites = ref([])
-const chirurgiens = ref([])
-const modeles = ref([])
-const tomorrow = new Date(Date.now() + 86400000).toISOString().slice(0, 10)
-const form = reactive({
-  specialite: '',
-  chirurgienId: '',
-  dateProgrammee: tomorrow,
-  salle: 'Salle A',
-  chirurgieModeleIds: [''],
-})
-
-const chirurgiensFiltres = computed(() =>
-  chirurgiens.value.filter(
-    (item) => String(item.specialite?.id) === String(form.specialite),
-  ),
-)
-const modelesFiltres = computed(() =>
-  modeles.value.filter(
-    (item) => String(item.specialite?.id) === String(form.specialite),
-  ),
-)
-
-watch(
-  () => form.specialite,
-  () => {
-    form.chirurgienId = ''
-    form.chirurgieModeleIds = ['']
-  },
-)
-
-function addSurgery() {
-  form.chirurgieModeleIds.push('')
-}
-
-function removeSurgery(index) {
-  if (form.chirurgieModeleIds.length > 1)
-    form.chirurgieModeleIds.splice(index, 1)
-}
-
-async function submit() {
-  const ids = form.chirurgieModeleIds.map(Number)
-  if (
-    !form.chirurgienId ||
-    !form.specialite ||
-    !form.dateProgrammee ||
-    !form.salle.trim() ||
-    ids.some((id) => !id)
-  ) {
-    referenceError.value =
-      'Tous les champs et chaque intervention sont obligatoires.'
-    return
-  }
-
-  const programme = await programmeStore.create({
-    chirurgienId: Number(form.chirurgienId),
-    dateProgrammee: form.dateProgrammee,
-    salle: form.salle.trim(),
-    chirurgieModeleIds: ids,
-  })
-  if (programme) await router.push(programmeDetailRoute(programme))
-}
-
-onMounted(async () => {
-  try {
-    ;[specialites.value, chirurgiens.value, modeles.value] = await Promise.all([
-      adminApi.list('specialites'),
-      adminApi.list('chirurgiens'),
-      adminApi.list('chirurgie-modeles'),
-    ])
-  } catch {
-    referenceError.value = 'Impossible de charger les référentiels.'
-  } finally {
-    referencesLoading.value = false
-  }
-})
+const {
+  addSurgery,
+  cancel,
+  displayedError,
+  form,
+  minimumDate,
+  planning,
+  referencesLoading,
+  removeSurgery,
+  rooms,
+  specialties,
+  submit,
+  surgeons,
+  surgeries,
+} = usePlanificationView()
 </script>
 
 <template>
-  <section class="page-section page-section--narrow">
-    <header class="page-header">
-      <div>
-        <p class="eyebrow">Nouvelle planification</p>
-        <h1>Planifier un programme</h1>
-        <p>Une liste de matériel sera initialisée pour chaque intervention.</p>
-      </div>
-    </header>
-
-    <AppLoading
-      v-if="referencesLoading"
-      message="Chargement des référentiels…"
+  <PageContainer>
+    <PageHeading
+      eyebrow="Programme opératoire"
+      title="Planifier un programme"
+      description="Choisissez une spécialité pour filtrer le chirurgien et les interventions, puis définissez leur ordre initial."
     />
-    <form v-else class="admin-form" @submit.prevent="submit">
-      <AppAlert
-        v-if="referenceError || programmeStore.error"
-        :message="referenceError || programmeStore.error"
-      />
-      <div class="admin-form-grid">
-        <label>
-          Spécialité
-          <select v-model="form.specialite" required>
-            <option value="">Sélectionner</option>
-            <option v-for="item in specialites" :key="item.id" :value="item.id">
-              {{ item.intitule }}
-            </option>
-          </select>
-        </label>
-        <label>
-          Chirurgien
-          <select
-            v-model="form.chirurgienId"
-            required
-            :disabled="!form.specialite"
-          >
-            <option value="">Sélectionner</option>
-            <option
-              v-for="item in chirurgiensFiltres"
-              :key="item.id"
-              :value="item.id"
-            >
-              Dr {{ item.prenom }} {{ item.nom }}
-            </option>
-          </select>
-        </label>
-        <label>
-          Date
-          <input
-            v-model="form.dateProgrammee"
-            type="date"
-            :min="tomorrow"
+
+    <form class="form-panel" @submit.prevent="submit">
+      <ErrorMessage v-if="displayedError" :message="displayedError" />
+
+      <fieldset class="programme-form-section">
+        <legend class="section-title">Informations du programme</legend>
+        <div class="form-grid mt-5">
+          <BaseSelect
+            v-model="form.specialiteId"
+            label="Spécialité"
+            :options="specialties"
+            placeholder="Sélectionner une spécialité"
             required
           />
-        </label>
-        <label>
-          Salle
-          <input v-model="form.salle" maxlength="50" required />
-        </label>
-      </div>
-
-      <fieldset class="surgery-picker">
-        <legend>Interventions dans l’ordre du programme</legend>
-        <div
-          v-for="(_, index) in form.chirurgieModeleIds"
-          :key="index"
-          class="surgery-picker__row"
-        >
-          <span>{{ index + 1 }}</span>
-          <select
-            v-model="form.chirurgieModeleIds[index]"
-            :disabled="!form.specialite"
+          <BaseSelect
+            v-model="form.chirurgienId"
+            label="Chirurgien"
+            :options="surgeons"
+            :placeholder="
+              form.specialiteId
+                ? 'Sélectionner un chirurgien'
+                : 'Sélectionner d’abord une spécialité'
+            "
+            :disabled="!form.specialiteId"
             required
-          >
-            <option value="">Sélectionner une intervention</option>
-            <option
-              v-for="item in modelesFiltres"
-              :key="item.id"
-              :value="item.id"
-            >
-              {{ item.intitule }}
-            </option>
-          </select>
-          <button
-            class="secondary-button"
-            type="button"
-            :disabled="form.chirurgieModeleIds.length === 1"
-            @click="removeSurgery(index)"
-          >
-            Retirer
-          </button>
+          />
+          <BaseInput
+            v-model="form.dateProgrammee"
+            label="Date programmée"
+            type="date"
+            :min="minimumDate"
+            required
+          />
+          <BaseSelect
+            v-model="form.salle"
+            label="Salle"
+            :options="rooms"
+            required
+          />
         </div>
-        <button class="text-link button-link" type="button" @click="addSurgery">
-          + Ajouter une intervention
-        </button>
+      </fieldset>
+
+      <fieldset class="programme-form-section">
+        <legend class="section-title">Chirurgies du programme</legend>
+        <p class="text-muted mt-2">
+          L’ordre de cette liste devient l’ordre initial du programme.
+        </p>
+
+        <ol class="surgery-model-list">
+          <li
+            v-for="(_, index) in form.chirurgieModeleIds"
+            :key="index"
+            class="surgery-model-row"
+          >
+            <BaseSelect
+              v-model="form.chirurgieModeleIds[index]"
+              :label="`Chirurgie ${index + 1}`"
+              :options="surgeries"
+              :placeholder="
+                form.specialiteId
+                  ? 'Sélectionner une intervention'
+                  : 'Sélectionner d’abord une spécialité'
+              "
+              :disabled="!form.specialiteId"
+              required
+            />
+            <BaseButton
+              v-if="form.chirurgieModeleIds.length > 1"
+              type="button"
+              variant="ghost"
+              size="sm"
+              class="surgery-remove-button"
+              @click="removeSurgery(index)"
+            >
+              Retirer
+            </BaseButton>
+          </li>
+        </ol>
+
+        <BaseButton
+          type="button"
+          variant="secondary"
+          class="mt-4"
+          @click="addSurgery"
+        >
+          + Ajouter une chirurgie
+        </BaseButton>
       </fieldset>
 
       <div class="form-actions">
-        <RouterLink class="secondary-button" :to="{ name: 'programmes' }">
-          Annuler
-        </RouterLink>
-        <button
-          class="primary-button"
-          type="submit"
-          :disabled="programmeStore.saving"
+        <BaseButton type="button" variant="secondary" @click="cancel"
+          >Annuler</BaseButton
         >
-          {{ programmeStore.saving ? 'Planification…' : 'Planifier' }}
-        </button>
+        <BaseButton
+          type="submit"
+          :disabled="referencesLoading"
+          :loading="planning"
+        >
+          {{
+            referencesLoading
+              ? 'Chargement des référentiels…'
+              : 'Planifier le programme'
+          }}
+        </BaseButton>
       </div>
     </form>
-  </section>
+  </PageContainer>
 </template>
