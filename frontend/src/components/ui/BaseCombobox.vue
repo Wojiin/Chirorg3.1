@@ -95,7 +95,7 @@ function displayValue(value) {
               v-for="option in normalizedOptions"
               :key="option.value"
               :value="option.value"
-              class="flex cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-sm text-gray-700 outline-none data-[highlighted]:bg-chirorg-100 data-[highlighted]:text-chirorg-900 dark:text-gray-200 dark:data-[highlighted]:bg-chirorg-900/50 dark:data-[highlighted]:text-white"
+              class="flex cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-sm font-medium text-gray-800 outline-none data-[highlighted]:bg-chirorg-700 data-[highlighted]:text-white data-[state=checked]:bg-chirorg-800 data-[state=checked]:text-white dark:text-gray-100 dark:data-[highlighted]:bg-chirorg-600 dark:data-[highlighted]:text-white dark:data-[state=checked]:bg-chirorg-700"
             >
               <span>{{ option.label }}</span>
               <ComboboxItemIndicator aria-hidden="true"

@@ -28,7 +28,14 @@ test.describe('administration ChirOrg', () => {
     await page.goto('/admin/materiels')
 
     await page.getByRole('combobox', { name: 'Spécialité' }).click()
-    await expect(page.getByRole('option', { name: 'Orthopédie' })).toBeVisible()
+    const specialityOption = page.getByRole('option', { name: 'Orthopédie' })
+    await expect(specialityOption).toBeVisible()
+    await specialityOption.hover()
+    await expect(specialityOption).toHaveCSS(
+      'background-color',
+      'rgb(21, 128, 61)',
+    )
+    await expect(specialityOption).toHaveCSS('color', 'rgb(255, 255, 255)')
 
     await page
       .getByLabel('Navigation principale')
