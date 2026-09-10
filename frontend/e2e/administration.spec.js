@@ -21,6 +21,22 @@ async function login(page, email, password) {
 }
 
 test.describe('administration ChirOrg', () => {
+  test('opens the material speciality filter without blocking navigation', async ({
+    page,
+  }) => {
+    await login(page, adminEmail, adminPassword)
+    await page.goto('/admin/materiels')
+
+    await page.getByRole('combobox', { name: 'Spécialité' }).click()
+    await expect(page.getByRole('option', { name: 'Orthopédie' })).toBeVisible()
+
+    await page
+      .getByLabel('Navigation principale')
+      .getByRole('link', { name: 'Programme', exact: true })
+      .click()
+    await expect(page).toHaveURL(/\/programme$/)
+  })
+
   test('creates, updates and deletes a speciality with confirmation', async ({
     page,
   }) => {

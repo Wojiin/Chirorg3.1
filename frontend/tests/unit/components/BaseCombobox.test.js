@@ -45,4 +45,31 @@ describe('BaseCombobox', () => {
 
     expect(wrapper.emitted('update:modelValue')?.[0]).toEqual([2])
   })
+
+  it('clears an optional filter without rendering an empty option', async () => {
+    const wrapper = mount(BaseCombobox, {
+      props: {
+        modelValue: 1,
+        label: 'Spécialité',
+        options: [{ value: 1, label: 'Orthopédie' }],
+        allowEmpty: true,
+        'onUpdate:modelValue': (value) =>
+          wrapper.setProps({ modelValue: value }),
+      },
+      global: {
+        stubs: { ComboboxPortal: { template: '<div><slot /></div>' } },
+      },
+    })
+
+    expect(
+      wrapper
+        .findAll('[role="option"]')
+        .every((option) => option.attributes('data-value') !== ''),
+    ).toBe(true)
+    await wrapper
+      .get('button[aria-label="Effacer le filtre Spécialité"]')
+      .trigger('click')
+
+    expect(wrapper.emitted('update:modelValue')?.[0]).toEqual([''])
+  })
 })
