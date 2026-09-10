@@ -1,68 +1,93 @@
 import { defineStore } from 'pinia'
+import { preparationApi } from '@/services/preparationApi'
+import { getApiErrorMessage } from '@/api/response'
+import { normalizeFinalView, normalizePreparation } from '@/mappers/preparation'
 
-import { apiErrorMessage } from '../api/problem.js'
-import {
-  normalizeFinalView,
-  normalizePreparation,
-} from '../domain/programme.js'
-import { preparationApi } from '../services/preparation.js'
-
+/** Gère la checklist, sa progression optimiste et la validation finale d'une chirurgie. */
 export const usePreparationStore = defineStore('preparation', {
   state: () => ({
     preparation: null,
     finalView: null,
-    loading: false,
+    pendingLoads: 0,
+    loadRequestId: 0,
     savingId: null,
-    error: null,
+    error: '',
   }),
+
   getters: {
+    loading: (state) => state.pendingLoads > 0,
+    isComplete: (state) =>
+      Boolean(state.preparation?.preparations?.length) &&
+      state.preparation.preparations.every((item) => item.coche),
     isResolved: (state) =>
-      Boolean(state.preparation?.preparations.length) &&
+      Boolean(state.preparation?.preparations?.length) &&
       state.preparation.preparations.every((item) => item.coche || item.absent),
+    isPartial: (state) =>
+      state.preparation?.chirurgie?.etatValidation === 'VALIDATION_PARTIELLE',
   },
+
   actions: {
+    /** Recalcule localement les compteurs utilisés par la barre de progression. */
     updateProgress() {
       if (!this.preparation) return
-      const rows = this.preparation.preparations
-      const coches = rows.filter((item) => item.coche).length
-      const absents = rows.filter((item) => item.absent).length
+
+      const total = this.preparation.preparations.length
+      const coches = this.preparation.preparations.filter(
+        (item) => item.coche,
+      ).length
+      const absents = this.preparation.preparations.filter(
+        (item) => item.absent,
+      ).length
+      const traites = coches + absents
       this.preparation.progressionPreparation = {
-        total: rows.length,
+        total,
         coches,
         absents,
-        traites: coches + absents,
-        complete: rows.length > 0 && coches + absents === rows.length,
+        traites,
+        complete: total > 0 && total === traites,
       }
     },
-    async fetch(id) {
-      this.loading = true
-      this.error = null
+
+    /** Charge la checklist fraîche d'une chirurgie et réinitialise les vues incompatibles. */
+    async loadPreparation(id) {
+      const requestId = ++this.loadRequestId
+      this.pendingLoads += 1
+      this.error = ''
+      this.preparation = null
       this.finalView = null
+
       try {
-        this.preparation = normalizePreparation(await preparationApi.get(id))
+        const data = await preparationApi.getPreparation(id)
+        const preparation = normalizePreparation(data)
+        if (requestId !== this.loadRequestId) return null
+        this.preparation = preparation
         return this.preparation
       } catch (error) {
-        this.error = apiErrorMessage(
-          error,
-          'Impossible de charger la préparation.',
-        )
-        this.preparation = null
+        if (requestId === this.loadRequestId) {
+          this.error = getApiErrorMessage(
+            error,
+            'Impossible de charger la préparation.',
+          )
+        }
         return null
       } finally {
-        this.loading = false
+        this.pendingLoads -= 1
       }
     },
-    async setState(item, state) {
+
+    /** Bascule l'état d'un matériel de façon optimiste puis restaure l'ancien état si l'API échoue. */
+    async setMaterialState(item, state) {
       const previous = { coche: item.coche, absent: item.absent }
       item.coche = state === 'ready' ? !item.coche : false
       item.absent = state === 'absent' ? !item.absent : false
       this.updateProgress()
       this.savingId = item.id
-      this.error = null
+      this.error = ''
+
       try {
         Object.assign(
           item,
-          await preparationApi.setState(item.id, {
+          await preparationApi.toggle(item.id, {
             coche: item.coche,
             absent: item.absent,
           }),
@@ -72,55 +97,71 @@ export const usePreparationStore = defineStore('preparation', {
       } catch (error) {
         Object.assign(item, previous)
         this.updateProgress()
-        this.error = apiErrorMessage(
+        this.error = getApiErrorMessage(
           error,
-          'Le matériel n’a pas pu être mis à jour.',
+          'La mise à jour du matériel a échoué.',
         )
         return false
       } finally {
         this.savingId = null
       }
     },
-    async validate() {
-      if (!this.isResolved || !this.preparation) return null
-      this.loading = true
-      this.error = null
+
+    async toggleMaterial(item) {
+      return this.setMaterialState(item, 'ready')
+    },
+
+    /** Valide une chirurgie uniquement lorsque toutes ses lignes sont cochées. */
+    async validateSurgery() {
+      if (!this.isResolved || !this.preparation) return false
+
+      this.pendingLoads += 1
+      this.error = ''
+
       try {
-        const surgery = await preparationApi.validate(
+        const data = await preparationApi.validate(
           this.preparation.chirurgie.id,
         )
-        Object.assign(this.preparation.chirurgie, surgery)
-        this.preparation.chirurgie.etatValidation = surgery.valide
-          ? 'VALIDEE'
-          : 'VALIDATION_PARTIELLE'
-        return surgery.valide ? 'final' : 'partial'
+        this.preparation.chirurgie = {
+          ...this.preparation.chirurgie,
+          ...data,
+          etatValidation: data.valide ? 'VALIDEE' : 'VALIDATION_PARTIELLE',
+        }
+        return data.valide ? 'final' : 'partial'
       } catch (error) {
-        this.error = apiErrorMessage(
+        this.error = getApiErrorMessage(
           error,
-          'La chirurgie n’a pas pu être validée.',
+          'La validation de la chirurgie a échoué.',
         )
-        return null
+        return false
       } finally {
-        this.loading = false
+        this.pendingLoads -= 1
       }
     },
-    async fetchFinalView(id) {
-      this.loading = true
-      this.error = null
+
+    /** Charge la vue finale et vide la checklist de travail devenue obsolète. */
+    async loadFinalView(id) {
+      const requestId = ++this.loadRequestId
+      this.pendingLoads += 1
+      this.error = ''
+      this.preparation = null
+      this.finalView = null
+
       try {
-        this.finalView = normalizeFinalView(
-          await preparationApi.getFinalView(id),
-        )
-        return this.finalView
+        const data = await preparationApi.getFinalView(id)
+        const finalView = normalizeFinalView(data)
+        if (requestId === this.loadRequestId) this.finalView = finalView
+        return finalView
       } catch (error) {
-        this.error = apiErrorMessage(
-          error,
-          'Impossible de charger la vue finale.',
-        )
-        this.finalView = null
+        if (requestId === this.loadRequestId) {
+          this.error = getApiErrorMessage(
+            error,
+            'Impossible de charger la vue finale.',
+          )
+        }
         return null
       } finally {
-        this.loading = false
+        this.pendingLoads -= 1
       }
     },
   },

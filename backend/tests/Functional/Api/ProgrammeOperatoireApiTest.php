@@ -130,7 +130,21 @@ final class ProgrammeOperatoireApiTest extends AuthenticatedApiTestCase
 
         $client->request('PATCH', '/api/preparations-materiel/'.$preparationId.'/cocher', [
             'headers' => ['content-type' => 'application/merge-patch+json'],
-            'json' => ['coche' => true],
+            'json' => ['absent' => true],
+        ]);
+        self::assertResponseIsSuccessful();
+
+        $client->request('POST', '/api/chirurgies-planifiees/'.$chirurgieId.'/validation');
+        self::assertResponseIsSuccessful();
+        self::assertJsonContains(['valide' => false]);
+
+        $client->request('GET', '/api/chirurgies-planifiees/'.$chirurgieId.'/preparation');
+        self::assertResponseIsSuccessful();
+        self::assertJsonContains(['valide' => false, 'etatValidation' => 'VALIDATION_PARTIELLE']);
+
+        $client->request('PATCH', '/api/preparations-materiel/'.$preparationId.'/cocher', [
+            'headers' => ['content-type' => 'application/merge-patch+json'],
+            'json' => ['coche' => true, 'absent' => false],
         ]);
         self::assertResponseIsSuccessful();
 

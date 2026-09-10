@@ -1,92 +1,54 @@
 <script setup>
-import { onMounted, reactive } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+/** Vue publique de connexion : son script ne relie que l'affichage au composable dédié. */
+import { useLoginView } from '@/composables/useLoginView'
+import BaseButton from '@/components/ui/BaseButton.vue'
+import BaseInput from '@/components/ui/BaseInput.vue'
+import ErrorMessage from '@/components/ui/ErrorMessage.vue'
 
-import AppAlert from '../components/AppAlert.vue'
-import { useAuthStore } from '../stores/auth.js'
+const props = defineProps({
+  redirect: { type: String, default: '' },
+})
 
-const auth = useAuthStore()
-const route = useRoute()
-const router = useRouter()
-const credentials = reactive({ email: '', password: '' })
-
-onMounted(() => auth.clearError())
-
-function safeRedirect() {
-  const redirect = route.query.redirect
-  return typeof redirect === 'string' &&
-    redirect.startsWith('/') &&
-    !redirect.startsWith('//')
-    ? redirect
-    : '/'
-}
-
-async function submit() {
-  try {
-    await auth.login(credentials)
-    await router.replace(safeRedirect())
-  } catch {
-    // The store exposes the normalized API error to the form.
-  }
-}
+const { error, form, loading, submit } = useLoginView(props)
 </script>
 
 <template>
-  <main class="auth-page">
-    <section class="auth-intro">
-      <div class="brand brand--light">
-        <span class="brand__mark" aria-hidden="true">C</span>
-        <span
-          ><strong>ChirOrg</strong
-          ><small>Organisation du bloc opératoire</small></span
-        >
-      </div>
-      <div class="auth-intro__copy">
-        <p class="eyebrow">Coordonner · Préparer · Sécuriser</p>
-        <h1>Le programme opératoire, lisible par toute l’équipe.</h1>
-        <p>
-          Centralisez les interventions et suivez la préparation du matériel
-          depuis un espace sécurisé.
-        </p>
-      </div>
-    </section>
+  <main class="login-page">
+    <div class="login-container">
+      <header class="login-brand">
+        <div aria-hidden="true" class="login-logo">C</div>
+        <h1 class="login-title">Chir<span>Org</span></h1>
+        <p class="text-muted mt-3">Connexion à l’espace bloc opératoire</p>
+      </header>
 
-    <section class="auth-panel" aria-labelledby="login-title">
-      <form class="login-card" @submit.prevent="submit">
-        <header>
-          <p class="eyebrow">Accès professionnel</p>
-          <h2 id="login-title">Connexion</h2>
-          <p>Utilisez le compte attribué par votre administrateur.</p>
-        </header>
-
-        <AppAlert v-if="auth.error" :message="auth.error" />
-
-        <label>
-          Adresse email
-          <input
-            v-model.trim="credentials.email"
-            name="email"
-            type="email"
-            autocomplete="username"
-            required
-          />
-        </label>
-
-        <label>
-          Mot de passe
-          <input
-            v-model="credentials.password"
-            name="password"
-            type="password"
-            autocomplete="current-password"
-            required
-          />
-        </label>
-
-        <button class="primary-button" type="submit" :disabled="auth.loading">
-          {{ auth.loading ? 'Connexion en cours…' : 'Se connecter' }}
-        </button>
+      <form class="login-panel" @submit.prevent="submit">
+        <div>
+          <h2 class="section-title">Connexion</h2>
+          <p class="text-muted mt-1">
+            Accédez au programme et aux préparations du jour.
+          </p>
+        </div>
+        <ErrorMessage v-if="error" :message="error" />
+        <BaseInput
+          v-model="form.email"
+          label="Email"
+          type="email"
+          autocomplete="username"
+          placeholder="nom@exemple.fr"
+          required
+        />
+        <BaseInput
+          v-model="form.password"
+          label="Mot de passe"
+          type="password"
+          autocomplete="current-password"
+          placeholder="••••••••"
+          required
+        />
+        <BaseButton type="submit" size="lg" class="w-full" :loading="loading">
+          Se connecter
+        </BaseButton>
       </form>
-    </section>
+    </div>
   </main>
 </template>

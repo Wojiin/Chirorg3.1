@@ -1,163 +1,121 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import AppShell from '@/components/ui/AppShell.vue'
+import { installAccessGuard } from '@/router/accessGuard'
 
-import { createNavigationGuard } from './guard.js'
-import AccessDeniedView from '../views/AccessDeniedView.vue'
-import AdminFormView from '../views/AdminFormView.vue'
-import AdminListView from '../views/AdminListView.vue'
-import AdministrationView from '../views/AdministrationView.vue'
-import HomeView from '../views/HomeView.vue'
-import LoginView from '../views/LoginView.vue'
-import PlanificationView from '../views/PlanificationView.vue'
-import PreparationView from '../views/PreparationView.vue'
-import ProgrammeDetailView from '../views/ProgrammeDetailView.vue'
-import ProgrammesView from '../views/ProgrammesView.vue'
-import VueFinaleView from '../views/VueFinaleView.vue'
-
+/** Décrit la SPA : connexion publique, shell protégé et vues chargées à la demande. */
 const routes = [
   {
-    path: '/connexion',
-    name: 'connexion',
-    component: LoginView,
+    path: '/login',
+    name: 'login',
+    component: () => import('@/views/LoginView.vue'),
+    props: (route) => ({
+      redirect:
+        typeof route.query.redirect === 'string' ? route.query.redirect : '',
+    }),
     meta: { guestOnly: true, title: 'Connexion' },
   },
   {
     path: '/',
-    name: 'accueil',
-    component: HomeView,
-    meta: {
-      requiresAuth: true,
-      roles: ['ROLE_USER'],
-      shell: true,
-      title: 'Accueil',
-    },
+    component: AppShell,
+    meta: { requiresAuth: true },
+    children: [
+      { path: '', redirect: { name: 'programme' } },
+      {
+        path: 'programme',
+        name: 'programme',
+        component: () => import('@/views/ProgrammeOperatoireView.vue'),
+        meta: { title: 'Programme opératoire' },
+      },
+      {
+        path: 'programmes/:date/:salle/:chirurgien',
+        name: 'programme-detail',
+        component: () => import('@/views/ProgrammeDetailView.vue'),
+        props: (route) => ({
+          date: route.params.date,
+          salle: route.params.salle,
+          chirurgienId: Number(route.params.chirurgien),
+        }),
+        meta: { title: 'Détail du programme' },
+      },
+      {
+        path: 'planifier',
+        name: 'planification',
+        component: () => import('@/views/PlanificationView.vue'),
+        meta: { title: 'Planifier un programme' },
+      },
+      {
+        path: 'chirurgies/:id/preparation',
+        name: 'preparation',
+        component: () => import('@/views/PreparationView.vue'),
+        props: (route) => ({ id: Number(route.params.id) }),
+        meta: { title: 'Préparation' },
+      },
+      {
+        path: 'chirurgies/:id/validation-partielle',
+        name: 'validation-partielle',
+        component: () => import('@/views/ValidationPartielleView.vue'),
+        props: (route) => ({ id: Number(route.params.id) }),
+        meta: { title: 'Validation partielle' },
+      },
+      {
+        path: 'chirurgies/:id/vue-finale',
+        name: 'vue-finale',
+        component: () => import('@/views/VueFinaleView.vue'),
+        props: (route) => ({ id: Number(route.params.id) }),
+        meta: { title: 'Vue finale' },
+      },
+      {
+        path: 'admin',
+        name: 'admin',
+        component: () => import('@/views/AdminDashboardView.vue'),
+        meta: { requiresAdmin: true, title: 'Administration' },
+      },
+      {
+        path: 'admin/:resource/new',
+        name: 'admin-new',
+        component: () => import('@/views/AdminFormView.vue'),
+        props: (route) => ({ resourceSlug: route.params.resource, id: null }),
+        meta: { requiresAdmin: true, title: 'Ajouter une ressource' },
+      },
+      {
+        path: 'admin/:resource/:id/edit',
+        name: 'admin-edit',
+        component: () => import('@/views/AdminFormView.vue'),
+        props: (route) => ({
+          resourceSlug: route.params.resource,
+          id: Number(route.params.id),
+        }),
+        meta: { requiresAdmin: true, title: 'Modifier une ressource' },
+      },
+      {
+        path: 'admin/:resource',
+        name: 'admin-list',
+        component: () => import('@/views/AdminListView.vue'),
+        props: (route) => ({ resourceSlug: route.params.resource }),
+        meta: { requiresAdmin: true, title: 'Référentiel' },
+      },
+      {
+        path: 'compte',
+        name: 'account',
+        component: () => import('@/views/AccountView.vue'),
+        meta: { title: 'Mon compte' },
+      },
+      {
+        path: ':pathMatch(.*)*',
+        name: 'not-found',
+        component: () => import('@/views/NotFoundView.vue'),
+        meta: { title: 'Page introuvable' },
+      },
+    ],
   },
-  {
-    path: '/programmes',
-    name: 'programmes',
-    component: ProgrammesView,
-    meta: {
-      requiresAuth: true,
-      roles: ['ROLE_USER'],
-      shell: true,
-      title: 'Programmes opératoires',
-    },
-  },
-  {
-    path: '/programmes/planifier',
-    name: 'planification',
-    component: PlanificationView,
-    meta: {
-      requiresAuth: true,
-      roles: ['ROLE_USER'],
-      shell: true,
-      title: 'Planifier un programme',
-    },
-  },
-  {
-    path: '/programmes/:date/:salle/:chirurgien',
-    name: 'programme-detail',
-    component: ProgrammeDetailView,
-    props: (route) => ({
-      date: route.params.date,
-      salle: route.params.salle,
-      chirurgien: Number(route.params.chirurgien),
-    }),
-    meta: {
-      requiresAuth: true,
-      roles: ['ROLE_USER'],
-      shell: true,
-      title: 'Détail du programme',
-    },
-  },
-  {
-    path: '/chirurgies/:id/preparation',
-    name: 'preparation',
-    component: PreparationView,
-    props: (route) => ({ id: Number(route.params.id) }),
-    meta: {
-      requiresAuth: true,
-      roles: ['ROLE_USER'],
-      shell: true,
-      title: 'Préparation du matériel',
-    },
-  },
-  {
-    path: '/chirurgies/:id/vue-finale',
-    name: 'vue-finale',
-    component: VueFinaleView,
-    props: (route) => ({ id: Number(route.params.id) }),
-    meta: {
-      requiresAuth: true,
-      roles: ['ROLE_USER'],
-      shell: true,
-      title: 'Vue finale',
-    },
-  },
-  {
-    path: '/administration',
-    name: 'administration',
-    component: AdministrationView,
-    meta: {
-      requiresAuth: true,
-      roles: ['ROLE_ADMIN'],
-      shell: true,
-      title: 'Administration',
-    },
-  },
-  {
-    path: '/administration/:resource',
-    name: 'admin-list',
-    component: AdminListView,
-    props: true,
-    meta: {
-      requiresAuth: true,
-      roles: ['ROLE_ADMIN'],
-      shell: true,
-      title: 'Référentiel',
-    },
-  },
-  {
-    path: '/administration/:resource/ajouter',
-    name: 'admin-create',
-    component: AdminFormView,
-    props: true,
-    meta: {
-      requiresAuth: true,
-      roles: ['ROLE_ADMIN'],
-      shell: true,
-      title: 'Ajouter',
-    },
-  },
-  {
-    path: '/administration/:resource/:id/modifier',
-    name: 'admin-edit',
-    component: AdminFormView,
-    props: (route) => ({
-      resource: route.params.resource,
-      id: Number(route.params.id),
-    }),
-    meta: {
-      requiresAuth: true,
-      roles: ['ROLE_ADMIN'],
-      shell: true,
-      title: 'Modifier',
-    },
-  },
-  {
-    path: '/acces-refuse',
-    name: 'acces-refuse',
-    component: AccessDeniedView,
-    meta: { title: 'Accès refusé' },
-  },
-  { path: '/:pathMatch(.*)*', redirect: '/' },
 ]
 
-export function createAppRouter(authStore, history = createWebHistory()) {
-  const router = createRouter({ history, routes })
-  router.beforeEach(createNavigationGuard(authStore))
-  router.afterEach((to) => {
-    document.title = `${to.meta.title || 'Application'} · ChirOrg`
-  })
+const router = createRouter({
+  history: createWebHistory(import.meta.env.BASE_URL),
+  routes,
+  scrollBehavior: () => ({ top: 0 }),
+})
 
-  return router
-}
+installAccessGuard(router)
+
+export default router

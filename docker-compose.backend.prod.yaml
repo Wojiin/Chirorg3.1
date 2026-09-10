@@ -38,6 +38,7 @@ services:
     volumes:
       - ${JWT_PRIVATE_KEY_PATH:?JWT_PRIVATE_KEY_PATH is required}:/run/secrets/jwt_private.pem:ro
       - ${JWT_PUBLIC_KEY_PATH:?JWT_PUBLIC_KEY_PATH is required}:/run/secrets/jwt_public.pem:ro
+      - technical_sheet_uploads:/var/www/html/public/uploads
     depends_on:
       database:
         condition: service_healthy
@@ -54,11 +55,14 @@ services:
       - "${BACKEND_HTTP_PORT:-8080}:80"
     depends_on:
       - backend
+    volumes:
+      - technical_sheet_uploads:/var/www/html/public/uploads:ro
     networks:
       - public
 
 volumes:
   database_prod_data:
+  technical_sheet_uploads:
 
 networks:
   database:

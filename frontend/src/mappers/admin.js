@@ -1,30 +1,36 @@
-function relationId(value) {
+/** Transforme une relation API en identifiant sélectionnable par le formulaire. */
+function normalizeInitialValue(value) {
   if (value && typeof value === 'object') return value.id ?? ''
-  if (typeof value === 'string' && value.includes('/'))
-    return value.split('/').pop()
   return value ?? ''
 }
 
+/** Crée l'état éditable d'un formulaire depuis son schéma et une éventuelle ressource existante. */
 export function createAdminForm(fields, existing = null) {
   return Object.fromEntries(
     fields.map((field) => {
       if (field.key === 'role') {
+        const role = existing?.roles?.includes('ROLE_ADMIN')
+          ? 'ROLE_ADMIN'
+          : 'ROLE_USER'
+        return [field.key, role]
+      }
+
+      if (field.type === 'material-picker') {
         return [
           field.key,
-          existing?.roles?.includes('ROLE_ADMIN') ? 'ROLE_ADMIN' : 'ROLE_USER',
+          (existing?.[field.key] ?? []).map(normalizeInitialValue),
         ]
       }
-      if (field.key === 'actif') return [field.key, existing?.actif ?? true]
-      if (field.type === 'multiselect') {
-        return [field.key, (existing?.[field.key] ?? []).map(relationId)]
-      }
-      return [field.key, relationId(existing?.[field.key])]
+
+      return [field.key, normalizeInitialValue(existing?.[field.key])]
     }),
   )
 }
 
+/** Convertit les valeurs du formulaire en payload API Platform. */
 export function buildAdminPayload(form) {
   const payload = { ...form }
+  delete payload.imageFile
   const relations = {
     specialite: 'specialites',
     chirurgien: 'chirurgiens',
@@ -34,20 +40,27 @@ export function buildAdminPayload(form) {
   for (const [field, resource] of Object.entries(relations)) {
     if (payload[field]) payload[field] = `/api/${resource}/${payload[field]}`
   }
+
   if (payload.role) {
     payload.roles = [payload.role]
     delete payload.role
   }
-  if (!payload.motDePasse) delete payload.motDePasse
-  if (Object.hasOwn(payload, 'materiels')) {
-    payload.materiels = payload.materiels.map(
-      (id) => `/api/materiels/${relationId(id)}`,
-    )
+  if (payload.password) {
+    payload.motDePasse = payload.password
   }
-  if (payload.ordre !== undefined && payload.ordre !== '')
-    payload.ordre = Number(payload.ordre)
-  if (Object.hasOwn(payload, 'description'))
+  delete payload.password
+  if (Object.hasOwn(payload, 'description')) {
     payload.description = payload.description?.trim() || null
+  }
+  if (Object.hasOwn(payload, 'materiels')) {
+    payload.materiels = payload.materiels.map((material) => {
+      const id = typeof material === 'object' ? material.id : material
+      return `/api/materiels/${id}`
+    })
+  }
+  if (payload.ordre !== undefined && payload.ordre !== '') {
+    payload.ordre = Number(payload.ordre)
+  }
 
   return payload
 }

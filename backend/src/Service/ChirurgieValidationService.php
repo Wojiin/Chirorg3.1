@@ -24,8 +24,13 @@ final readonly class ChirurgieValidationService
             if (!$preparation->isCoche() && !$preparation->isAbsent()) {
                 throw new UnprocessableEntityHttpException('Tout le matériel doit être déclaré prêt ou absent avant la validation.');
             }
+        }
+        foreach ($chirurgie->getPreparationsMateriel() as $preparation) {
             if ($preparation->isAbsent()) {
-                throw new UnprocessableEntityHttpException('Une chirurgie ne peut pas être validée tant qu’un matériel est absent.');
+                $this->auditTrail->markModified($chirurgie);
+                $this->entityManager->flush();
+
+                return $chirurgie;
             }
         }
 

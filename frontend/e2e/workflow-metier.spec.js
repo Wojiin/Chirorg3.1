@@ -11,53 +11,74 @@ test.skip(
 test('un utilisateur planifie puis prépare une intervention', async ({
   page,
 }) => {
-  const date = new Date(Date.now() + 30 * 86400000).toISOString().slice(0, 10)
+  const daysAhead = 60 + Math.floor(Math.random() * 300)
+  const date = new Date(Date.now() + daysAhead * 86400000)
+    .toISOString()
+    .slice(0, 10)
 
-  await page.goto('/connexion')
-  await page.getByLabel('Adresse email').fill(userEmail)
+  await page.goto('/login')
+  await page.getByLabel('Email').fill(userEmail)
   await page.getByLabel('Mot de passe').fill(userPassword)
   await page.getByRole('button', { name: 'Se connecter' }).click()
 
   await page
     .getByLabel('Navigation principale')
-    .getByRole('link', { name: 'Planifier', exact: true })
+    .getByRole('link', { name: 'Planifier un programme', exact: true })
     .click()
   await page.getByLabel('Spécialité').selectOption({ label: 'Orthopédie' })
   await page
     .getByLabel('Chirurgien')
     .selectOption({ label: 'Dr Nicolas Bernard' })
-  await page.getByLabel('Date').fill(date)
-  await page.getByLabel('Salle').fill('Salle E2E')
+  await page.getByLabel('Date programmée').fill(date)
+  await page.getByLabel('Salle').selectOption('Salle C')
   await page
-    .getByRole('group', { name: 'Interventions dans l’ordre du programme' })
-    .getByRole('combobox')
+    .getByLabel('Chirurgie 1')
     .selectOption({ label: 'Prothèse totale de hanche' })
-  await page.getByRole('button', { name: 'Planifier', exact: true }).click()
+  await page.getByRole('button', { name: 'Planifier le programme' }).click()
 
-  await expect(page.getByRole('heading', { name: 'Salle E2E' })).toBeVisible()
+  const programme = page
+    .locator('article.programme-summary-card')
+    .filter({ hasText: 'Salle C' })
+    .filter({ hasText: 'Bernard Nicolas' })
+  await expect(programme).toBeVisible()
+  await programme
+    .getByRole('link', { name: 'Voir le détail du programme' })
+    .click()
+  await expect(
+    page.getByRole('heading', { name: 'Détail du programme' }),
+  ).toBeVisible()
   const chirurgie = page
-    .getByRole('listitem')
-    .filter({ has: page.getByRole('heading', { name: /Proth/ }) })
+    .locator('article.programme-card')
+    .filter({ hasText: 'Prothèse' })
     .last()
   await chirurgie.getByRole('link', { name: /parer/ }).click()
   await expect(
     page.getByRole('heading', { name: 'Prothèse totale de hanche' }),
   ).toBeVisible()
   const premierMateriel = await page
-    .locator('.material-row h2')
+    .locator('.preparation-item .item-title')
     .first()
     .innerText()
-  const boutonsPret = page.getByRole('button', { name: /Marquer pr/ })
-  while ((await boutonsPret.count()) > 0) {
-    const nombreRestant = await boutonsPret.count()
-    await boutonsPret.first().click()
-    await expect(boutonsPret).toHaveCount(nombreRestant - 1)
+  const casesPret = page.getByLabel('Prêt')
+  const casesAbsent = page.getByLabel('Absent')
+  const materialCount = await casesPret.count()
+  for (let index = 0; index < materialCount - 1; index += 1) {
+    await casesPret.nth(index).check()
+    await expect(casesPret.nth(index)).toBeChecked()
   }
-  await page.getByRole('button', { name: 'Valider la préparation' }).click()
+  await casesAbsent.last().check()
+  await page.getByRole('button', { name: 'Valider la chirurgie' }).click()
 
-  await expect(page.getByText('Intervention validée')).toBeVisible()
+  await expect(page).toHaveURL(/\/validation-partielle$/)
+  await expect(
+    page.getByRole('heading', { name: 'Matériel absent' }),
+  ).toBeVisible()
+  await page.getByRole('button', { name: /Passer à « Prêt »/ }).click()
+
+  await expect(page).toHaveURL(/\/vue-finale$/)
+  await expect(page.getByText(/lecture seule/)).toBeVisible()
   await expect(page.getByText(premierMateriel, { exact: true })).toBeVisible()
   await expect(
-    page.getByRole('heading', { name: 'Fiches techniques' }),
+    page.getByRole('heading', { name: 'Fiche technique' }),
   ).toBeVisible()
 })

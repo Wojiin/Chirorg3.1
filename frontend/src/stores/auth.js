@@ -1,133 +1,130 @@
 import { defineStore } from 'pinia'
+import { authApi } from '@/services/authApi'
+import { accountApi } from '@/services/accountApi'
+import { getApiErrorMessage } from '@/api/response'
+import { getUserFromAccessToken } from '@/utils/jwt'
 
-import { setAccessToken } from '../api/http.js'
-import { apiErrorMessage } from '../api/problem.js'
-import { authService } from '../services/auth.js'
+// Empêche plusieurs gardes de route de lancer simultanément le même refresh silencieux.
+let initializationPromise = null
 
-const PROFILE_STORAGE_KEY = 'chirorg.profile'
-let refreshPromise = null
-
-function readStoredProfile() {
-  try {
-    const value = window.localStorage.getItem(PROFILE_STORAGE_KEY)
-    return value ? JSON.parse(value) : null
-  } catch {
-    window.localStorage.removeItem(PROFILE_STORAGE_KEY)
-    return null
-  }
-}
-
-function persistProfile(profile) {
-  if (profile) {
-    window.localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(profile))
-  } else {
-    window.localStorage.removeItem(PROFILE_STORAGE_KEY)
-  }
-}
-
+/** Centralise la session utilisateur en mémoire et ne persiste jamais le JWT dans le navigateur. */
 export const useAuthStore = defineStore('auth', {
   state: () => ({
-    profile: readStoredProfile(),
-    authenticated: false,
-    initialized: false,
+    user: null,
+    token: null,
     loading: false,
-    error: null,
+    initializing: false,
+    initialized: false,
+    error: '',
   }),
 
   getters: {
-    isAuthenticated: (state) => state.authenticated,
-    roles: (state) => state.profile?.roles || [],
-    isAdmin() {
-      return this.roles.includes('ROLE_ADMIN')
-    },
+    isAuthenticated: (state) => Boolean(state.token && state.user),
+    isAdmin: (state) => state.user?.roles?.includes('ROLE_ADMIN') ?? false,
+    displayName: (state) =>
+      state.user?.email?.split('@')[0] || 'Compte ChirOrg',
   },
 
   actions: {
-    setProfile(profile) {
-      this.profile = profile
-      persistProfile(profile)
+    /** Mémorise ou efface le JWT d'accès reçu de l'API. */
+    setAccessToken(token) {
+      this.token = token || null
     },
 
+    /** Efface toute identité locale quand le refresh échoue ou après déconnexion. */
     clearSession() {
-      setAccessToken(null)
-      this.authenticated = false
-      this.setProfile(null)
+      this.user = null
+      this.token = null
     },
 
+    /** Initialise directement l'écran public de connexion sans provoquer un refresh anonyme en 401. */
+    initializeGuestSession() {
+      this.clearSession()
+      this.initializing = false
+      this.initialized = true
+    },
+
+    /** Récupère le profil associé au JWT courant pour compléter la session en mémoire. */
+    async fetchMe() {
+      const user = await accountApi.getCurrent()
+      this.user = user
+      return user
+    },
+
+    /** Utilise les claims signés du JWT et ne sollicite `/me` qu'en solution de repli. */
+    async hydrateUser(token) {
+      const tokenUser = getUserFromAccessToken(token)
+      if (tokenUser) {
+        this.user = tokenUser
+        return tokenUser
+      }
+
+      return this.fetchMe()
+    },
+
+    /** Authentifie l'utilisateur, conserve le token en mémoire puis hydrate son profil. */
     async login(credentials) {
       this.loading = true
-      this.error = null
+      this.error = ''
 
       try {
-        const session = await authService.login(credentials)
-        if (!session?.token) {
-          throw new Error('Le serveur n’a pas retourné de jeton d’accès.')
-        }
-        setAccessToken(session.token)
-        this.authenticated = true
-        this.setProfile(await authService.me())
+        const data = await authApi.login(credentials)
+        this.setAccessToken(data.token)
+        await this.hydrateUser(data.token)
         this.initialized = true
+        return true
       } catch (error) {
         this.clearSession()
-        this.error = apiErrorMessage(error, 'Connexion impossible.')
-        throw error
+        this.error = getApiErrorMessage(
+          error,
+          'Email ou mot de passe incorrect.',
+        )
+        return false
       } finally {
         this.loading = false
       }
     },
 
-    refreshAccessToken() {
-      if (!refreshPromise) {
-        refreshPromise = authService
-          .refresh()
-          .then(({ token }) => {
-            if (!token) {
-              throw new Error('Le renouvellement de session a échoué.')
-            }
-            setAccessToken(token)
-            this.authenticated = true
-            return token
-          })
-          .catch((error) => {
-            this.clearSession()
-            throw error
-          })
-          .finally(() => {
-            refreshPromise = null
-          })
-      }
+    /** Tente une restauration silencieuse de session une seule fois au démarrage de la SPA. */
+    initialize() {
+      if (this.initialized) return Promise.resolve(this.isAuthenticated)
+      if (initializationPromise) return initializationPromise
 
-      return refreshPromise
+      this.initializing = true
+      initializationPromise = (async () => {
+        try {
+          if (!this.token) {
+            this.setAccessToken(await authApi.refreshSession())
+          }
+          await this.hydrateUser(this.token)
+          return true
+        } catch {
+          this.clearSession()
+          return false
+        } finally {
+          this.initialized = true
+          this.initializing = false
+          initializationPromise = null
+        }
+      })()
+
+      return initializationPromise
     },
 
-    async initialize() {
-      if (this.initialized) return
-
-      this.loading = true
-      try {
-        await this.refreshAccessToken()
-        this.setProfile(await authService.me())
-      } catch {
-        this.clearSession()
-      } finally {
-        this.initialized = true
-        this.loading = false
-      }
-    },
-
+    /** Invalide côté serveur puis nettoie la session locale même en cas d'indisponibilité réseau. */
     async logout() {
       this.loading = true
+      this.error = ''
+
       try {
-        await authService.logout()
+        await authApi.logout()
+      } catch {
+        // Le client est déconnecté même si l'API est momentanément indisponible.
       } finally {
         this.clearSession()
         this.initialized = true
         this.loading = false
       }
-    },
-
-    clearError() {
-      this.error = null
     },
   },
 })
