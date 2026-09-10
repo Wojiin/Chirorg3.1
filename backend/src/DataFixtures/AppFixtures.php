@@ -35,7 +35,7 @@ final class AppFixtures extends Fixture
         $manager->persist($user);
 
         $specialites = [];
-        foreach (['Orthopédie', 'Chirurgie viscérale et digestive', 'Chirurgie générale', 'Traumatologie', 'Urologie', 'Sans spécialité'] as $intitule) {
+        foreach (['Orthopédie', 'Chirurgie viscérale et digestive', 'Chirurgie générale', 'Traumatologie', 'Urologie', Specialite::SANS_SPECIALITE] as $intitule) {
             $specialite = (new Specialite())->setIntitule($intitule);
             $specialites[] = $specialite;
             $manager->persist($specialite);

@@ -2,6 +2,8 @@
 
 namespace App\Tests\Functional\Api;
 
+use App\Entity\Specialite;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class ReferentielsApiTest extends AuthenticatedApiTestCase
@@ -109,7 +111,27 @@ final class ReferentielsApiTest extends AuthenticatedApiTestCase
         }
 
         $client->request('DELETE', $specialite);
+        self::assertResponseStatusCodeSame(204);
+
+        foreach ([$chirurgien, $materiel, $chirurgieModele] as $iri) {
+            $client->request('GET', $iri);
+            self::assertResponseStatusCodeSame(200);
+            self::assertJsonContains([
+                'specialite' => ['intitule' => Specialite::SANS_SPECIALITE],
+            ]);
+        }
+
+        $entityManager = static::getContainer()->get(EntityManagerInterface::class);
+        $defaultSpecialite = $entityManager->getRepository(Specialite::class)->findOneBy([
+            'intitule' => Specialite::SANS_SPECIALITE,
+        ]);
+        self::assertInstanceOf(Specialite::class, $defaultSpecialite);
+
+        $client->request('DELETE', '/api/specialites/'.$defaultSpecialite->getId());
         self::assertResponseStatusCodeSame(409);
+        self::assertJsonContains([
+            'detail' => 'La spécialité « Sans spécialité » ne peut pas être supprimée.',
+        ]);
 
         $client->request('DELETE', $chirurgien);
         self::assertResponseStatusCodeSame(409);
@@ -122,7 +144,7 @@ final class ReferentielsApiTest extends AuthenticatedApiTestCase
         self::assertResponseIsSuccessful();
         self::assertJsonContains(['totalItems' => 1]);
 
-        foreach ([$listeMateriel, $ficheTechnique, $materiel, $autreMateriel, $chirurgien, $chirurgieModele, $specialite, $autreSpecialite] as $iri) {
+        foreach ([$listeMateriel, $ficheTechnique, $materiel, $autreMateriel, $chirurgien, $chirurgieModele, $autreSpecialite] as $iri) {
             $client->request('DELETE', $iri);
             self::assertResponseStatusCodeSame(204);
         }
