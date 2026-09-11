@@ -13,7 +13,6 @@ const { links } = useAppNavigation()
         v-for="link in links"
         :key="link.to"
         :to="link.to"
-        :aria-label="link.label"
         class="bottom-navigation-link"
         active-class="!text-chirorg-700 dark:!text-chirorg-300"
       >

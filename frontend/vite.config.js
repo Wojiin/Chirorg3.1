@@ -4,12 +4,44 @@ import vue from '@vitejs/plugin-vue'
 import tailwindcss from '@tailwindcss/vite'
 import { defineConfig } from 'vite'
 
-// https://vite.dev/config/
-export default defineConfig({
+const sourceDirectory = fileURLToPath(new URL('./src', import.meta.url))
+const piniaProductionBuild = fileURLToPath(
+  new URL(
+    './node_modules/pinia/dist/pinia.esm-browser.prod.js',
+    import.meta.url,
+  ),
+)
+
+/** Sélectionne le build Pinia minimal uniquement pour les livrables de production. */
+export default defineConfig(({ command }) => ({
   plugins: [vue(), tailwindcss()],
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url)),
+      '@': sourceDirectory,
+      ...(command === 'build' ? { pinia: piniaProductionBuild } : {}),
+    },
+  },
+  build: {
+    rolldownOptions: {
+      output: {
+        // Fractionne l'analyse des deux dépendances communes coûteuses sur CPU ralenti.
+        codeSplitting: {
+          groups: [
+            {
+              name: 'axios',
+              test: /node_modules[\\/]axios/,
+              priority: 20,
+              includeDependenciesRecursively: false,
+            },
+            {
+              name: 'pinia',
+              test: /node_modules[\\/]pinia/,
+              priority: 20,
+              includeDependenciesRecursively: false,
+            },
+          ],
+        },
+      },
     },
   },
   test: {
@@ -29,4 +61,4 @@ export default defineConfig({
       },
     },
   },
-})
+}))

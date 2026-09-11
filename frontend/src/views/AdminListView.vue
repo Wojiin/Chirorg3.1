@@ -1,16 +1,20 @@
 <script setup>
 /** Vue de liste administrative : son script ne relie que l'affichage au composable dédié. */
+import { defineAsyncComponent } from 'vue'
 import { useAdminListView } from '@/composables/useAdminListView'
 import PageContainer from '@/components/ui/PageContainer.vue'
 import PageHeading from '@/components/ui/PageHeading.vue'
 import AdminItemActions from '@/components/AdminItemActions.vue'
 import BaseInput from '@/components/ui/BaseInput.vue'
-import BaseCombobox from '@/components/ui/BaseCombobox.vue'
 import BasePagination from '@/components/ui/BasePagination.vue'
 import EmptyState from '@/components/ui/EmptyState.vue'
 import ErrorMessage from '@/components/ui/ErrorMessage.vue'
 import LoadingState from '@/components/ui/LoadingState.vue'
 import ConfirmationModal from '@/components/ui/ConfirmationModal.vue'
+
+const BaseCombobox = defineAsyncComponent(
+  () => import('@/components/ui/BaseCombobox.vue'),
+)
 
 const props = defineProps({
   resourceSlug: { type: String, required: true },
@@ -72,22 +76,36 @@ const {
         type="search"
         placeholder="Rechercher dans le référentiel…"
       />
-      <BaseCombobox
-        v-if="hasSpecialityFilter"
-        v-model="specialityFilter"
-        :label="isTechnicalSheetList ? 'Spécialité de chirurgie' : 'Spécialité'"
-        :options="specialityOptions"
-        placeholder="Toutes les spécialités"
-        allow-empty
-      />
-      <BaseCombobox
-        v-if="hasSurgeonFilter"
-        v-model="surgeonFilter"
-        label="Chirurgien"
-        :options="surgeonOptions"
-        placeholder="Tous les chirurgiens"
-        allow-empty
-      />
+      <Suspense v-if="hasSpecialityFilter">
+        <BaseCombobox
+          v-model="specialityFilter"
+          :label="
+            isTechnicalSheetList ? 'Spécialité de chirurgie' : 'Spécialité'
+          "
+          :options="specialityOptions"
+          placeholder="Toutes les spécialités"
+          allow-empty
+        />
+        <template #fallback>
+          <div
+            class="h-[70px] animate-pulse rounded-xl bg-gray-100 dark:bg-gray-800"
+          />
+        </template>
+      </Suspense>
+      <Suspense v-if="hasSurgeonFilter">
+        <BaseCombobox
+          v-model="surgeonFilter"
+          label="Chirurgien"
+          :options="surgeonOptions"
+          placeholder="Tous les chirurgiens"
+          allow-empty
+        />
+        <template #fallback>
+          <div
+            class="h-[70px] animate-pulse rounded-xl bg-gray-100 dark:bg-gray-800"
+          />
+        </template>
+      </Suspense>
     </div>
     <ErrorMessage v-if="displayedError" :message="displayedError" />
     <LoadingState v-if="pageLoading" />

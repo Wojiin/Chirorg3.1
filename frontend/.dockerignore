@@ -3,6 +3,7 @@
 .env.*.local
 coverage/
 dist/
+lighthouse-reports/
 node_modules/
 playwright-report/
 test-results/

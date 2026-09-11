@@ -13,9 +13,12 @@ services:
       && exec php-fpm"
 
   frontend:
-    environment:
-      VITE_ENABLE_DEVTOOLS: "false"
-    command: sh -c "npm install && npm run build && npm run preview:lighthouse"
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+      args:
+        VITE_API_BASE_URL: /api
+    command: ["nginx", "-g", "daemon off;"]
 
 volumes:
   backend_var_lighthouse:

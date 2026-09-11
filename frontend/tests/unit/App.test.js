@@ -58,6 +58,17 @@ describe('application shell and routing', () => {
     description.name = 'description'
     document.head.append(description)
     const pinia = createPinia()
+    const router = createRouter({
+      history: createMemoryHistory(),
+      routes: [
+        {
+          path: '/admin/:resource',
+          name: 'admin-list',
+          component: { template: '<p>Référentiel</p>' },
+          meta: { requiresAuth: true, requiresAdmin: true },
+        },
+      ],
+    })
     setActivePinia(pinia)
     const authStore = useAuthStore()
     authStore.user = {
@@ -67,12 +78,12 @@ describe('application shell and routing', () => {
     }
     authStore.token = 'test-token'
     authStore.initialized = true
-    await appRouter.push('/admin/materiels')
-    await appRouter.isReady()
+    await router.push('/admin/materiels')
+    await router.isReady()
 
     const wrapper = mount(App, {
       global: {
-        plugins: [pinia, appRouter],
+        plugins: [pinia, router],
         stubs: { Toaster: true },
       },
     })

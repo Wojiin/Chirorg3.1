@@ -324,6 +324,10 @@ jobs:
           LH_API_BASE_URL: http://127.0.0.1:8080/api
           LH_EMAIL: admin@chirorg.test
           LH_PASSWORD: AdminFixture-2026!
+          LH_MIN_PERFORMANCE_MEDIAN: 98
+          LH_MIN_PERFORMANCE_MINIMUM: 95
+          LH_MIN_ACCESSIBILITY: 100
+          LH_MIN_BEST_PRACTICES: 100
 
       - name: Upload Lighthouse reports
         if: always()

@@ -5,6 +5,7 @@ import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import lighthouse from 'lighthouse'
 import { chromium } from '@playwright/test'
+import { evaluateQualityGate, qualityGateError } from './qualityGate.mjs'
 
 const baseUrl = process.env.LH_BASE_URL ?? 'http://localhost:5173'
 const apiBaseUrl = process.env.LH_API_BASE_URL ?? 'http://localhost:8080/api'
@@ -345,6 +346,7 @@ async function main() {
       runs,
       pages: summary,
       global,
+      qualityGate: evaluateQualityGate(global, process.env),
     }
     writeFileSync(
       join(reportDirectory, 'summary.json'),
@@ -353,7 +355,14 @@ async function main() {
 
     console.table(summary)
     console.table(global)
+    console.table(report.qualityGate.thresholds)
     console.log(`Rapports générés dans ${reportDirectory}`)
+
+    if (!report.qualityGate.passed) {
+      throw new Error(
+        `Budgets Lighthouse non respectés — ${qualityGateError(report.qualityGate.failures)}.`,
+      )
+    }
   } finally {
     await context?.close()
     try {
