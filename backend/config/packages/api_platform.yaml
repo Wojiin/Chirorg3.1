@@ -17,3 +17,8 @@ api_platform:
     collection:
         pagination:
             items_per_page_parameter_name: itemsPerPage
+
+when@prod:
+    api_platform:
+        enable_docs: false
+        enable_entrypoint: false

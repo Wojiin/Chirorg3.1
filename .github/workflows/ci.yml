@@ -166,12 +166,21 @@ jobs:
           -f docker-compose.lighthouse.yaml
           config --quiet
 
-      - name: Validate production backend Compose
+      - name: Validate production Compose
         run: >
           docker compose
           --env-file .env.prod.example
-          -f docker-compose.backend.prod.yaml
+          -f docker-compose.prod.yaml
           config --quiet
+
+      - name: Validate Caddy configuration
+        run: >
+          docker run --rm
+          -e APP_DOMAIN=chirorg.example.org
+          -e ACME_EMAIL=administrateur@example.org
+          -v "$PWD/docker/caddy/Caddyfile:/etc/caddy/Caddyfile:ro"
+          caddy:2-alpine
+          caddy validate --config /etc/caddy/Caddyfile
 
       - name: Build backend and frontend images
         run: >
@@ -180,12 +189,12 @@ jobs:
           -f docker-compose.dev.yaml
           build backend frontend
 
-      - name: Build production backend images
+      - name: Build production images
         run: >
           docker compose
           --env-file .env.prod.example
-          -f docker-compose.backend.prod.yaml
-          build backend nginx
+          -f docker-compose.prod.yaml
+          build backend nginx frontend
 
       - name: Start development stack and wait for healthchecks
         run: >
@@ -211,6 +220,61 @@ jobs:
       - name: Stop development stack
         if: always()
         run: docker compose --env-file .env.example -f docker-compose.dev.yaml down --volumes
+
+      - name: Generate ephemeral production JWT keys
+        run: |
+          mkdir -p secrets/jwt
+          openssl genpkey -algorithm RSA -aes-256-cbc -pass pass:ci-jwt-passphrase -pkeyopt rsa_keygen_bits:4096 -out secrets/jwt/private.pem
+          openssl pkey -in secrets/jwt/private.pem -passin pass:ci-jwt-passphrase -pubout -out secrets/jwt/public.pem
+
+      - name: Start isolated production stack
+        env:
+          APP_DOMAIN: http://localhost
+          APP_HOST: localhost
+          HTTP_PORT: 8081
+          HTTPS_PORT: 8443
+          DEFAULT_URI: http://localhost:8081
+          CORS_ALLOW_ORIGIN: ^http://localhost:8081$
+          TRUSTED_HOSTS: ^localhost$
+          JWT_PASSPHRASE: ci-jwt-passphrase
+        run: >
+          docker compose
+          -p chirorg31-prod-ci
+          --env-file .env.prod.example
+          -f docker-compose.prod.yaml
+          up -d --wait --wait-timeout 180
+
+      - name: Validate production migrations and endpoints
+        env:
+          APP_DOMAIN: http://localhost
+          APP_HOST: localhost
+          HTTP_PORT: 8081
+          HTTPS_PORT: 8443
+          DEFAULT_URI: http://localhost:8081
+          CORS_ALLOW_ORIGIN: ^http://localhost:8081$
+          TRUSTED_HOSTS: ^localhost$
+          JWT_PASSPHRASE: ci-jwt-passphrase
+        run: |
+          docker compose -p chirorg31-prod-ci --env-file .env.prod.example -f docker-compose.prod.yaml exec -T backend php bin/console doctrine:migrations:migrate --no-interaction
+          docker compose -p chirorg31-prod-ci --env-file .env.prod.example -f docker-compose.prod.yaml exec -T backend php bin/console doctrine:schema:validate
+          curl --fail --retry 10 --retry-delay 2 http://localhost:8081/api/health > /dev/null
+          curl --fail --retry 10 --retry-delay 2 http://localhost:8081/ > /dev/null
+
+      - name: Show production logs on failure
+        if: failure()
+        env:
+          APP_DOMAIN: http://localhost
+          APP_HOST: localhost
+          JWT_PASSPHRASE: ci-jwt-passphrase
+        run: docker compose -p chirorg31-prod-ci --env-file .env.prod.example -f docker-compose.prod.yaml logs --no-color
+
+      - name: Stop isolated production stack
+        if: always()
+        env:
+          APP_DOMAIN: http://localhost
+          APP_HOST: localhost
+          JWT_PASSPHRASE: ci-jwt-passphrase
+        run: docker compose -p chirorg31-prod-ci --env-file .env.prod.example -f docker-compose.prod.yaml down --volumes
 
   e2e:
     name: End-to-end workflows

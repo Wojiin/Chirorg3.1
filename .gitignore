@@ -14,3 +14,7 @@ frontend/playwright-report/
 frontend/test-results/
 frontend/lighthouse-reports/
 *.log
+.env.prod
+.deploy/
+backups/
+secrets/
