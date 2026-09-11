@@ -30,6 +30,7 @@ const preparationPayload = {
   dateProgrammee: '2030-01-15',
   salle: 'Salle B',
   ordre: 1,
+  nombreChirurgies: 5,
   valide: false,
   chirurgien: { id: 7, prenom: 'Ada', nom: 'Lovelace' },
   chirurgieModele: { id: 2, intitule: 'Intervention' },
@@ -368,6 +369,7 @@ describe('ChirOrg stores with API services', () => {
       dateProgrammee: '2026-07-24',
       salle: 'Salle A',
       ordre: 1,
+      nombreChirurgies: 5,
       valide: false,
       chirurgien: { id: 1, prenom: 'Jean', nom: 'Dupont' },
       chirurgieModele: { id: 2, intitule: 'Intervention' },
@@ -382,6 +384,7 @@ describe('ChirOrg stores with API services', () => {
     })
 
     expect(preparation.chirurgie.id).toBe(42)
+    expect(preparation.chirurgie.nombreChirurgies).toBe(5)
     expect(preparation.preparations[0].coche).toBe(true)
     expect(preparation.preparations[0].materiel.type).toBe('Instrument')
   })

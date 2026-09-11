@@ -7,6 +7,7 @@ export function normalizePreparation(data) {
       date: data.dateProgrammee,
       salle: data.salle,
       ordre: data.ordre,
+      nombreChirurgies: data.nombreChirurgies,
       valide: data.valide,
       valideLe: data.valideLe,
       etatValidation:

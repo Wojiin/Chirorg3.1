@@ -1,5 +1,5 @@
 import { apiClient } from '@/api/axios'
-import { unwrapCollection } from '@/api/response'
+import { unwrapPaginatedCollection } from '@/api/response'
 
 /** Porte les appels CRUD génériques des référentiels administratifs, sans état d'interface. */
 export const adminApi = {
@@ -10,7 +10,32 @@ export const adminApi = {
       params,
       headers: { Accept: 'application/ld+json' },
     })
-    return unwrapCollection(data)
+    return unwrapPaginatedCollection(data)
+  },
+  /** Charge toutes les pages d'un référentiel destiné à alimenter un sélecteur. */
+  async listAll(resource, params = {}) {
+    const itemsPerPage = 100
+    const firstPage = await this.list(resource, {
+      ...params,
+      page: 1,
+      itemsPerPage,
+    })
+    const normalizedFirstPage = Array.isArray(firstPage)
+      ? { items: firstPage, totalItems: firstPage.length }
+      : firstPage
+    const items = [...normalizedFirstPage.items]
+    const pageCount = Math.ceil(normalizedFirstPage.totalItems / itemsPerPage)
+
+    for (let page = 2; page <= pageCount; page += 1) {
+      const result = await this.list(resource, {
+        ...params,
+        page,
+        itemsPerPage,
+      })
+      items.push(...(Array.isArray(result) ? result : result.items))
+    }
+
+    return items
   },
   /** Charge une ressource administrative par son identifiant. */
   async get(resource, id) {

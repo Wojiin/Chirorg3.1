@@ -106,7 +106,7 @@ final class ProgrammeOperatoireApiTest extends AuthenticatedApiTestCase
 
         $client->request('GET', '/api/chirurgies-planifiees/'.$chirurgieId.'/preparation');
         self::assertResponseIsSuccessful();
-        self::assertJsonContains(['etatValidation' => 'EN_PREPARATION', 'progressionPreparation' => ['total' => 1, 'traites' => 0, 'complete' => false]]);
+        self::assertJsonContains(['ordre' => 1, 'nombreChirurgies' => 1, 'etatValidation' => 'EN_PREPARATION', 'progressionPreparation' => ['total' => 1, 'traites' => 0, 'complete' => false]]);
 
         $nestedPreparations = $client->request('GET', '/api/chirurgies-planifiees/'.$chirurgieId.'/preparations-materiel');
         self::assertResponseIsSuccessful();
@@ -174,8 +174,11 @@ final class ProgrammeOperatoireApiTest extends AuthenticatedApiTestCase
         $client->request('PATCH', $programmeUrl, ['headers' => ['content-type' => 'application/merge-patch+json'], 'json' => ['chirurgieIds' => [$chirurgieId]]]);
         self::assertResponseStatusCodeSame(409);
 
-        $filteredResponse = $client->request('GET', sprintf('/api/programmes-operatoires?dateDebut=%s&dateFin=%s', $date->format('Y-m-d'), $date->format('Y-m-d')));
+        $filteredResponse = $client->request('GET', sprintf('/api/programmes-operatoires?dateDebut=%s&dateFin=%s&page=1&itemsPerPage=1', $date->format('Y-m-d'), $date->format('Y-m-d')));
         self::assertResponseIsSuccessful();
+        $filteredPayload = $filteredResponse->toArray();
+        self::assertGreaterThanOrEqual(1, $filteredPayload['totalItems']);
+        self::assertCount(1, $filteredPayload['member']);
         self::assertStringContainsString('"date":"'.$date->format('Y-m-d').'"', $filteredResponse->getContent());
         $client->request('GET', sprintf('/api/programmes-operatoires?dateDebut=%s&dateFin=%s', $date->modify('+1 day')->format('Y-m-d'), $date->format('Y-m-d')));
         self::assertResponseStatusCodeSame(400);

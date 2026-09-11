@@ -26,28 +26,36 @@ describe('AdminListView speciality filter', () => {
   })
 
   it('shows only surgeons belonging to the selected speciality', async () => {
-    vi.spyOn(adminApi, 'list').mockImplementation(async (resource) => {
-      if (resource === 'specialites') {
-        return [
-          { id: 12, intitule: 'Orthopédie' },
-          { id: 13, intitule: 'Cardiologie' },
+    vi.spyOn(adminApi, 'list').mockImplementation(
+      async (resource, params = {}) => {
+        if (resource === 'specialites') {
+          return [
+            { id: 12, intitule: 'Orthopédie' },
+            { id: 13, intitule: 'Cardiologie' },
+          ]
+        }
+        const surgeons = [
+          {
+            id: 1,
+            prenom: 'Jean',
+            nom: 'Dupont',
+            specialite: { id: 12, intitule: 'Orthopédie' },
+          },
+          {
+            id: 2,
+            prenom: 'Alice',
+            nom: 'Martin',
+            specialite: { id: 13, intitule: 'Cardiologie' },
+          },
         ]
-      }
-      return [
-        {
-          id: 1,
-          prenom: 'Jean',
-          nom: 'Dupont',
-          specialite: { id: 12, intitule: 'Orthopédie' },
-        },
-        {
-          id: 2,
-          prenom: 'Alice',
-          nom: 'Martin',
-          specialite: { id: 13, intitule: 'Cardiologie' },
-        },
-      ]
-    })
+        return params.specialite
+          ? surgeons.filter(
+              (item) =>
+                String(item.specialite.id) === String(params.specialite),
+            )
+          : surgeons
+      },
+    )
 
     const wrapper = mount(AdminListView, {
       props: { resourceSlug: 'chirurgiens' },
@@ -130,6 +138,9 @@ describe('AdminListView speciality filter', () => {
     expect(wrapper.text()).toContain('Liste cardiaque')
     expect(wrapper.text()).not.toContain('Liste orthopédique')
     expect(list).toHaveBeenCalledWith('listes-materiel', {
+      page: 1,
+      itemsPerPage: 10,
+      q: undefined,
       specialite: '12',
       chirurgien: undefined,
     })

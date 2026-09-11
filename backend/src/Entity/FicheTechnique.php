@@ -2,6 +2,9 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\FreeTextQueryFilter;
+use ApiPlatform\Doctrine\Orm\Filter\OrFilter;
+use ApiPlatform\Doctrine\Orm\Filter\PartialSearchFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -9,6 +12,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\QueryParameter;
 use App\Error\ErrorMessage;
 use App\Repository\FicheTechniqueRepository;
 use Doctrine\DBAL\Types\Types;
@@ -23,7 +27,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 )]
 #[ApiResource(
     operations: [
-        new GetCollection(uriTemplate: '/fiches-techniques', security: "is_granted('ROLE_USER')", normalizationContext: ['groups' => ['fiche_technique:list']]),
+        new GetCollection(uriTemplate: '/fiches-techniques', security: "is_granted('ROLE_USER')", normalizationContext: ['groups' => ['fiche_technique:list']], parameters: [
+            'q' => new QueryParameter(filter: new FreeTextQueryFilter(new OrFilter(new PartialSearchFilter())), properties: ['titre', 'description']),
+            'specialite' => new QueryParameter(property: 'chirurgieModele.specialite', filter: new \ApiPlatform\Doctrine\Orm\Filter\ExactFilter()),
+        ]),
         new GetCollection(
             uriTemplate: '/chirurgie-modeles/{id}/fiches-techniques',
             uriVariables: ['id' => new Link(fromClass: ChirurgieModele::class, toProperty: 'chirurgieModele')],

@@ -4,6 +4,8 @@ namespace App\State;
 
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\State\Pagination\ArrayPaginator;
+use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\State\ParameterNotFound;
 use ApiPlatform\State\ProviderInterface;
 use App\Dto\ProgrammeOperatoire;
@@ -17,12 +19,12 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 /** @implements ProviderInterface<ProgrammeOperatoire> */
 final readonly class ProgrammeOperatoireProvider implements ProviderInterface
 {
-    public function __construct(private ProgrammeOperatoireService $service, private ProgrammeReferenceResolver $referenceResolver)
+    public function __construct(private ProgrammeOperatoireService $service, private ProgrammeReferenceResolver $referenceResolver, private Pagination $pagination)
     {
     }
 
-    /** @return ProgrammeOperatoire|list<ProgrammeOperatoireResume> */
-    public function provide(Operation $operation, array $uriVariables = [], array $context = []): ProgrammeOperatoire|array
+    /** @return ProgrammeOperatoire|ArrayPaginator<ProgrammeOperatoireResume> */
+    public function provide(Operation $operation, array $uriVariables = [], array $context = []): ProgrammeOperatoire|ArrayPaginator
     {
         if (isset($uriVariables['date'], $uriVariables['salle'], $uriVariables['chirurgien'])) {
             $reference = $this->referenceResolver->resolve($uriVariables);
@@ -42,7 +44,10 @@ final readonly class ProgrammeOperatoireProvider implements ProviderInterface
         $salle = $this->parameter($operation, 'salle');
         $chirurgien = $this->parameter($operation, 'chirurgien');
 
-        return $this->service->list(null === $date ? null : $this->referenceResolver->date((string) $date), null === $salle ? null : trim((string) $salle), null === $chirurgien ? null : (int) $chirurgien, $start, $end);
+        $programmes = $this->service->list(null === $date ? null : $this->referenceResolver->date((string) $date), null === $salle ? null : trim((string) $salle), null === $chirurgien ? null : (int) $chirurgien, $start, $end);
+        [, $offset, $limit] = $this->pagination->getPagination($operation, $context);
+
+        return new ArrayPaginator($programmes, $offset, $limit);
     }
 
     private function parameter(Operation $operation, string $name): mixed

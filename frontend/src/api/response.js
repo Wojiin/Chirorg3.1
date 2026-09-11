@@ -46,3 +46,15 @@ export function getApiErrorMessage(error, fallback = ERROR_MESSAGES.generic) {
 export function unwrapCollection(data) {
   return data?.member ?? data?.['hydra:member'] ?? data ?? []
 }
+
+/** Conserve les métadonnées de pagination API Platform avec les éléments normalisés. */
+export function unwrapPaginatedCollection(data) {
+  const items = unwrapCollection(data)
+
+  return {
+    items,
+    totalItems: Number(
+      data?.totalItems ?? data?.['hydra:totalItems'] ?? items.length,
+    ),
+  }
+}

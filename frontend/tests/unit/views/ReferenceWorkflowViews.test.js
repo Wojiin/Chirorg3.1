@@ -15,6 +15,9 @@ const mocks = vi.hoisted(() => ({
     filters: { date: '', room: '' },
     loading: false,
     loadProgrammes: vi.fn(),
+    page: 1,
+    itemsPerPage: 10,
+    totalItems: 0,
     rooms: ['Salle A'],
   },
   detail: {
@@ -84,6 +87,8 @@ const surgery = {
   date: '2030-01-15',
   dateProgrammee: '2030-01-15',
   salle: 'Salle A',
+  ordre: 1,
+  nombreChirurgies: 5,
   valide: false,
   chirurgien: { id: 7, prenom: 'Ada', nom: 'Lovelace' },
   chirurgieModele: { id: 3, intitule: 'Intervention test' },
@@ -209,6 +214,7 @@ describe('reference workflow views', () => {
     const wrapper = mountView(PreparationView, { id: 42 })
 
     expect(wrapper.text()).toContain('Matériel à préparer')
+    expect(wrapper.text()).toContain('Intervention 1 sur 5')
     await wrapper.findAll('input')[0].setValue(true)
     await wrapper.findAll('button')[0].trigger('click')
     expect(mocks.preparation.setMaterialState).toHaveBeenCalled()

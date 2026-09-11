@@ -135,7 +135,7 @@ test.describe('administration ChirOrg', () => {
     page.on('request', (request) => {
       if (request.url().endsWith('/api/auth/refresh')) refreshRequests += 1
     })
-    await page.route('**/api/specialites', async (route) => {
+    await page.route(/\/api\/specialites(?:\?.*)?$/, async (route) => {
       if (!rejected && route.request().method() === 'GET') {
         rejected = true
         await route.fulfill({
@@ -153,6 +153,7 @@ test.describe('administration ChirOrg', () => {
     await expect(
       page.getByRole('heading', { name: 'Spécialités' }),
     ).toBeVisible()
+    await expect.poll(() => rejected).toBe(true)
     await expect.poll(() => refreshRequests).toBe(1)
     await expect(page).toHaveURL(/admin\/specialites/)
   })

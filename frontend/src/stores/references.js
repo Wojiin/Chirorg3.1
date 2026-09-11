@@ -33,7 +33,7 @@ export const useReferenceStore = defineStore('references', {
 
       try {
         const results = await Promise.all(
-          missing.map((resource) => adminApi.list(resource)),
+          missing.map((resource) => adminApi.listAll(resource)),
         )
         this.collections = {
           ...this.collections,

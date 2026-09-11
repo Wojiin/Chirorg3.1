@@ -1,12 +1,12 @@
 import { apiClient } from '@/api/axios'
-import { unwrapCollection } from '@/api/response'
+import { unwrapPaginatedCollection } from '@/api/response'
 
 /** Encapsule les contrats API de consultation, création et réordonnancement des programmes. */
 export const programmeApi = {
   /** Liste les résumés de programmes avec les filtres optionnels fournis. */
   async list(params = {}) {
     const { data } = await apiClient.get('/programmes-operatoires', { params })
-    return unwrapCollection(data)
+    return unwrapPaginatedCollection(data)
   },
   /** Charge le détail d'un programme identifié par date, salle et chirurgien. */
   async getProgramme({ date, salle, chirurgien }) {

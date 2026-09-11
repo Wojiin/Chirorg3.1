@@ -1,9 +1,9 @@
 const frenchCollator = new Intl.Collator('fr', { sensitivity: 'base' })
 
 const FILTERS_BY_RESOURCE = {
-  chirurgiens: { speciality: true },
-  materiels: { speciality: true },
-  'fiches-techniques': { speciality: true },
+  chirurgiens: { speciality: true, serverSide: true },
+  materiels: { speciality: true, serverSide: true },
+  'fiches-techniques': { speciality: true, serverSide: true },
   'listes-materiel': { speciality: true, surgeon: true, serverSide: true },
 }
 
@@ -78,7 +78,6 @@ export function getAdminListFilterParams(
   resource,
   { specialityId = '', surgeonId = '' } = {},
 ) {
-  if (!getAdminListFilterConfig(resource).serverSide) return {}
   return {
     specialite: specialityId || undefined,
     chirurgien: surgeonId || undefined,

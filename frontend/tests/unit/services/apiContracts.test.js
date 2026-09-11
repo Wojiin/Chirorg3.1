@@ -22,9 +22,10 @@ describe('API contracts', () => {
       .mockResolvedValue({ data: { id: 2, intitule: 'Modifié' } })
     const remove = vi.spyOn(apiClient, 'delete').mockResolvedValue({})
 
-    await expect(adminApi.list('users', { page: 2 })).resolves.toEqual([
-      { id: 1 },
-    ])
+    await expect(adminApi.list('users', { page: 2 })).resolves.toEqual({
+      items: [{ id: 1 }],
+      totalItems: 1,
+    })
     await adminApi.list('specialites')
     await expect(adminApi.get('users', 2)).resolves.toEqual({
       member: [{ id: 1 }],
@@ -123,9 +124,10 @@ describe('API contracts', () => {
       .mockResolvedValue({ data: { id: 'ordered' } })
     const remove = vi.spyOn(apiClient, 'delete').mockResolvedValue({})
 
-    await expect(programmeApi.list({ date: '2030-01-01' })).resolves.toEqual([
-      { id: 1 },
-    ])
+    await expect(programmeApi.list({ date: '2030-01-01' })).resolves.toEqual({
+      items: [{ id: 1 }],
+      totalItems: 1,
+    })
     await programmeApi.getProgramme({
       date: '2030-01-01',
       salle: 'Salle A/B',

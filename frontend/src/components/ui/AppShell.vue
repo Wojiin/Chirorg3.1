@@ -9,9 +9,9 @@ import AppBottomNav from './AppBottomNav.vue'
 <template>
   <div class="app-shell">
     <AppSidebar />
-    <div class="min-h-screen md:pl-56">
+    <div class="min-h-screen lg:pl-56">
       <AppHeader />
-      <main id="main-content" class="pb-24 md:pb-8">
+      <main id="main-content" class="pb-24 lg:pb-8">
         <RouterView />
       </main>
     </div>

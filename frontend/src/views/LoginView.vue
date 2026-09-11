@@ -4,16 +4,29 @@ import { useLoginView } from '@/composables/useLoginView'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import BaseInput from '@/components/ui/BaseInput.vue'
 import ErrorMessage from '@/components/ui/ErrorMessage.vue'
+import { useTheme } from '@/composables/useTheme'
 
 const props = defineProps({
   redirect: { type: String, default: '' },
 })
 
 const { error, form, loading, submit } = useLoginView(props)
+const { isDark, toggleTheme } = useTheme()
 </script>
 
 <template>
   <main class="login-page">
+    <button
+      type="button"
+      class="header-action login-theme-toggle"
+      :aria-label="
+        isDark ? 'Activer le thème clair' : 'Activer le thème sombre'
+      "
+      @click="toggleTheme"
+    >
+      <span aria-hidden="true">{{ isDark ? '☀' : '☾' }}</span>
+      {{ isDark ? 'Thème clair' : 'Thème sombre' }}
+    </button>
     <div class="login-container">
       <header class="login-brand">
         <div aria-hidden="true" class="login-logo">C</div>

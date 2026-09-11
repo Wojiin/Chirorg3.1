@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use ApiPlatform\Doctrine\Orm\Filter\ExactFilter;
+use ApiPlatform\Doctrine\Orm\Filter\FreeTextQueryFilter;
+use ApiPlatform\Doctrine\Orm\Filter\OrFilter;
 use ApiPlatform\Doctrine\Orm\Filter\PartialSearchFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
@@ -28,6 +30,7 @@ use Symfony\Component\Validator\Constraints as Assert;
             security: "is_granted('ROLE_USER')",
             normalizationContext: ['groups' => ['chirurgien:list']],
             parameters: [
+                'q' => new QueryParameter(filter: new FreeTextQueryFilter(new OrFilter(new PartialSearchFilter())), properties: ['nom', 'prenom']),
                 'nom' => new QueryParameter(property: 'nom', filter: new PartialSearchFilter()),
                 'prenom' => new QueryParameter(property: 'prenom', filter: new PartialSearchFilter()),
                 'specialite' => new QueryParameter(property: 'specialite', filter: new ExactFilter()),

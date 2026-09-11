@@ -74,6 +74,20 @@ class ChirurgiePlanifieeRepository extends ServiceEntityRepository
         return ((int) $maximum) + 1;
     }
 
+    public function countProgrammeSurgeries(ChirurgiePlanifiee $chirurgie): int
+    {
+        return (int) $this->createQueryBuilder('programme')
+            ->select('COUNT(programme.id)')
+            ->where('programme.dateProgrammee = :date')
+            ->andWhere('programme.salle = :salle')
+            ->andWhere('programme.chirurgien = :chirurgien')
+            ->setParameter('date', $chirurgie->getDateProgrammee(), Types::DATE_IMMUTABLE)
+            ->setParameter('salle', $chirurgie->getSalle())
+            ->setParameter('chirurgien', $chirurgie->getChirurgien())
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
     private function baseDataQuery(): QueryBuilder
     {
         return $this->createQueryBuilder('c')

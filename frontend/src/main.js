@@ -5,10 +5,12 @@ import { configureApiAuth } from './api/axios'
 import { createSessionExpiredHandler } from './services/sessionExpiry'
 import { useAuthStore } from './stores/auth'
 import { pinia } from './stores/pinia'
+import { initializeTheme } from './composables/useTheme'
 import './index.css'
 
 /** Point d'entrée : restaure la session Pinia avant d'autoriser la première navigation. */
 const app = createApp(App)
+initializeTheme()
 
 // Lance le téléchargement de la route principale pendant la restauration de session.
 if (['/', '/programme'].includes(window.location.pathname)) {
