@@ -32,7 +32,10 @@ const page = defineModel('page', { type: Number, required: true })
       v-slot="{ items }"
       class="flex flex-wrap justify-center gap-2"
     >
-      <PaginationPrev class="pagination-button px-3">
+      <PaginationPrev
+        aria-label="Page précédente"
+        class="pagination-button px-3"
+      >
         Précédent
       </PaginationPrev>
       <template v-for="(item, index) in items" :key="index">
@@ -48,7 +51,9 @@ const page = defineModel('page', { type: Number, required: true })
           <span class="sr-only">Pages intermédiaires</span>
         </PaginationEllipsis>
       </template>
-      <PaginationNext class="pagination-button px-3"> Suivant </PaginationNext>
+      <PaginationNext aria-label="Page suivante" class="pagination-button px-3">
+        Suivant
+      </PaginationNext>
     </PaginationList>
   </PaginationRoot>
 </template>

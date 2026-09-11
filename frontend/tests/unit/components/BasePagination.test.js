@@ -21,7 +21,7 @@ describe('BasePagination', () => {
       },
     })
 
-    await wrapper.get('button[aria-label="Next Page"]').trigger('click')
+    await wrapper.get('button[aria-label="Page suivante"]').trigger('click')
 
     expect(wrapper.emitted('update:page')?.[0]).toEqual([2])
   })

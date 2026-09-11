@@ -1,6 +1,7 @@
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
+import { preloadViewForPath } from './router/viewLoaders'
 import { configureApiAuth } from './api/axios'
 import { createSessionExpiredHandler } from './services/sessionExpiry'
 import { useAuthStore } from './stores/auth'
@@ -12,10 +13,8 @@ import './index.css'
 const app = createApp(App)
 initializeTheme()
 
-// Lance le téléchargement de la route principale pendant la restauration de session.
-if (['/', '/programme'].includes(window.location.pathname)) {
-  void import('./views/ProgrammeOperatoireView.vue')
-}
+// Télécharge la vue demandée pendant la restauration de session, sans retarder le bootstrap.
+void preloadViewForPath(window.location.pathname)
 
 app.use(pinia)
 
