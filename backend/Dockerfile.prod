@@ -25,6 +25,7 @@ FROM php-base AS runtime
 WORKDIR /var/www/html
 COPY --from=vendor --chown=www-data:www-data /app ./
 COPY docker/php/conf.d/app.prod.ini /usr/local/etc/php/conf.d/app.prod.ini
+COPY --chmod=755 docker/entrypoint.prod.sh /usr/local/bin/chirorg-entrypoint
 
 RUN mkdir -p var/cache var/log public/uploads \
     && chown -R www-data:www-data var public/uploads
@@ -34,4 +35,5 @@ ENV APP_ENV=prod \
 
 USER www-data
 
+ENTRYPOINT ["chirorg-entrypoint"]
 CMD ["php-fpm"]

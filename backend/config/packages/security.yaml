@@ -32,6 +32,9 @@ security:
                 password_path: password
                 success_handler: lexik_jwt_authentication.handler.authentication_success
                 failure_handler: lexik_jwt_authentication.handler.authentication_failure
+            login_throttling:
+                max_attempts: 5
+                interval: '15 minutes'
             jwt: ~
             refresh_jwt:
                 check_path: api_auth_refresh
@@ -42,6 +45,7 @@ security:
     access_control:
         # Rules are evaluated from top to bottom; only the first match is applied.
         - { path: ^/api/auth/(login|refresh|logout)$, roles: PUBLIC_ACCESS, methods: [POST] }
+        - { path: ^/api/health$, roles: PUBLIC_ACCESS, methods: [GET, HEAD] }
         - { path: ^/api/docs, roles: PUBLIC_ACCESS, methods: [GET, HEAD] }
         - { path: ^/api/contexts, roles: PUBLIC_ACCESS, methods: [GET, HEAD] }
         - { path: ^/api, roles: PUBLIC_ACCESS, methods: [OPTIONS] }

@@ -11,48 +11,8 @@
       content="ChirOrg, planification des programmes opératoires et préparation du matériel chirurgical."
     />
     <title>Connexion | ChirOrg</title>
-    <script>
-      try {
-        const savedTheme = localStorage.getItem('chirorg-theme')
-        const dark = savedTheme
-          ? savedTheme === 'dark'
-          : matchMedia('(prefers-color-scheme: dark)').matches
-        document.documentElement.classList.toggle('dark', dark)
-        document.documentElement.style.colorScheme = dark ? 'dark' : 'light'
-      } catch {
-        document.documentElement.style.colorScheme = 'light'
-      }
-    </script>
-    <style>
-      .app-boot {
-        min-height: 100vh;
-        display: grid;
-        place-items: center;
-        background: #f8fafc;
-        color: #14532d;
-        font-family: ui-sans-serif, system-ui, sans-serif;
-      }
-      .app-boot__content {
-        text-align: center;
-      }
-      .app-boot__brand {
-        margin: 0;
-        font-size: 1.5rem;
-        font-weight: 800;
-      }
-      .app-boot__status {
-        margin: 0.5rem 0 0;
-        color: #475569;
-        font-size: 0.875rem;
-      }
-      .dark .app-boot {
-        background: #030712;
-        color: #86efac;
-      }
-      .dark .app-boot__status {
-        color: #94a3b8;
-      }
-    </style>
+    <link rel="stylesheet" href="/boot.css" />
+    <script src="/theme-init.js"></script>
   </head>
   <body>
     <div id="app">

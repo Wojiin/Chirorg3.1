@@ -8,6 +8,27 @@ use Doctrine\ORM\EntityManagerInterface;
 
 final class AuthentificationApiTest extends AuthenticatedApiTestCase
 {
+    public function testLoginIsRateLimitedAfterFiveFailures(): void
+    {
+        $client = $this->createApiClient();
+        $credentials = [
+            'email' => 'limitation-'.bin2hex(random_bytes(6)).'@chirorg.test',
+            'password' => 'mot-de-passe-invalide',
+        ];
+
+        for ($attempt = 1; $attempt <= 5; ++$attempt) {
+            $client->request('POST', '/api/auth/login', ['json' => $credentials]);
+            self::assertResponseStatusCodeSame(401);
+        }
+
+        $response = $client->request('POST', '/api/auth/login', ['json' => $credentials]);
+        self::assertResponseStatusCodeSame(401);
+        self::assertSame(
+            'Trop de tentatives de connexion échouées, veuillez réessayer dans 15 minutes.',
+            $response->toArray(false)['message'] ?? null,
+        );
+    }
+
     public function testJwtLifecycleWithPersistentRotatingRefreshToken(): void
     {
         $client = $this->createApiClient();
