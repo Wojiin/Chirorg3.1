@@ -158,6 +158,14 @@ jobs:
           -f docker-compose.dev.yaml
           config --quiet
 
+      - name: Validate Lighthouse Compose
+        run: >
+          docker compose
+          --env-file .env.example
+          -f docker-compose.dev.yaml
+          -f docker-compose.lighthouse.yaml
+          config --quiet
+
       - name: Validate production backend Compose
         run: >
           docker compose
@@ -270,6 +278,69 @@ jobs:
       - name: Stop E2E stack
         if: always()
         run: docker compose --env-file .env.example -f docker-compose.dev.yaml down --volumes
+
+  lighthouse:
+    name: Lighthouse view audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install Lighthouse dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Install Chromium
+        working-directory: frontend
+        run: npx playwright install --with-deps chromium
+
+      - name: Start production-like application stack
+        run: >
+          docker compose
+          --env-file .env.example
+          -f docker-compose.dev.yaml
+          -f docker-compose.lighthouse.yaml
+          up -d --build --wait --wait-timeout 180
+
+      - name: Prepare Lighthouse database
+        run: |
+          docker compose --env-file .env.example -f docker-compose.dev.yaml -f docker-compose.lighthouse.yaml exec -T backend php bin/console doctrine:migrations:migrate --no-interaction
+          docker compose --env-file .env.example -f docker-compose.dev.yaml -f docker-compose.lighthouse.yaml exec -T -e APP_ENV=dev backend php bin/console doctrine:fixtures:load --no-interaction
+
+      - name: Audit every view with Lighthouse
+        working-directory: frontend
+        run: npm run lighthouse:ci
+        env:
+          LH_BASE_URL: http://127.0.0.1:5173
+          LH_API_BASE_URL: http://127.0.0.1:8080/api
+          LH_EMAIL: admin@chirorg.test
+          LH_PASSWORD: AdminFixture-2026!
+
+      - name: Upload Lighthouse reports
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: lighthouse-reports
+          path: frontend/lighthouse-reports
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Show application logs on failure
+        if: failure()
+        run: docker compose --env-file .env.example -f docker-compose.dev.yaml -f docker-compose.lighthouse.yaml logs --no-color
+
+      - name: Stop Lighthouse stack
+        if: always()
+        run: docker compose --env-file .env.example -f docker-compose.dev.yaml -f docker-compose.lighthouse.yaml down --volumes
 
   secrets:
     name: Secret detection

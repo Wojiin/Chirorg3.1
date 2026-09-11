@@ -6,6 +6,7 @@ export default [
     ignores: [
       'dist/**',
       'coverage/**',
+      'lighthouse-reports/**',
       'playwright-report/**',
       'test-results/**',
     ],
