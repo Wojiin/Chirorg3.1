@@ -1,5 +1,6 @@
 coverage/
 dist/
 node_modules/
+lighthouse-reports/
 playwright-report/
 test-results/

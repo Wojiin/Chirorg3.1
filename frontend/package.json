@@ -7,6 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "preview:lighthouse": "vite preview --host 0.0.0.0 --port 5173",
+    "lighthouse:ci": "node ./lighthouse/audit.mjs",
     "test": "vitest run --passWithNoTests",
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
@@ -34,6 +36,7 @@
     "eslint": "^10.9.1",
     "eslint-plugin-vue": "^10.10.0",
     "jsdom": "^30.0.1",
+    "lighthouse": "^13.4.1",
     "prettier": "^3.9.6",
     "vite": "^8.2.2",
     "vitest": "^5.0.0"

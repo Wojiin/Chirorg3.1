@@ -1,0 +1,21 @@
+services:
+  backend:
+    environment:
+      APP_ENV: prod
+      APP_DEBUG: 0
+    volumes:
+      - backend_var_lighthouse:/var/www/html/var
+    command: >-
+      sh -c "composer install --no-interaction --prefer-dist --no-progress --no-scripts
+      && php bin/console lexik:jwt:generate-keypair --skip-if-exists --no-interaction
+      && php bin/console cache:clear --env=prod --no-debug
+      && chown -R www-data:www-data var
+      && exec php-fpm"
+
+  frontend:
+    environment:
+      VITE_ENABLE_DEVTOOLS: "false"
+    command: sh -c "npm install && npm run build && npm run preview:lighthouse"
+
+volumes:
+  backend_var_lighthouse:

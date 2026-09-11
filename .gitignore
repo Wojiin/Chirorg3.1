@@ -12,4 +12,5 @@ frontend/dist/
 frontend/coverage/
 frontend/playwright-report/
 frontend/test-results/
+frontend/lighthouse-reports/
 *.log
