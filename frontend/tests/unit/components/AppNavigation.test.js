@@ -78,6 +78,10 @@ describe('application navigation', () => {
     expect(wrapper.text()).toContain('Programme opératoire')
     expect(wrapper.text()).toContain('admin')
     expect(wrapper.text()).toContain('Administrateur')
+    expect(wrapper.find('.theme-toggle').text()).toBe('')
+    expect(wrapper.get('.theme-toggle-icon').attributes('aria-hidden')).toBe(
+      'true',
+    )
 
     await wrapper.get('[aria-label="Activer le thème sombre"]').trigger('click')
     expect(wrapper.get('[aria-label="Activer le thème clair"]')).toBeTruthy()

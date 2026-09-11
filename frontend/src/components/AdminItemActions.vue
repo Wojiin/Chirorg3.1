@@ -1,8 +1,9 @@
 <script setup>
 /** Actions de modification et suppression partagées par les rendus admin mobile et tableau. */
+import { computed } from 'vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
 
-defineProps({
+const props = defineProps({
   resourceSlug: { type: String, required: true },
   item: { type: Object, required: true },
   title: { type: String, required: true },
@@ -11,6 +12,13 @@ defineProps({
 })
 
 defineEmits(['remove'])
+
+const deletionDisabled = computed(
+  () =>
+    props.resourceSlug === 'specialites' &&
+    props.item.intitule?.trim().toLocaleLowerCase('fr-FR') ===
+      'sans spécialité',
+)
 </script>
 
 <template>
@@ -29,7 +37,17 @@ defineEmits(['remove'])
       variant="danger"
       size="sm"
       :loading="deleting"
-      :aria-label="`Supprimer ${title}`"
+      :disabled="deletionDisabled"
+      :aria-label="
+        deletionDisabled
+          ? `Suppression impossible pour ${title}`
+          : `Supprimer ${title}`
+      "
+      :title="
+        deletionDisabled
+          ? 'Cette spécialité système ne peut pas être supprimée.'
+          : undefined
+      "
       @click="$emit('remove')"
     >
       Supprimer

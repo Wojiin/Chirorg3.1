@@ -583,7 +583,11 @@
   }
 
   .theme-toggle {
-    @apply min-w-11 px-3;
+    @apply grid size-11 min-w-11 place-items-center p-0 text-gray-950 hover:text-black dark:text-white dark:hover:text-white;
+  }
+
+  .theme-toggle-icon {
+    @apply size-6;
   }
 
   .login-theme-toggle {
