@@ -21,6 +21,29 @@ export default defineConfig(({ command }) => ({
       ...(command === 'build' ? { pinia: piniaProductionBuild } : {}),
     },
   },
+  build: {
+    rolldownOptions: {
+      output: {
+        // Fractionne l'analyse des deux dépendances communes coûteuses sur CPU ralenti.
+        codeSplitting: {
+          groups: [
+            {
+              name: 'axios',
+              test: /node_modules[\\/]axios/,
+              priority: 20,
+              includeDependenciesRecursively: false,
+            },
+            {
+              name: 'pinia',
+              test: /node_modules[\\/]pinia/,
+              priority: 20,
+              includeDependenciesRecursively: false,
+            },
+          ],
+        },
+      },
+    },
+  },
   test: {
     environment: 'jsdom',
     include: ['tests/unit/**/*.test.js'],
