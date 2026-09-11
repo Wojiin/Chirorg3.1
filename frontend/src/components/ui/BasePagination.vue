@@ -32,16 +32,14 @@ const page = defineModel('page', { type: Number, required: true })
       v-slot="{ items }"
       class="flex flex-wrap justify-center gap-2"
     >
-      <PaginationPrev
-        class="pagination-button px-3 hover:border-chirorg-400 hover:text-chirorg-800 data-[selected]:border-chirorg-700 data-[selected]:bg-chirorg-700 data-[selected]:text-white dark:data-[selected]:border-chirorg-500 dark:data-[selected]:bg-chirorg-700"
-      >
+      <PaginationPrev class="pagination-button px-3">
         Précédent
       </PaginationPrev>
       <template v-for="(item, index) in items" :key="index">
         <PaginationListItem
           v-if="item.type === 'page'"
           :value="item.value"
-          class="pagination-button hover:border-chirorg-400 hover:text-chirorg-800 data-[selected]:border-chirorg-700 data-[selected]:bg-chirorg-700 data-[selected]:text-white dark:data-[selected]:border-chirorg-500 dark:data-[selected]:bg-chirorg-700"
+          class="pagination-button"
         >
           {{ item.value }}
         </PaginationListItem>
@@ -50,11 +48,7 @@ const page = defineModel('page', { type: Number, required: true })
           <span class="sr-only">Pages intermédiaires</span>
         </PaginationEllipsis>
       </template>
-      <PaginationNext
-        class="pagination-button px-3 hover:border-chirorg-400 hover:text-chirorg-800 data-[selected]:border-chirorg-700 data-[selected]:bg-chirorg-700 data-[selected]:text-white dark:data-[selected]:border-chirorg-500 dark:data-[selected]:bg-chirorg-700"
-      >
-        Suivant
-      </PaginationNext>
+      <PaginationNext class="pagination-button px-3"> Suivant </PaginationNext>
     </PaginationList>
   </PaginationRoot>
 </template>

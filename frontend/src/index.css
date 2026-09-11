@@ -660,7 +660,11 @@
   }
 
   .pagination-button {
-    @apply grid min-h-10 min-w-10 place-items-center rounded-lg border border-gray-300 bg-white px-2 text-sm font-semibold text-gray-700 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chirorg-500 disabled:cursor-not-allowed disabled:opacity-40 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200;
+    @apply grid min-h-10 min-w-10 place-items-center rounded-lg border border-gray-300 bg-white px-2 text-sm font-semibold text-gray-700 transition hover:border-chirorg-500 hover:bg-chirorg-50 hover:text-chirorg-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chirorg-500 disabled:cursor-not-allowed disabled:opacity-40 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:border-chirorg-500 dark:hover:bg-gray-800 dark:hover:text-chirorg-300;
+  }
+
+  .pagination-button[data-selected] {
+    @apply border-chirorg-700 bg-chirorg-700 text-white hover:border-chirorg-800 hover:bg-chirorg-800 hover:text-white dark:border-chirorg-500 dark:bg-chirorg-700 dark:hover:border-chirorg-300 dark:hover:bg-chirorg-600 dark:hover:text-white;
   }
 
   /* Progression */
