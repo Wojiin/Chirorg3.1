@@ -1,11 +1,9 @@
 <script setup>
 /** Tableau d'administration : son script ne relie que l'affichage au composable dédié. */
-import { useAdminDashboardView } from '@/composables/useAdminDashboardView'
+import { adminResources as resources } from '@/config/adminResources'
 import PageContainer from '@/components/ui/PageContainer.vue'
 import PageHeading from '@/components/ui/PageHeading.vue'
 import AdminResourceCard from '@/components/AdminResourceCard.vue'
-
-const { resources } = useAdminDashboardView()
 </script>
 
 <template>

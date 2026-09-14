@@ -83,13 +83,19 @@ export const usePreparationStore = defineStore('preparation', {
       this.error = ''
 
       try {
-        Object.assign(
-          item,
-          await preparationApi.toggle(item.id, {
-            coche: item.coche,
-            absent: item.absent,
-          }),
-        )
+        const currentMaterial = item.materiel
+        const updatedItem = await preparationApi.toggle(item.id, {
+          coche: item.coche,
+          absent: item.absent,
+        })
+        const { materiel: updatedMaterial, ...updatedState } = updatedItem
+        Object.assign(item, updatedState)
+        item.materiel =
+          updatedMaterial &&
+          typeof updatedMaterial === 'object' &&
+          updatedMaterial.intitule
+            ? { ...currentMaterial, ...updatedMaterial }
+            : currentMaterial
         this.updateProgress()
         return true
       } catch (error) {
@@ -100,10 +106,6 @@ export const usePreparationStore = defineStore('preparation', {
       } finally {
         this.savingId = null
       }
-    },
-
-    async toggleMaterial(item) {
-      return this.setMaterialState(item, 'ready')
     },
 
     /** Valide une chirurgie uniquement lorsque toutes ses lignes sont cochées. */

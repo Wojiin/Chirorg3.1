@@ -45,3 +45,12 @@ export function resolvePageMetadata(route) {
     description: routeDescriptions[route.name] ?? defaultDescription,
   }
 }
+
+/** Applique les métadonnées de la route après chaque navigation réussie. */
+export function applyPageMetadata(route) {
+  const metadata = resolvePageMetadata(route)
+  document.title = metadata.title
+  document
+    .querySelector('meta[name="description"]')
+    ?.setAttribute('content', metadata.description)
+}

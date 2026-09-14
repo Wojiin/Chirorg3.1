@@ -11,7 +11,6 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\QueryParameter;
@@ -41,18 +40,6 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
                 'chirurgieModele' => new QueryParameter(property: 'chirurgieModele', filter: new ExactFilter()),
                 'specialite' => new QueryParameter(property: 'chirurgieModele.specialite', filter: new ExactFilter()),
             ],
-        ),
-        new GetCollection(
-            uriTemplate: '/chirurgiens/{id}/listes-materiel',
-            uriVariables: ['id' => new Link(fromClass: Chirurgien::class, toProperty: 'chirurgien')],
-            security: "is_granted('ROLE_USER')",
-            normalizationContext: ['groups' => ['liste_materiel:read']],
-        ),
-        new GetCollection(
-            uriTemplate: '/chirurgie-modeles/{id}/listes-materiel',
-            uriVariables: ['id' => new Link(fromClass: ChirurgieModele::class, toProperty: 'chirurgieModele')],
-            security: "is_granted('ROLE_USER')",
-            normalizationContext: ['groups' => ['liste_materiel:read']],
         ),
         new Get(uriTemplate: '/listes-materiel/{id}', security: "is_granted('ROLE_USER')", normalizationContext: ['groups' => ['liste_materiel:read']]),
         new Post(

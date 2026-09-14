@@ -53,7 +53,6 @@ export function useAdminListView(props) {
   const pageLoading = computed(
     () => loading.value || (hasAdminFilters.value && referencesLoading.value),
   )
-  const filteredItems = computed(() => items.value)
   const specialityOptions = computed(() =>
     getSpecialityFilterOptions(referenceCollections.value.specialites ?? []),
   )
@@ -61,12 +60,12 @@ export function useAdminListView(props) {
     getSurgeonFilterOptions(referenceCollections.value.chirurgiens ?? []),
   )
   const technicalSheetGroups = computed(() => groupTechnicalSheets(items.value))
-  const paginatedItems = computed(() => items.value)
-  const paginatedTechnicalSheetGroups = computed(
-    () => technicalSheetGroups.value,
-  )
   const paginationTotal = computed(() => totalItems.value)
   const hasDisplayedItems = computed(() => items.value.length > 0)
+
+  function presentAdminItemDetails(item) {
+    return getAdminItemDetails(item, referenceCollections.value)
+  }
 
   function loadPage() {
     if (!resource.value) return Promise.resolve([])
@@ -133,8 +132,7 @@ export function useAdminListView(props) {
   return {
     deletingId,
     displayedError,
-    filteredItems,
-    getAdminItemDetails,
+    getAdminItemDetails: presentAdminItemDetails,
     getAdminItemTitle,
     hasDisplayedItems,
     hasSpecialityFilter,
@@ -143,8 +141,7 @@ export function useAdminListView(props) {
     pageLoading,
     page,
     itemsPerPage,
-    paginatedItems,
-    paginatedTechnicalSheetGroups,
+    items,
     paginationTotal,
     pendingRemoval,
     requestRemoval,

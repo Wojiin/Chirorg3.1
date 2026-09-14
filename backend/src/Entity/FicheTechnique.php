@@ -14,13 +14,12 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\QueryParameter;
 use App\Error\ErrorMessage;
-use App\Repository\FicheTechniqueRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[ORM\Entity(repositoryClass: FicheTechniqueRepository::class)]
+#[ORM\Entity]
 #[Assert\Expression(
     expression: 'this.getDescription() !== null or this.getLienImage() !== null',
     message: ErrorMessage::TECHNICAL_SHEET_CONTENT_REQUIRED,

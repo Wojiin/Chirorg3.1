@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
+import { applyPageMetadata } from '@/config/pageMetadata'
 import { createMemoryHistory, createRouter } from 'vue-router'
 import App from '@/App.vue'
 import appRouter from '@/router'
@@ -87,6 +88,7 @@ describe('application shell and routing', () => {
         stubs: { Toaster: true },
       },
     })
+    applyPageMetadata(router.currentRoute.value)
 
     expect(document.title).toBe('Matériels | ChirOrg')
     expect(description.content).toContain('référentiel ChirOrg')

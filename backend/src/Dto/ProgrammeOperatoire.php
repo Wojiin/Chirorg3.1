@@ -24,7 +24,6 @@ use Symfony\Component\Validator\Constraints as Assert;
         'itemsPerPage' => new QueryParameter(schema: ['type' => 'integer', 'minimum' => 1, 'maximum' => 100], castToNativeType: true, constraints: [new Assert\Range(min: 1, max: 100)]),
     ]),
     new Get(uriTemplate: '/programmes-operatoires/{date}/{salle}/{chirurgien}', provider: ProgrammeOperatoireProvider::class, security: "is_granted('ROLE_USER')"),
-    new Get(uriTemplate: '/programmes-operatoires/{date}/{salle}/{chirurgien}/vue-finale', provider: ProgrammeOperatoireProvider::class, security: "is_granted('ROLE_USER')"),
     new Post(uriTemplate: '/programmes-operatoires', input: ProgrammePlanificationInput::class, output: ProgrammePlanificationOutput::class, processor: ProgrammePlanificationProcessor::class, security: "is_granted('ROLE_USER')"),
     new Patch(uriTemplate: '/programmes-operatoires/{date}/{salle}/{chirurgien}/ordre', read: false, input: ProgrammeOrdreInput::class, output: self::class, processor: ProgrammeOrdreProcessor::class, security: "is_granted('ROLE_USER')"),
 ])]

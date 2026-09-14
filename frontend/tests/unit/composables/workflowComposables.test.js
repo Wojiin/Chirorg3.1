@@ -14,7 +14,6 @@ vi.mock('vue-router', async (importOriginal) => ({
   useRouter: () => router,
 }))
 
-import { useAdminDashboardView } from '@/composables/useAdminDashboardView'
 import { useAdminFormView } from '@/composables/useAdminFormView'
 import { useLoginView } from '@/composables/useLoginView'
 import { usePlanificationView } from '@/composables/usePlanificationView'
@@ -74,10 +73,6 @@ describe('workflow composables', () => {
     vi.restoreAllMocks()
     vi.clearAllMocks()
     setActivePinia(createPinia())
-  })
-
-  it('exposes the complete administrator resource catalogue', () => {
-    expect(useAdminDashboardView().resources).toHaveLength(7)
   })
 
   it('rejects an unknown administrator resource', async () => {

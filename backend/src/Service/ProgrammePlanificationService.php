@@ -4,17 +4,17 @@ namespace App\Service;
 
 use App\Dto\ProgrammePlanificationInput;
 use App\Dto\ProgrammePlanificationOutput;
+use App\Entity\ChirurgieModele;
+use App\Entity\Chirurgien;
 use App\Entity\ChirurgiePlanifiee;
 use App\Error\ErrorMessage;
-use App\Repository\ChirurgieModeleRepository;
-use App\Repository\ChirurgienRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 final readonly class ProgrammePlanificationService
 {
-    public function __construct(private ChirurgienRepository $chirurgiens, private ChirurgieModeleRepository $modeles, private ProgrammeOrderAllocator $orderAllocator, private PreparationMaterielInitializer $initializer, private ProgrammeOperatoireService $programmes, private ChirurgieAuditTrail $auditTrail, private EntityManagerInterface $entityManager)
+    public function __construct(private ProgrammeOrderAllocator $orderAllocator, private PreparationMaterielInitializer $initializer, private ProgrammeOperatoireService $programmes, private ChirurgieAuditTrail $auditTrail, private EntityManagerInterface $entityManager)
     {
     }
 
@@ -23,11 +23,11 @@ final readonly class ProgrammePlanificationService
         if (null === $input->dateProgrammee || null === $input->salle || null === $input->chirurgienId) {
             throw new BadRequestHttpException(ErrorMessage::PROGRAMME_INVALID);
         }
-        $chirurgien = $this->chirurgiens->find($input->chirurgienId) ?? throw new NotFoundHttpException(ErrorMessage::CHIRURGIEN_NOT_FOUND);
+        $chirurgien = $this->entityManager->find(Chirurgien::class, $input->chirurgienId) ?? throw new NotFoundHttpException(ErrorMessage::CHIRURGIEN_NOT_FOUND);
         $salle = trim($input->salle);
         $models = [];
         foreach ($input->chirurgieModeleIds as $modelId) {
-            $models[] = $this->modeles->find($modelId) ?? throw new NotFoundHttpException(ErrorMessage::chirurgieModeleNotFound($modelId));
+            $models[] = $this->entityManager->find(ChirurgieModele::class, $modelId) ?? throw new NotFoundHttpException(ErrorMessage::chirurgieModeleNotFound($modelId));
         }
 
         return $this->entityManager->wrapInTransaction(function () use ($input, $chirurgien, $models, $salle): ProgrammePlanificationOutput {

@@ -20,7 +20,7 @@ class ChirurgiePlanifieeRepository extends ServiceEntityRepository
     }
 
     /** @return list<ChirurgiePlanifiee> */
-    public function findProgrammes(?\DateTimeInterface $date = null, ?string $salle = null, ?int $chirurgienId = null, ?\DateTimeInterface $dateDebut = null, ?\DateTimeInterface $dateFin = null, ?bool $valide = null, bool $withFichesTechniques = false): array
+    public function findProgrammes(?\DateTimeInterface $date = null, ?string $salle = null, ?int $chirurgienId = null, ?\DateTimeInterface $dateDebut = null, ?\DateTimeInterface $dateFin = null): array
     {
         $qb = $this->baseDataQuery()
             ->orderBy('c.dateProgrammee', 'ASC')->addOrderBy('c.salle', 'ASC')->addOrderBy('c.ordre', 'ASC');
@@ -39,12 +39,6 @@ class ChirurgiePlanifieeRepository extends ServiceEntityRepository
         }
         if (null !== $chirurgienId) {
             $qb->andWhere('chirurgien.id = :chirurgien')->setParameter('chirurgien', $chirurgienId);
-        }
-        if (null !== $valide) {
-            $qb->andWhere('c.valide = :valide')->setParameter('valide', $valide);
-        }
-        if ($withFichesTechniques) {
-            $qb->leftJoin('modele.fichesTechniques', 'fiches')->addSelect('fiches');
         }
 
         return $qb->getQuery()->getResult();
@@ -98,29 +92,4 @@ class ChirurgiePlanifieeRepository extends ServiceEntityRepository
             ->leftJoin('preparations.materiel', 'materiel')
             ->leftJoin('c.validePar', 'validePar');
     }
-
-    //    /**
-    //     * @return ChirurgiePlanifiee[] Returns an array of ChirurgiePlanifiee objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('c')
-    //            ->andWhere('c.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('c.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?ChirurgiePlanifiee
-    //    {
-    //        return $this->createQueryBuilder('c')
-    //            ->andWhere('c.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
 }

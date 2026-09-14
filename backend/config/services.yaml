@@ -22,8 +22,18 @@ services:
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
 
+when@dev:
+    services:
+        App\Tests\Functional\Command\E2eCleanupCommand:
+            autowire: true
+            autoconfigure: true
+
 when@test:
     services:
+        App\Tests\Functional\Command\E2eCleanupCommand:
+            autowire: true
+            autoconfigure: true
+
         test.user_password_hasher:
             alias: security.user_password_hasher
             public: true
