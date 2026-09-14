@@ -68,6 +68,10 @@ export function useAdminListView(props) {
   const paginationTotal = computed(() => totalItems.value)
   const hasDisplayedItems = computed(() => items.value.length > 0)
 
+  function presentAdminItemDetails(item) {
+    return getAdminItemDetails(item, referenceCollections.value)
+  }
+
   function loadPage() {
     if (!resource.value) return Promise.resolve([])
 
@@ -134,7 +138,7 @@ export function useAdminListView(props) {
     deletingId,
     displayedError,
     filteredItems,
-    getAdminItemDetails,
+    getAdminItemDetails: presentAdminItemDetails,
     getAdminItemTitle,
     hasDisplayedItems,
     hasSpecialityFilter,

@@ -337,6 +337,30 @@ describe('ChirOrg stores with API services', () => {
     expect(await store.validateSurgery()).toBe('final')
   })
 
+  it('keeps material details when the toggle response contains an IRI', async () => {
+    vi.spyOn(preparationApi, 'getPreparation').mockResolvedValue(
+      preparationPayload,
+    )
+    vi.spyOn(preparationApi, 'toggle').mockResolvedValue({
+      id: 10,
+      coche: true,
+      absent: false,
+      materiel: '/api/materiels/3',
+    })
+    const store = usePreparationStore()
+    await store.loadPreparation(42)
+    const item = store.preparation.preparations[0]
+
+    await store.setMaterialState(item, 'ready')
+
+    expect(item.materiel).toMatchObject({
+      id: 3,
+      intitule: 'Scalpel',
+      type: 'Instrument',
+    })
+    expect(item.coche).toBe(true)
+  })
+
   it('keeps an absent material editable in partial validation', async () => {
     vi.spyOn(preparationApi, 'getPreparation').mockResolvedValue(
       preparationPayload,

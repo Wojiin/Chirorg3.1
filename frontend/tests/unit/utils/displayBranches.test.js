@@ -28,6 +28,15 @@ describe('display and validation fallbacks', () => {
     expect(getAdminItemDetails(item)).toBe(expected)
   })
 
+  it('resolves an API Platform surgeon IRI for administrator details', () => {
+    expect(
+      getAdminItemDetails(
+        { chirurgien: { '@id': '/api/chirurgiens/7' } },
+        { chirurgiens: [{ id: 7, prenom: 'Ada', nom: 'Lovelace' }] },
+      ),
+    ).toBe('Dr Ada Lovelace')
+  })
+
   it('groups incomplete technical sheets with stable fallbacks and ordering', () => {
     const groups = groupTechnicalSheets([
       { id: 0, titre: 'Ignorée', chirurgieModele: null },

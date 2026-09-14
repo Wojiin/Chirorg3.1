@@ -33,6 +33,20 @@ describe('speciality filters and material-list form', () => {
     expect(buildAdminPayload(form).materiels).toEqual(['/api/materiels/8'])
   })
 
+  it('normalizes API Platform IRIs when editing a material list', () => {
+    const fields = getAdminFormFields('listes-materiel')
+    const form = createAdminForm(fields, {
+      intitule: 'Liste existante',
+      chirurgien: '/api/chirurgiens/2',
+      chirurgieModele: { '@id': '/api/chirurgie-modeles/3' },
+      materiels: ['/api/materiels/8', { '@id': '/api/materiels/9' }],
+    })
+
+    expect(form.chirurgien).toBe(2)
+    expect(form.chirurgieModele).toBe(3)
+    expect(form.materiels).toEqual([8, 9])
+  })
+
   it('only offers materials from the selected surgeon speciality', () => {
     const surgeons = [{ id: 5, specialite: { id: 12, intitule: 'Orthopédie' } }]
     const materials = [
