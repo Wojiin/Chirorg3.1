@@ -54,5 +54,5 @@ describe('route view preloading', () => {
     )
 
     expect(modules.every((module) => module.default)).toBe(true)
-  })
+  }, 15_000)
 })

@@ -1,6 +1,12 @@
 /** Transforme une relation API en identifiant sélectionnable par le formulaire. */
 function normalizeInitialValue(value) {
-  if (value && typeof value === 'object') return value.id ?? ''
+  if (value && typeof value === 'object') {
+    return value.id ?? normalizeInitialValue(value['@id'])
+  }
+  if (typeof value === 'string') {
+    const match = value.match(/\/(\d+)$/)
+    if (match) return Number(match[1])
+  }
   return value ?? ''
 }
 
