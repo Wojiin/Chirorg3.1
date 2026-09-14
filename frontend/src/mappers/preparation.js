@@ -10,8 +10,7 @@ export function normalizePreparation(data) {
       nombreChirurgies: data.nombreChirurgies,
       valide: data.valide,
       valideLe: data.valideLe,
-      etatValidation:
-        data.etatValidation ?? (data.valide ? 'VALIDEE' : 'EN_PREPARATION'),
+      etatValidation: data.etatValidation,
       chirurgien: data.chirurgien,
       chirurgieModele: data.chirurgieModele,
     },
@@ -19,7 +18,7 @@ export function normalizePreparation(data) {
       ...item,
       materiel: {
         ...item.materiel,
-        type: item.materiel?.type ?? item.materiel?.typeMateriel,
+        type: item.materiel?.typeMateriel,
       },
     })),
     progressionPreparation: data.progressionPreparation,
@@ -30,43 +29,27 @@ export function normalizePreparation(data) {
 export function normalizeTechnicalSheets(technicalSheets = []) {
   return technicalSheets.map((sheet) => ({
     ...sheet,
-    contenu: sheet.contenu ?? sheet.description ?? '',
-    image: sheet.image ?? sheet.lienImage ?? null,
+    contenu: sheet.description ?? '',
+    image: sheet.lienImage ?? null,
   }))
 }
 
 /** Adapte les deux formes historiques de vue finale au même contrat d'affichage. */
 export function normalizeFinalView(data) {
-  const surgerySource = data.chirurgie ?? data
-  const materials = data.materiels ?? data.materielsValides ?? []
-  const technicalSheets = data.fichesTechniques ?? data.ficheTechnique ?? []
-
   return {
-    chirurgie: normalizePreparation(surgerySource).chirurgie,
+    chirurgie: normalizePreparation(data).chirurgie,
     validePar: data.validePar ?? null,
-    materiels: materials.map((item) => {
-      if (item.materiel) {
-        return {
-          ...item,
-          materiel: {
-            ...item.materiel,
-            type: item.materiel.type ?? item.materiel.typeMateriel,
-          },
-        }
-      }
-
-      return {
+    materiels: data.materielsValides.map((item) => ({
+      id: item.id,
+      coche: true,
+      cocheLe: item.cocheLe,
+      materiel: {
         id: item.id,
-        coche: true,
-        cocheLe: item.cocheLe,
-        materiel: {
-          id: item.id,
-          intitule: item.intitule,
-          adresse: item.adresse,
-          type: item.typeMateriel,
-        },
-      }
-    }),
-    fichesTechniques: normalizeTechnicalSheets(technicalSheets),
+        intitule: item.intitule,
+        adresse: item.adresse,
+        type: item.typeMateriel,
+      },
+    })),
+    fichesTechniques: normalizeTechnicalSheets(data.ficheTechnique),
   }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Command;
+namespace App\Tests\Functional\Command;
 
 use Doctrine\DBAL\Connection;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -8,29 +8,18 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\HttpKernel\KernelInterface;
 
-#[AsCommand(
-    name: 'app:e2e:cleanup',
-    description: 'Supprime uniquement les données temporaires identifiables créées par les scénarios E2E.',
-)]
+#[AsCommand(name: 'app:e2e:cleanup', description: 'Supprime uniquement les données temporaires identifiables créées par les scénarios E2E.')]
 final class E2eCleanupCommand extends Command
 {
-    public function __construct(
-        private readonly Connection $connection,
-        private readonly KernelInterface $kernel,
-    ) {
+    public function __construct(private readonly Connection $connection)
+    {
         parent::__construct();
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-        if (!in_array($this->kernel->getEnvironment(), ['dev', 'test'], true)) {
-            $io->error('Le nettoyage E2E est interdit hors des environnements dev et test.');
-
-            return Command::FAILURE;
-        }
 
         /** @var array<string, int> $deleted */
         $deleted = $this->connection->transactional(function (Connection $connection): array {
@@ -48,12 +37,7 @@ final class E2eCleanupCommand extends Command
                            OR cp.cree_par LIKE :e2eActor
                            OR cp.cree_par = :fixtureUser
                         SQL,
-                    [
-                        'surgeon' => $surgeon,
-                        'model' => $model,
-                        'e2eActor' => '%.e2e@chirorg.test',
-                        'fixtureUser' => 'user@chirorg.test',
-                    ],
+                    ['surgeon' => $surgeon, 'model' => $model, 'e2eActor' => '%.e2e@chirorg.test', 'fixtureUser' => 'user@chirorg.test'],
                 ),
                 'listes de matériel' => $connection->executeStatement(
                     <<<'SQL'
@@ -68,22 +52,13 @@ final class E2eCleanupCommand extends Command
                     'DELETE FROM materiel WHERE intitule LIKE :materialOne OR intitule LIKE :materialTwo',
                     ['materialOne' => 'Boîte parcours %', 'materialTwo' => 'Implant parcours %'],
                 ),
-                'chirurgies modèles' => $connection->executeStatement(
-                    'DELETE FROM chirurgie_modele WHERE intitule LIKE :model',
-                    ['model' => $model],
-                ),
-                'chirurgiens' => $connection->executeStatement(
-                    'DELETE FROM chirurgien WHERE nom LIKE :surgeon',
-                    ['surgeon' => $surgeon],
-                ),
+                'chirurgies modèles' => $connection->executeStatement('DELETE FROM chirurgie_modele WHERE intitule LIKE :model', ['model' => $model]),
+                'chirurgiens' => $connection->executeStatement('DELETE FROM chirurgien WHERE nom LIKE :surgeon', ['surgeon' => $surgeon]),
                 'spécialités' => $connection->executeStatement(
                     'DELETE FROM specialite WHERE intitule LIKE :speciality OR intitule LIKE :simpleSpeciality',
                     ['speciality' => 'Spécialité parcours %', 'simpleSpeciality' => 'Spécialité E2E %'],
                 ),
-                'utilisateurs' => $connection->executeStatement(
-                    'DELETE FROM utilisateur WHERE email LIKE :user',
-                    ['user' => 'managed.%@chirorg.test'],
-                ),
+                'utilisateurs' => $connection->executeStatement('DELETE FROM utilisateur WHERE email LIKE :user', ['user' => 'managed.%@chirorg.test']),
             ];
         });
 

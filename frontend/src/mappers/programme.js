@@ -1,21 +1,8 @@
 /** Uniformise une chirurgie planifiée, quelle que soit la forme du payload API reçu. */
-export function normalizePlannedSurgery(data) {
+function normalizePlannedSurgery(data) {
   return {
     ...data,
-    date: data.dateProgrammee ?? data.date ?? '',
-    progressionPreparation: data.progressionPreparation ?? {
-      total: data.preparationsMateriel?.length ?? 0,
-      coches:
-        data.preparationsMateriel?.filter((item) => item.coche).length ?? 0,
-      absents:
-        data.preparationsMateriel?.filter((item) => item.absent).length ?? 0,
-      traites:
-        data.preparationsMateriel?.filter((item) => item.coche || item.absent)
-          .length ?? 0,
-      complete:
-        Boolean(data.preparationsMateriel?.length) &&
-        data.preparationsMateriel.every((item) => item.coche || item.absent),
-    },
+    date: data.dateProgrammee,
   }
 }
 
@@ -38,8 +25,7 @@ export function normalizeProgramme(data) {
 function normalizeProgrammeSummary(data) {
   return {
     ...data,
-    id: data.id ?? `${data.date}|${data.salle}|${data.chirurgien.id}`,
-    chirurgies: data.chirurgies ?? [],
+    chirurgies: [],
   }
 }
 

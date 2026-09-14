@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test'
 function requiredEnvironment(name) {
   const value = process.env[name]
   if (!value)
-    throw new Error(`Missing required E2E environment variable: ${name}`)
+    throw new Error(`La variable d’environnement E2E ${name} est obligatoire.`)
   return value
 }
 

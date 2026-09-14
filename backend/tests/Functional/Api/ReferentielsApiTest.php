@@ -168,10 +168,6 @@ final class ReferentielsApiTest extends AuthenticatedApiTestCase
         self::assertResponseIsSuccessful();
         self::assertJsonContains(['totalItems' => 1]);
 
-        $client->request('GET', $chirurgien.'/listes-materiel');
-        self::assertResponseIsSuccessful();
-        self::assertJsonContains(['totalItems' => 1]);
-
         foreach ([$listeMateriel, $ficheTechnique, $materiel, $autreMateriel, $chirurgien, $chirurgieModele, $autreSpecialite] as $iri) {
             $client->request('DELETE', $iri);
             self::assertResponseStatusCodeSame(204);

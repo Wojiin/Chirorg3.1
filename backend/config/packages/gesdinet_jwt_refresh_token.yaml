@@ -1,7 +1,7 @@
 gesdinet_jwt_refresh_token:
     refresh_token_class: App\Entity\RefreshToken
     ttl: 1209600
-    single_use: true
+    single_use: '%env(bool:JWT_REFRESH_SINGLE_USE)%'
     return_expiration: true
     cookie:
         enabled: true

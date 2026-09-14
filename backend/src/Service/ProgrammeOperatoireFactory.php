@@ -13,7 +13,7 @@ final readonly class ProgrammeOperatoireFactory
     }
 
     /** @param list<ChirurgiePlanifiee> $chirurgies */
-    public function create(array $chirurgies, bool $technicalSheets = false): ?ProgrammeOperatoire
+    public function create(array $chirurgies): ?ProgrammeOperatoire
     {
         $first = $chirurgies[0] ?? null;
         $date = $first?->getDateProgrammee();
@@ -23,7 +23,7 @@ final readonly class ProgrammeOperatoireFactory
             return null;
         }
         usort($chirurgies, static fn (ChirurgiePlanifiee $a, ChirurgiePlanifiee $b): int => [$a->getOrdre() ?? PHP_INT_MAX, $a->getId() ?? PHP_INT_MAX] <=> [$b->getOrdre() ?? PHP_INT_MAX, $b->getId() ?? PHP_INT_MAX]);
-        $items = array_map(fn (ChirurgiePlanifiee $item): array => $this->chirurgieFactory->createProgrammeItem($item, $technicalSheets), $chirurgies);
+        $items = array_map(fn (ChirurgiePlanifiee $item): array => $this->chirurgieFactory->createProgrammeItem($item), $chirurgies);
 
         return new ProgrammeOperatoire(
             rawurlencode($date->format('Y-m-d').'|'.$salle.'|'.$chirurgien->getId()), $date->format('Y-m-d'), $salle,
@@ -58,7 +58,7 @@ final readonly class ProgrammeOperatoireFactory
                 }
             }
             $progress['complete'] = $progress['total'] > 0 && $progress['total'] === $progress['traites'];
-            $result[] = new ProgrammeOperatoireResume($programme->date, $programme->salle, $programme->chirurgien, $programme->nombreChirurgies, $programme->nombreChirurgiesValidees, $progress, $items[0]->getCreePar());
+            $result[] = new ProgrammeOperatoireResume($programme->id, $programme->date, $programme->salle, $programme->chirurgien, $programme->nombreChirurgies, $programme->nombreChirurgiesValidees, $progress, $items[0]->getCreePar());
         }
 
         return $result;

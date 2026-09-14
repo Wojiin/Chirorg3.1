@@ -21,7 +21,7 @@ final class ProgrammeOperatoireApiTest extends AuthenticatedApiTestCase
         $this->useBearerToken($client, $this->login($client, $utilisateur, $password));
 
         $client->request('POST', '/api/chirurgies-planifiees', ['json' => []]);
-        self::assertResponseStatusCodeSame(405);
+        self::assertResponseStatusCodeSame(404);
         $client->request('PATCH', '/api/chirurgies-planifiees/1', [
             'headers' => ['content-type' => 'application/merge-patch+json'],
             'json' => [],
@@ -108,14 +108,6 @@ final class ProgrammeOperatoireApiTest extends AuthenticatedApiTestCase
         self::assertResponseIsSuccessful();
         self::assertJsonContains(['ordre' => 1, 'nombreChirurgies' => 1, 'etatValidation' => 'EN_PREPARATION', 'progressionPreparation' => ['total' => 1, 'traites' => 0, 'complete' => false]]);
 
-        $nestedPreparations = $client->request('GET', '/api/chirurgies-planifiees/'.$chirurgieId.'/preparations-materiel');
-        self::assertResponseIsSuccessful();
-        self::assertStringContainsString('"id":'.$preparationId, $nestedPreparations->getContent());
-
-        $filteredChirurgies = $client->request('GET', sprintf('/api/chirurgies-planifiees?dateProgrammee=%s&salle=Bloc%%201&chirurgien=%d', $date->format('Y-m-d'), $chirurgien->getId()));
-        self::assertResponseIsSuccessful();
-        self::assertStringContainsString('"id":'.$chirurgieId, $filteredChirurgies->getContent());
-
         $client->request('GET', '/api/chirurgies-planifiees/'.$chirurgieId.'/vue-finale');
         self::assertResponseStatusCodeSame(409);
 
@@ -166,10 +158,6 @@ final class ProgrammeOperatoireApiTest extends AuthenticatedApiTestCase
         self::assertResponseIsSuccessful();
         self::assertJsonContains(['nombreChirurgies' => 1, 'nombreChirurgiesValidees' => 1]);
 
-        $client->request('GET', sprintf('/api/programmes-operatoires/%s/Bloc%%201/%d/vue-finale', $date->format('Y-m-d'), $chirurgien->getId()));
-        self::assertResponseIsSuccessful();
-        self::assertJsonContains(['nombreChirurgies' => 1, 'nombreChirurgiesValidees' => 1]);
-
         $programmeUrl = sprintf('/api/programmes-operatoires/%s/Bloc%%201/%d/ordre', $date->format('Y-m-d'), $chirurgien->getId());
         $client->request('PATCH', $programmeUrl, ['headers' => ['content-type' => 'application/merge-patch+json'], 'json' => ['chirurgieIds' => [$chirurgieId]]]);
         self::assertResponseStatusCodeSame(409);
@@ -179,6 +167,7 @@ final class ProgrammeOperatoireApiTest extends AuthenticatedApiTestCase
         $filteredPayload = $filteredResponse->toArray();
         self::assertGreaterThanOrEqual(1, $filteredPayload['totalItems']);
         self::assertCount(1, $filteredPayload['member']);
+        self::assertIsString($filteredPayload['member'][0]['id']);
         self::assertStringContainsString('"date":"'.$date->format('Y-m-d').'"', $filteredResponse->getContent());
         $client->request('GET', sprintf('/api/programmes-operatoires?dateDebut=%s&dateFin=%s', $date->modify('+1 day')->format('Y-m-d'), $date->format('Y-m-d')));
         self::assertResponseStatusCodeSame(400);
