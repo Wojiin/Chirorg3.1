@@ -85,7 +85,6 @@
 
   :where(
     .surface-panel,
-    .content-panel,
     .form-panel,
     .programme-card,
     .programme-group,
@@ -102,10 +101,6 @@
     .programme-filters
   ) {
     @apply rounded-2xl border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800;
-  }
-
-  .content-panel {
-    @apply p-5 shadow-card sm:p-7;
   }
 
   .form-panel {

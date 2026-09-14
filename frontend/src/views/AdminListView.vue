@@ -32,8 +32,7 @@ const {
   pageLoading,
   page,
   itemsPerPage,
-  paginatedItems,
-  paginatedTechnicalSheetGroups,
+  items,
   paginationTotal,
   pendingRemoval,
   requestRemoval,
@@ -56,13 +55,17 @@ const {
       :description="resource?.description"
     >
       <template #action>
-        <RouterLink
-          v-if="resource"
-          :to="{ name: 'admin-new', params: { resource: resourceSlug } }"
-          class="primary-link"
-        >
-          + Ajouter dans {{ resource.label }}
-        </RouterLink>
+        <div v-if="resource" class="flex flex-wrap gap-3">
+          <RouterLink :to="{ name: 'admin' }" class="secondary-link">
+            ← Retour aux référentiels
+          </RouterLink>
+          <RouterLink
+            :to="{ name: 'admin-new', params: { resource: resourceSlug } }"
+            class="primary-link"
+          >
+            + Ajouter dans {{ resource.label }}
+          </RouterLink>
+        </div>
       </template>
     </PageHeading>
 
@@ -120,7 +123,7 @@ const {
         Fiches techniques regroupées par chirurgie
       </h2>
 
-      <article v-for="group in paginatedTechnicalSheetGroups" :key="group.id">
+      <article v-for="group in technicalSheetGroups" :key="group.id">
         <header class="mb-3 flex flex-wrap items-center justify-between gap-2">
           <div>
             <p
@@ -209,7 +212,7 @@ const {
     <section v-else-if="resource" aria-labelledby="resource-list-title">
       <h2 id="resource-list-title" class="sr-only">Liste des éléments</h2>
       <ul class="admin-mobile-list">
-        <li v-for="item in paginatedItems" :key="item.id">
+        <li v-for="item in items" :key="item.id">
           <article class="admin-mobile-card">
             <h3 class="item-title">{{ getAdminItemTitle(item) }}</h3>
             <p class="text-muted mt-1 line-clamp-2">
@@ -242,7 +245,7 @@ const {
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
-            <tr v-for="item in paginatedItems" :key="item.id">
+            <tr v-for="item in items" :key="item.id">
               <th scope="row" class="admin-table-cell item-title">
                 {{ getAdminItemTitle(item) }}
               </th>

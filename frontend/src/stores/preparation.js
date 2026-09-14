@@ -108,10 +108,6 @@ export const usePreparationStore = defineStore('preparation', {
       }
     },
 
-    async toggleMaterial(item) {
-      return this.setMaterialState(item, 'ready')
-    },
-
     /** Valide une chirurgie uniquement lorsque toutes ses lignes sont cochées. */
     async validateSurgery() {
       if (!this.isResolved || !this.preparation) return false

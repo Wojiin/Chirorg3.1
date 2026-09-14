@@ -136,6 +136,25 @@ final class ReferentielsApiTest extends AuthenticatedApiTestCase
         ]);
         self::assertInstanceOf(Specialite::class, $defaultSpecialite);
 
+        $visibleSpecialites = $client->request('GET', '/api/specialites?'.http_build_query([
+            'masquerSansSpecialite' => 'true',
+            'itemsPerPage' => 100,
+        ]));
+        self::assertResponseIsSuccessful();
+        self::assertNotContains(
+            Specialite::SANS_SPECIALITE,
+            array_column($visibleSpecialites->toArray()['member'], 'intitule'),
+        );
+
+        $client->request('PATCH', '/api/specialites/'.$defaultSpecialite->getId(), [
+            'headers' => ['content-type' => 'application/merge-patch+json'],
+            'json' => ['intitule' => 'Spécialité renommée interdite'],
+        ]);
+        self::assertResponseStatusCodeSame(409);
+        self::assertJsonContains([
+            'detail' => 'La spécialité « Sans spécialité » ne peut pas être modifiée.',
+        ]);
+
         $client->request('DELETE', '/api/specialites/'.$defaultSpecialite->getId());
         self::assertResponseStatusCodeSame(409);
         self::assertJsonContains([

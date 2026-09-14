@@ -69,10 +69,70 @@ describe('AdminListView speciality filter', () => {
     })
     await flushPromises()
 
+    expect(wrapper.text()).toContain('Retour aux référentiels')
     await wrapper.get('select').setValue('12')
 
     expect(wrapper.text()).toContain('Jean Dupont')
     expect(wrapper.text()).not.toContain('Alice Martin')
+  })
+
+  it('filters surgery models using their speciality', async () => {
+    const list = vi
+      .spyOn(adminApi, 'list')
+      .mockImplementation(async (resource) => {
+        if (resource === 'specialites') {
+          return [{ id: 12, intitule: 'Orthopédie' }]
+        }
+        return []
+      })
+
+    const wrapper = mount(AdminListView, {
+      props: { resourceSlug: 'chirurgie-modeles' },
+      global: {
+        plugins: [createPinia()],
+        stubs: {
+          RouterLink: { template: '<a><slot /></a>' },
+          BaseCombobox: BaseComboboxStub,
+        },
+      },
+    })
+    await flushPromises()
+
+    await wrapper.get('select').setValue('12')
+    await flushPromises()
+
+    expect(list).toHaveBeenCalledWith('chirurgie-modeles', {
+      page: 1,
+      itemsPerPage: 10,
+      q: undefined,
+      specialite: '12',
+      chirurgien: undefined,
+    })
+  })
+
+  it('requests the speciality CRUD without the technical fallback', async () => {
+    const list = vi.spyOn(adminApi, 'list').mockResolvedValue([])
+
+    mount(AdminListView, {
+      props: { resourceSlug: 'specialites' },
+      global: {
+        plugins: [createPinia()],
+        stubs: {
+          RouterLink: { template: '<a><slot /></a>' },
+          BaseCombobox: BaseComboboxStub,
+        },
+      },
+    })
+    await flushPromises()
+
+    expect(list).toHaveBeenCalledWith('specialites', {
+      page: 1,
+      itemsPerPage: 10,
+      q: undefined,
+      specialite: undefined,
+      chirurgien: undefined,
+      masquerSansSpecialite: true,
+    })
   })
 
   it('filters material lists using the surgery speciality', async () => {

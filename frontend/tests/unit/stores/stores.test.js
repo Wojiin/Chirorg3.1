@@ -320,7 +320,7 @@ describe('ChirOrg stores with API services', () => {
       (item) => !item.coche,
     )
     const previousCount = store.preparation.progressionPreparation.coches
-    await store.toggleMaterial(firstUnchecked)
+    await store.setMaterialState(firstUnchecked, 'ready')
 
     expect(store.preparation.progressionPreparation.coches).toBe(
       previousCount + 1,
@@ -330,7 +330,7 @@ describe('ChirOrg stores with API services', () => {
     for (const item of store.preparation.preparations.filter(
       (entry) => !entry.coche,
     )) {
-      await store.toggleMaterial(item)
+      await store.setMaterialState(item, 'ready')
     }
 
     expect(store.isComplete).toBe(true)
