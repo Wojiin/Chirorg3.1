@@ -44,6 +44,7 @@ const {
   specialityOptions,
   surgeonFilter,
   surgeonOptions,
+  technicalSheetGroups,
 } = useAdminListView(props)
 </script>
 

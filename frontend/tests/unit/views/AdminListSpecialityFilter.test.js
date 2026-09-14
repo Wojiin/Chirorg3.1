@@ -110,6 +110,45 @@ describe('AdminListView speciality filter', () => {
     })
   })
 
+  it('renders technical sheets grouped by surgery', async () => {
+    vi.spyOn(adminApi, 'list').mockImplementation(async (resource) => {
+      if (resource === 'specialites') {
+        return [{ id: 12, intitule: 'Orthopédie' }]
+      }
+      return [
+        {
+          id: 21,
+          titre: 'Installation du patient',
+          description: 'Installer le patient en décubitus dorsal.',
+          ordre: 1,
+          chirurgieModele: {
+            id: 7,
+            intitule: 'Arthroscopie',
+            specialite: { id: 12, intitule: 'Orthopédie' },
+          },
+        },
+      ]
+    })
+
+    const wrapper = mount(AdminListView, {
+      props: { resourceSlug: 'fiches-techniques' },
+      global: {
+        plugins: [createPinia()],
+        stubs: {
+          RouterLink: { template: '<a><slot /></a>' },
+          BaseCombobox: BaseComboboxStub,
+        },
+      },
+    })
+    await flushPromises()
+
+    expect(wrapper.text()).toContain('Arthroscopie')
+    expect(wrapper.text()).toContain('Installation du patient')
+    expect(wrapper.text()).toContain(
+      'Installer le patient en décubitus dorsal.',
+    )
+  })
+
   it('requests the speciality CRUD without the technical fallback', async () => {
     const list = vi.spyOn(adminApi, 'list').mockResolvedValue([])
 
