@@ -7,6 +7,7 @@ use App\Entity\Chirurgien;
 use App\Entity\FicheTechnique;
 use App\Entity\ListeMateriel;
 use App\Entity\Materiel;
+use App\Entity\Salle;
 use App\Entity\Specialite;
 use App\Entity\Utilisateur;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -31,6 +32,15 @@ final class EntityValidationTest extends KernelTestCase
         self::assertSame(
             ['intitule'],
             $this->paths($this->validator->validate((new Specialite())->setIntitule(str_repeat('a', 101)))),
+        );
+    }
+
+    public function testSalleRequiresALabelWithinDatabaseLength(): void
+    {
+        self::assertSame(['intitule'], $this->paths($this->validator->validate(new Salle())));
+        self::assertSame(
+            ['intitule'],
+            $this->paths($this->validator->validate((new Salle())->setIntitule(str_repeat('a', 51)))),
         );
     }
 

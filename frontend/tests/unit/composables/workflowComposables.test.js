@@ -200,9 +200,15 @@ describe('workflow composables', () => {
 
   it('loads programme summaries, reacts to filters and clears them', async () => {
     const list = vi.spyOn(programmeApi, 'list').mockResolvedValue([])
+    vi.spyOn(adminApi, 'list').mockResolvedValue([
+      { id: 2, intitule: 'Salle B' },
+      { id: 1, intitule: 'Salle A' },
+      { id: 3, intitule: 'Salle C' },
+    ])
     const { result } = mountComposable(useProgrammeOperatoireView)
     await flushPromises()
     expect(list).toHaveBeenCalled()
+    expect(result.rooms.value).toEqual(['Salle A', 'Salle B', 'Salle C'])
 
     result.filters.room = 'Salle A'
     await nextTick()
@@ -227,6 +233,7 @@ describe('workflow composables', () => {
           'chirurgie-modeles': [
             { id: 3, intitule: 'Prothèse', specialite: { id: 2 } },
           ],
+          salles: [{ id: 1, intitule: 'Salle A' }],
         })[resource] ?? [],
     )
     const plan = vi.spyOn(programmeApi, 'planProgram').mockResolvedValue({

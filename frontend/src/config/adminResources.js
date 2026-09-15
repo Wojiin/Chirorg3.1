@@ -1,6 +1,11 @@
 /** Liste déclarative des référentiels administrables et de leur intention métier. */
 export const adminResources = [
   {
+    slug: 'salles',
+    label: 'Salles',
+    description: 'Salles opératoires disponibles',
+  },
+  {
     slug: 'specialites',
     label: 'Spécialités',
     description: 'Domaines chirurgicaux de référence',

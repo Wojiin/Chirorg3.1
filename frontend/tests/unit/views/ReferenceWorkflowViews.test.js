@@ -150,7 +150,7 @@ describe('reference workflow views', () => {
   it('renders every administrator resource card', () => {
     const wrapper = mountView(AdminDashboardView)
     expect(wrapper.text()).toContain('Administration')
-    expect(wrapper.findAll('.resource-card')).toHaveLength(7)
+    expect(wrapper.findAll('.resource-card')).toHaveLength(8)
   })
 
   it('renders the not-found page and its return navigation', () => {

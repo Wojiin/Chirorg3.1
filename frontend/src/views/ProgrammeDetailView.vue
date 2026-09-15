@@ -49,7 +49,10 @@ const {
     >
       <template #action>
         <div class="flex flex-wrap gap-3">
-          <RouterLink :to="{ name: 'programme' }" class="secondary-link">
+          <RouterLink
+            :to="{ name: 'programme' }"
+            class="button-base button-secondary button-md"
+          >
             Retour à la liste des programmes
           </RouterLink>
           <BaseButton

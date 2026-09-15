@@ -6,8 +6,6 @@ import { useReferenceStore } from '@/stores/references'
 import { ERROR_MESSAGES } from '@/config/errorMessages'
 import { getTomorrowDateValue } from '@/utils/date'
 
-const rooms = ['Salle A', 'Salle B', 'Salle C']
-
 /** Orchestre le formulaire de planification et ses référentiels dépendants. */
 export function usePlanificationView() {
   const router = useRouter()
@@ -22,7 +20,7 @@ export function usePlanificationView() {
     specialiteId: '',
     chirurgienId: '',
     dateProgrammee: minimumDate,
-    salle: 'Salle A',
+    salle: '',
     chirurgieModeleIds: [''],
   })
 
@@ -52,6 +50,14 @@ export function usePlanificationView() {
       )
       .map((item) => ({ value: item.id, label: item.intitule }))
       .sort((left, right) => left.label.localeCompare(right.label, 'fr')),
+  )
+  const rooms = computed(() =>
+    referenceStore
+      .getCollection('salles')
+      .map((item) => item.intitule)
+      .sort((left, right) =>
+        left.localeCompare(right, 'fr', { sensitivity: 'base' }),
+      ),
   )
   const displayedError = computed(
     () => formError.value || programmeError.value || referenceError.value,
@@ -118,10 +124,18 @@ export function usePlanificationView() {
     },
   )
 
-  onMounted(() => {
-    referenceStore
-      .load(['specialites', 'chirurgiens', 'chirurgie-modeles'])
-      .catch(() => {})
+  onMounted(async () => {
+    try {
+      await referenceStore.load([
+        'salles',
+        'specialites',
+        'chirurgiens',
+        'chirurgie-modeles',
+      ])
+      if (!form.salle && rooms.value.length) form.salle = rooms.value[0]
+    } catch {
+      // Le store expose déjà l'erreur de chargement à la vue.
+    }
   })
 
   return {

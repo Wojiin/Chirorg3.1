@@ -93,6 +93,19 @@ class ChirurgiePlanifieeRepository extends ServiceEntityRepository
             ->execute();
     }
 
+    /** Répercute le renommage d'une salle sur tous les programmes associés. */
+    public function renameSalle(string $ancienIntitule, string $nouvelIntitule): int
+    {
+        return $this->createQueryBuilder('chirurgie')
+            ->update()
+            ->set('chirurgie.salle', ':nouvelIntitule')
+            ->where('chirurgie.salle = :ancienIntitule')
+            ->setParameter('nouvelIntitule', $nouvelIntitule)
+            ->setParameter('ancienIntitule', $ancienIntitule)
+            ->getQuery()
+            ->execute();
+    }
+
     private function baseDataQuery(): QueryBuilder
     {
         return $this->createQueryBuilder('c')
