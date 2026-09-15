@@ -16,7 +16,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 #[AsCommand(
     name: 'app:utilisateur:create',
-    description: 'Create an application user without exposing the password in process arguments.',
+    description: 'Crée un utilisateur sans exposer son mot de passe dans les arguments du processus.',
 )]
 final class UtilisateurCreateCommand extends Command
 {
@@ -31,8 +31,8 @@ final class UtilisateurCreateCommand extends Command
     protected function configure(): void
     {
         $this
-            ->addArgument('email', InputArgument::OPTIONAL, 'Email used to authenticate')
-            ->addOption('admin', null, InputOption::VALUE_NONE, 'Grant ROLE_ADMIN')
+            ->addArgument('email', InputArgument::OPTIONAL, 'Adresse email utilisée pour se connecter')
+            ->addOption('admin', null, InputOption::VALUE_NONE, 'Accorder le rôle administrateur')
         ;
     }
 
@@ -41,27 +41,27 @@ final class UtilisateurCreateCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $emailInput = $input->getArgument('email') ?? $io->ask('Email');
         if (!is_string($emailInput)) {
-            $io->error('A valid email address is required.');
+            $io->error('Une adresse email valide est obligatoire.');
 
             return Command::INVALID;
         }
 
         $email = mb_strtolower(trim($emailInput));
         if (false === filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $io->error('A valid email address is required.');
+            $io->error('Une adresse email valide est obligatoire.');
 
             return Command::INVALID;
         }
 
         if (null !== $this->utilisateurRepository->findOneBy(['email' => $email])) {
-            $io->error('An utilisateur already exists with this email address.');
+            $io->error('Un utilisateur existe déjà avec cette adresse email.');
 
             return Command::FAILURE;
         }
 
-        $password = $io->askHidden('Password (12 characters minimum)');
-        if (!is_string($password) || 12 > mb_strlen($password)) {
-            $io->error('The password must contain at least 12 characters.');
+        $password = $io->askHidden('Mot de passe (12 caractères minimum)');
+        if (!is_string($password) || !$this->isPasswordStrong($password)) {
+            $io->error('Le mot de passe doit contenir entre 12 et 4096 caractères, avec une minuscule, une majuscule, un chiffre et un caractère spécial.');
 
             return Command::INVALID;
         }
@@ -74,8 +74,20 @@ final class UtilisateurCreateCommand extends Command
         $this->entityManager->persist($utilisateur);
         $this->entityManager->flush();
 
-        $io->success(sprintf('Utilisateur %s created.', $email));
+        $io->success(sprintf('Utilisateur %s créé.', $email));
 
         return Command::SUCCESS;
+    }
+
+    private function isPasswordStrong(string $password): bool
+    {
+        $length = mb_strlen($password);
+
+        return $length >= 12
+            && $length <= 4096
+            && 1 === preg_match('/[a-z]/', $password)
+            && 1 === preg_match('/[A-Z]/', $password)
+            && 1 === preg_match('/\d/', $password)
+            && 1 === preg_match('/[^a-zA-Z\d]/', $password);
     }
 }

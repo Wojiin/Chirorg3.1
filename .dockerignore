@@ -1,0 +1,13 @@
+.git
+.github
+.env*
+.deploy
+backups
+secrets
+backend/vendor
+backend/var
+frontend/node_modules
+frontend/dist
+frontend/lighthouse-reports
+frontend/test-results
+frontend/playwright-report

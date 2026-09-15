@@ -24,6 +24,8 @@ compose() {
     docker compose --env-file "$env_file" -f "$project_dir/docker-compose.prod.yaml" "$@"
 }
 
+ENV_FILE="$env_file" "$project_dir/scripts/preflight.sh"
+
 rollback_on_error() {
     status=$?
     trap - EXIT INT TERM
