@@ -8,6 +8,16 @@ import { getAdminFormFields } from '@/config/adminForms'
 import { buildAdminPayload, createAdminForm } from '@/mappers/admin'
 
 describe('speciality filters and material-list form', () => {
+  it('exposes the editable room form', () => {
+    expect(getAdminFormFields('salles')).toEqual([
+      {
+        key: 'intitule',
+        label: 'Intitulé de la salle',
+        required: true,
+      },
+    ])
+  })
+
   it('configures server-side filters for surgery models and specialities', () => {
     expect(getAdminListFilterConfig('chirurgie-modeles')).toEqual({
       speciality: true,

@@ -61,6 +61,10 @@ final class ErrorMessage
     public const string REFERENCE_IN_USE = 'Cette ressource ne peut pas être supprimée car elle est utilisée.';
     public const string REQUIRED_FIELD = 'Ce champ est obligatoire.';
     public const string ROLE_INVALID = 'Ce rôle n’est pas autorisé.';
+    public const string SALLE_ALREADY_EXISTS = 'Cette salle existe déjà.';
+    public const string SALLE_EXPECTED = 'Une salle est attendue.';
+    public const string SALLE_IN_USE = 'Cette salle ne peut pas être supprimée car elle est utilisée par un programme.';
+    public const string SALLE_NOT_FOUND = 'Salle introuvable.';
     public const string SPECIALITE_ALREADY_EXISTS = 'Cette spécialité existe déjà.';
     public const string SPECIALITE_EXPECTED = 'Une spécialité est attendue.';
     public const string TECHNICAL_SHEET_CONTENT_REQUIRED = 'Une fiche technique doit contenir une description, une image ou les deux.';

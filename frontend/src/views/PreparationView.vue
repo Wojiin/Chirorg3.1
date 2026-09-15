@@ -124,12 +124,7 @@ const {
                     : 'Valider la chirurgie'
               }}
             </BaseButton>
-            <BaseButton
-              class="w-full"
-              size="lg"
-              variant="secondary"
-              @click="goBack"
-            >
+            <BaseButton class="w-full" variant="secondary" @click="goBack">
               Retour
             </BaseButton>
           </div>

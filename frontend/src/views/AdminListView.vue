@@ -44,6 +44,7 @@ const {
   specialityOptions,
   surgeonFilter,
   surgeonOptions,
+  technicalSheetGroups,
 } = useAdminListView(props)
 </script>
 
@@ -56,7 +57,10 @@ const {
     >
       <template #action>
         <div v-if="resource" class="flex flex-wrap gap-3">
-          <RouterLink :to="{ name: 'admin' }" class="secondary-link">
+          <RouterLink
+            :to="{ name: 'admin' }"
+            class="button-base button-secondary button-md"
+          >
             ← Retour aux référentiels
           </RouterLink>
           <RouterLink

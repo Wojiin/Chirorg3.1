@@ -32,8 +32,6 @@ export const useProgrammeStore = defineStore('programme', {
     loading: (state) => state.pendingLoads > 0,
     chirurgies: (state) =>
       state.programmes.flatMap((programme) => programme.chirurgies),
-    rooms: (state) =>
-      [...new Set(state.programmes.map((item) => item.salle))].sort(),
     filteredProgrammes: (state) =>
       state.programmes.filter(
         (programme) =>
@@ -159,6 +157,29 @@ export const useProgrammeStore = defineStore('programme', {
         return createdProgramme
       } catch (error) {
         this.error = getApiErrorMessage(error, ERROR_MESSAGES.programmePlan)
+        return null
+      } finally {
+        this.planning = false
+      }
+    },
+
+    /** Ajoute une chirurgie à un programme existant et remplace immédiatement son détail local. */
+    async addSurgeryToProgramme(programme, chirurgieModeleId) {
+      this.planning = true
+      this.error = ''
+
+      try {
+        const data = await programmeApi.planProgram({
+          chirurgienId: Number(programme.chirurgien.id),
+          chirurgieModeleIds: [Number(chirurgieModeleId)],
+          dateProgrammee: programme.date,
+          salle: programme.salle,
+        })
+        const updatedProgramme = this.upsertProgramme(data)
+        this.selectedProgramme = updatedProgramme
+        return updatedProgramme
+      } catch (error) {
+        this.error = getApiErrorMessage(error, ERROR_MESSAGES.surgeryAdd)
         return null
       } finally {
         this.planning = false

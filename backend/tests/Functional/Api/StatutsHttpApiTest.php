@@ -7,6 +7,7 @@ final class StatutsHttpApiTest extends AuthenticatedApiTestCase
     /** @return iterable<string, array{string, array<string, mixed>}> */
     public static function protectedResources(): iterable
     {
+        yield 'salles' => ['/api/salles', []];
         yield 'spécialités' => ['/api/specialites', []];
         yield 'chirurgiens' => ['/api/chirurgiens', []];
         yield 'chirurgies modèles' => ['/api/chirurgie-modeles', []];

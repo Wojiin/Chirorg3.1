@@ -675,6 +675,10 @@
     @apply h-2.5 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700;
   }
 
+  .progress-track-danger {
+    @apply bg-red-600 dark:bg-red-700;
+  }
+
   .progress-value {
     @apply h-full rounded-full bg-chirorg-600 transition-all duration-300;
   }

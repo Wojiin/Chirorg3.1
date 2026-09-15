@@ -7,10 +7,12 @@ use App\Dto\ProgrammePlanificationOutput;
 use App\Entity\ChirurgieModele;
 use App\Entity\Chirurgien;
 use App\Entity\ChirurgiePlanifiee;
+use App\Entity\Salle;
 use App\Error\ErrorMessage;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
 final readonly class ProgrammePlanificationService
 {
@@ -25,9 +27,16 @@ final readonly class ProgrammePlanificationService
         }
         $chirurgien = $this->entityManager->find(Chirurgien::class, $input->chirurgienId) ?? throw new NotFoundHttpException(ErrorMessage::CHIRURGIEN_NOT_FOUND);
         $salle = trim($input->salle);
+        if (null === $this->entityManager->getRepository(Salle::class)->findOneBy(['intitule' => $salle])) {
+            throw new NotFoundHttpException(ErrorMessage::SALLE_NOT_FOUND);
+        }
         $models = [];
         foreach ($input->chirurgieModeleIds as $modelId) {
-            $models[] = $this->entityManager->find(ChirurgieModele::class, $modelId) ?? throw new NotFoundHttpException(ErrorMessage::chirurgieModeleNotFound($modelId));
+            $modele = $this->entityManager->find(ChirurgieModele::class, $modelId) ?? throw new NotFoundHttpException(ErrorMessage::chirurgieModeleNotFound($modelId));
+            if ($modele->getSpecialite() !== $chirurgien->getSpecialite()) {
+                throw new UnprocessableEntityHttpException(ErrorMessage::CHIRURGIE_MODELE_SPECIALITE_MISMATCH);
+            }
+            $models[] = $modele;
         }
 
         return $this->entityManager->wrapInTransaction(function () use ($input, $chirurgien, $models, $salle): ProgrammePlanificationOutput {

@@ -9,6 +9,7 @@ use App\Entity\FicheTechnique;
 use App\Entity\ListeMateriel;
 use App\Entity\Materiel;
 use App\Entity\PreparationMateriel;
+use App\Entity\Salle;
 use App\Entity\Specialite;
 use App\Entity\Utilisateur;
 use Doctrine\Bundle\FixturesBundle\Fixture;
@@ -33,6 +34,11 @@ final class AppFixtures extends Fixture
         $user = $this->createUtilisateur(self::USER_EMAIL, ['ROLE_USER'], self::USER_PASSWORD);
         $manager->persist($admin);
         $manager->persist($user);
+
+        $salles = ['Salle A', 'Salle B', 'Salle C'];
+        foreach ($salles as $intitule) {
+            $manager->persist((new Salle())->setIntitule($intitule));
+        }
 
         $specialites = [];
         foreach (['Orthopédie', 'Chirurgie viscérale et digestive', 'Chirurgie générale', 'Traumatologie', 'Urologie', Specialite::SANS_SPECIALITE] as $intitule) {
@@ -93,7 +99,6 @@ final class AppFixtures extends Fixture
 
         $chirurgies = [];
         $aujourdhui = new \DateTimeImmutable('today');
-        $salles = ['Salle A', 'Salle B', 'Salle C'];
         for ($index = 0; $index < 30; ++$index) {
             $groupeIndex = intdiv($index, 2);
             $chirurgienIndex = $groupeIndex % 5;

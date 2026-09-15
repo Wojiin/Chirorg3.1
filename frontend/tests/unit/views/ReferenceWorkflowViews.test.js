@@ -21,6 +21,16 @@ const mocks = vi.hoisted(() => ({
     rooms: ['Salle A'],
   },
   detail: {
+    addSurgeryFormOpen: false,
+    addingSurgery: false,
+    chirurgieModeleId: '',
+    displayedAddSurgeryError: '',
+    referencesLoading: false,
+    speciality: { id: 2, intitule: 'Orthopédie' },
+    surgeryModels: [{ value: 3, label: 'Intervention test' }],
+    openAddSurgeryForm: vi.fn(),
+    cancelAddSurgery: vi.fn(),
+    submitSurgery: vi.fn(),
     deletingSurgeryId: null,
     pendingSurgeryRemoval: null,
     requestSurgeryRemoval: vi.fn(),
@@ -113,6 +123,7 @@ describe('reference workflow views', () => {
     mocks.detail.loading = false
     mocks.detail.programme = null
     mocks.detail.pendingSurgeryRemoval = null
+    mocks.detail.addSurgeryFormOpen = false
     mocks.preparation.error = ''
     mocks.preparation.loading = false
     mocks.preparation.isPartial = false
@@ -139,7 +150,7 @@ describe('reference workflow views', () => {
   it('renders every administrator resource card', () => {
     const wrapper = mountView(AdminDashboardView)
     expect(wrapper.text()).toContain('Administration')
-    expect(wrapper.findAll('.resource-card')).toHaveLength(7)
+    expect(wrapper.findAll('.resource-card')).toHaveLength(8)
   })
 
   it('renders the not-found page and its return navigation', () => {
@@ -190,6 +201,8 @@ describe('reference workflow views', () => {
 
     expect(wrapper.text()).toContain('Détail du programme')
     expect(wrapper.text()).toContain('Intervention test')
+    await wrapper.get('button.button-primary').trigger('click')
+    expect(mocks.detail.openAddSurgeryForm).toHaveBeenCalledOnce()
     const cancelButton = [
       ...document.body.querySelectorAll('[role="dialog"] button'),
     ].find((button) => button.textContent.includes('Annuler'))

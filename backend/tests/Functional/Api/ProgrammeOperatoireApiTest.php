@@ -47,7 +47,7 @@ final class ProgrammeOperatoireApiTest extends AuthenticatedApiTestCase
 
         $client->request('POST', '/api/programmes-operatoires', ['json' => [
             'dateProgrammee' => (new \DateTimeImmutable('tomorrow'))->format('Y-m-d'),
-            'salle' => 'Bloc 2',
+            'salle' => 'Salle B',
             'chirurgienId' => $chirurgien->getId(),
             'chirurgieModeleIds' => [$modele->getId()],
         ]]);
@@ -61,6 +61,47 @@ final class ProgrammeOperatoireApiTest extends AuthenticatedApiTestCase
         self::assertSame([], $entityManager->getRepository(ChirurgiePlanifiee::class)->findBy(['chirurgien' => $managedChirurgien]));
         foreach ([$modele, $chirurgien, $specialite, $utilisateur] as $entity) {
             $managed = $entityManager->find($entity::class, $entity->getId());
+            if (null !== $managed) {
+                $entityManager->remove($managed);
+            }
+        }
+        $entityManager->flush();
+    }
+
+    public function testPlanningRejectsASurgeryModelFromAnotherSpeciality(): void
+    {
+        $client = $this->createApiClient();
+        [$utilisateur, $password] = $this->persistUtilisateur(roles: ['ROLE_USER']);
+        $this->useBearerToken($client, $this->login($client, $utilisateur, $password));
+        $entityManager = static::getContainer()->get(EntityManagerInterface::class);
+        $surgeonSpeciality = (new Specialite())->setIntitule('Orthopédie '.bin2hex(random_bytes(4)));
+        $modelSpeciality = (new Specialite())->setIntitule('Cardiologie '.bin2hex(random_bytes(4)));
+        $chirurgien = (new Chirurgien())->setPrenom('Alex')->setNom('Martin')->setSpecialite($surgeonSpeciality);
+        $modele = (new ChirurgieModele())->setIntitule('Pontage')->setSpecialite($modelSpeciality);
+        foreach ([$surgeonSpeciality, $modelSpeciality, $chirurgien, $modele] as $entity) {
+            $entityManager->persist($entity);
+        }
+        $entityManager->flush();
+        $entityIds = array_map(static fn (object $entity): array => [$entity::class, $entity->getId()], [$modele, $chirurgien, $modelSpeciality, $surgeonSpeciality, $utilisateur]);
+        $chirurgienId = $chirurgien->getId();
+
+        $client->request('POST', '/api/programmes-operatoires', ['json' => [
+            'dateProgrammee' => (new \DateTimeImmutable('tomorrow'))->format('Y-m-d'),
+            'salle' => 'Salle C',
+            'chirurgienId' => $chirurgienId,
+            'chirurgieModeleIds' => [$modele->getId()],
+        ]]);
+
+        self::assertResponseStatusCodeSame(422);
+        $registry = static::getContainer()->get(ManagerRegistry::class);
+        $registry->resetManager();
+        $entityManager = $registry->getManager();
+        self::assertInstanceOf(EntityManagerInterface::class, $entityManager);
+        $managedChirurgien = $entityManager->find(Chirurgien::class, $chirurgienId);
+        self::assertSame([], $entityManager->getRepository(ChirurgiePlanifiee::class)->findBy(['chirurgien' => $managedChirurgien]));
+
+        foreach ($entityIds as [$entityClass, $entityId]) {
+            $managed = $entityManager->find($entityClass, $entityId);
             if (null !== $managed) {
                 $entityManager->remove($managed);
             }
@@ -87,15 +128,23 @@ final class ProgrammeOperatoireApiTest extends AuthenticatedApiTestCase
         $entityManager->flush();
 
         $date = new \DateTimeImmutable('tomorrow');
+        $client->request('POST', '/api/programmes-operatoires', ['json' => [
+            'dateProgrammee' => $date->format('Y-m-d'),
+            'salle' => 'Salle inconnue',
+            'chirurgienId' => $chirurgien->getId(),
+            'chirurgieModeleIds' => [$modele->getId()],
+        ]]);
+        self::assertResponseStatusCodeSame(404);
+
         $response = $client->request('POST', '/api/programmes-operatoires', ['json' => [
             'dateProgrammee' => $date->format('Y-m-d'),
-            'salle' => 'Bloc 1',
+            'salle' => 'Salle A',
             'chirurgienId' => $chirurgien->getId(),
             'chirurgieModeleIds' => [$modele->getId()],
         ]]);
 
         self::assertResponseStatusCodeSame(201);
-        self::assertJsonContains(['date' => $date->format('Y-m-d'), 'salle' => 'Bloc 1', 'nombreChirurgies' => 1]);
+        self::assertJsonContains(['date' => $date->format('Y-m-d'), 'salle' => 'Salle A', 'nombreChirurgies' => 1]);
         $payload = $response->toArray();
         self::assertCount(1, $payload['chirurgies'][0]['preparationsMateriel']);
 
@@ -154,11 +203,11 @@ final class ProgrammeOperatoireApiTest extends AuthenticatedApiTestCase
         ]);
         self::assertResponseStatusCodeSame(409);
 
-        $client->request('GET', sprintf('/api/programmes-operatoires/%s/Bloc%%201/%d', $date->format('Y-m-d'), $chirurgien->getId()));
+        $client->request('GET', sprintf('/api/programmes-operatoires/%s/Salle%%20A/%d', $date->format('Y-m-d'), $chirurgien->getId()));
         self::assertResponseIsSuccessful();
         self::assertJsonContains(['nombreChirurgies' => 1, 'nombreChirurgiesValidees' => 1]);
 
-        $programmeUrl = sprintf('/api/programmes-operatoires/%s/Bloc%%201/%d/ordre', $date->format('Y-m-d'), $chirurgien->getId());
+        $programmeUrl = sprintf('/api/programmes-operatoires/%s/Salle%%20A/%d/ordre', $date->format('Y-m-d'), $chirurgien->getId());
         $client->request('PATCH', $programmeUrl, ['headers' => ['content-type' => 'application/merge-patch+json'], 'json' => ['chirurgieIds' => [$chirurgieId]]]);
         self::assertResponseStatusCodeSame(409);
 
