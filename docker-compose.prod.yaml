@@ -62,6 +62,35 @@ services:
     networks: [database, application]
     logging: *default-logging
 
+  programme_cleanup:
+    image: ${BACKEND_IMAGE:-ghcr.io/wojiin/chirorg3.1-backend}:${IMAGE_TAG:?IMAGE_TAG is required}
+    restart: unless-stopped
+    environment:
+      APP_ENV: prod
+      APP_DEBUG: 0
+      APP_SECRET: ${APP_SECRET:?APP_SECRET is required}
+      DATABASE_URL: ${DATABASE_URL:?DATABASE_URL is required}
+      DEFAULT_URI: ${DEFAULT_URI:?DEFAULT_URI is required}
+      CORS_ALLOW_ORIGIN: ${CORS_ALLOW_ORIGIN:?CORS_ALLOW_ORIGIN is required}
+      TRUSTED_PROXIES: ${TRUSTED_PROXIES:-private_ranges}
+      TRUSTED_HOSTS: ${TRUSTED_HOSTS:?TRUSTED_HOSTS is required}
+      JWT_SECRET_KEY: /run/secrets/jwt_private.pem
+      JWT_PUBLIC_KEY: /run/secrets/jwt_public.pem
+      JWT_PASSPHRASE: ${JWT_PASSPHRASE:?JWT_PASSPHRASE is required}
+      JWT_REFRESH_COOKIE_SECURE: 1
+      JWT_REFRESH_SINGLE_USE: 1
+      PROGRAMME_CLEANUP_HOUR: ${PROGRAMME_CLEANUP_HOUR:-6}
+    command: ["sh", "docker/programme-cleanup.sh"]
+    volumes:
+      - ${JWT_PRIVATE_KEY_PATH:?JWT_PRIVATE_KEY_PATH is required}:/run/secrets/jwt_private.pem:ro
+      - ${JWT_PUBLIC_KEY_PATH:?JWT_PUBLIC_KEY_PATH is required}:/run/secrets/jwt_public.pem:ro
+      - technical_sheet_uploads:/var/www/html/public/uploads
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks: [database]
+    logging: *default-logging
+
   nginx:
     image: ${BACKEND_NGINX_IMAGE:-ghcr.io/wojiin/chirorg3.1-backend-nginx}:${IMAGE_TAG:?IMAGE_TAG is required}
     build:
