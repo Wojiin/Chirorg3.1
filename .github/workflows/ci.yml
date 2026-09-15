@@ -262,6 +262,27 @@ jobs:
           curl --fail --retry 10 --retry-delay 2 http://localhost:8081/api/health > /dev/null
           curl --fail --retry 10 --retry-delay 2 http://localhost:8081/ > /dev/null
 
+      - name: Validate production technical sheet uploads
+        env:
+          APP_DOMAIN: http://localhost
+          APP_HOST: localhost
+          HTTP_PORT: 8081
+          HTTPS_PORT: 8443
+          DEFAULT_URI: http://localhost:8081
+          CORS_ALLOW_ORIGIN: ^http://localhost:8081$
+          TRUSTED_HOSTS: ^localhost$
+          JWT_PASSPHRASE: ci-jwt-passphrase
+        run: |
+          ADMIN_PASSWORD="Admin-$(openssl rand -hex 16)!"
+          printf '%s\n' "$ADMIN_PASSWORD" | docker compose -p chirorg31-prod-ci --env-file .env.prod.example -f docker-compose.prod.yaml exec -T backend php bin/console app:utilisateur:create admin.production-ci@chirorg.test --admin
+          ACCESS_TOKEN=$(curl --fail --silent --show-error -X POST http://localhost:8081/api/auth/login -H 'Content-Type: application/json' --data "{\"email\":\"admin.production-ci@chirorg.test\",\"password\":\"$ADMIN_PASSWORD\"}" | jq -r '.token')
+          test -n "$ACCESS_TOKEN"
+          printf '%s' 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=' | base64 --decode > /tmp/chirorg-upload.png
+          UPLOAD_URL=$(curl --fail --silent --show-error -X POST http://localhost:8081/api/fiche-technique-images -H "Authorization: Bearer $ACCESS_TOKEN" -F image=@/tmp/chirorg-upload.png | jq -r '.url')
+          test -n "$UPLOAD_URL"
+          curl --fail --silent --show-error "http://localhost:8081$UPLOAD_URL" --output /tmp/chirorg-upload-result.png
+          cmp /tmp/chirorg-upload.png /tmp/chirorg-upload-result.png
+
       - name: Show production logs on failure
         if: failure()
         env:
