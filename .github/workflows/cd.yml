@@ -68,6 +68,15 @@ jobs:
           provenance: mode=max
           sbom: true
 
+      - name: Rechercher les vulnérabilités critiques
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: ${{ matrix.image }}:sha-${{ github.sha }}
+          format: table
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: '1'
+
   deployer:
     name: Déployer sur ${{ inputs.environnement }}
     needs: images
