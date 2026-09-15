@@ -19,6 +19,8 @@ export const ERROR_MESSAGES = Object.freeze({
   programmeDetailLoad: 'Impossible de charger le détail du programme.',
   programmePlan: 'Le programme n’a pas pu être planifié.',
   programmeReorder: 'Le nouvel ordre n’a pas pu être enregistré.',
+  surgeryAdd: 'La chirurgie n’a pas pu être ajoutée au programme.',
+  surgeryModelRequired: 'Sélectionnez une chirurgie modèle.',
   surgeryDelete: 'La chirurgie n’a pas pu être supprimée.',
   validatedSurgeryDelete: 'Une chirurgie validée ne peut pas être supprimée.',
   preparationLoad: 'Impossible de charger la préparation.',

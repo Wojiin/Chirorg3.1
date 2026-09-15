@@ -68,6 +68,47 @@ final class ProgrammeOperatoireApiTest extends AuthenticatedApiTestCase
         $entityManager->flush();
     }
 
+    public function testPlanningRejectsASurgeryModelFromAnotherSpeciality(): void
+    {
+        $client = $this->createApiClient();
+        [$utilisateur, $password] = $this->persistUtilisateur(roles: ['ROLE_USER']);
+        $this->useBearerToken($client, $this->login($client, $utilisateur, $password));
+        $entityManager = static::getContainer()->get(EntityManagerInterface::class);
+        $surgeonSpeciality = (new Specialite())->setIntitule('Orthopédie '.bin2hex(random_bytes(4)));
+        $modelSpeciality = (new Specialite())->setIntitule('Cardiologie '.bin2hex(random_bytes(4)));
+        $chirurgien = (new Chirurgien())->setPrenom('Alex')->setNom('Martin')->setSpecialite($surgeonSpeciality);
+        $modele = (new ChirurgieModele())->setIntitule('Pontage')->setSpecialite($modelSpeciality);
+        foreach ([$surgeonSpeciality, $modelSpeciality, $chirurgien, $modele] as $entity) {
+            $entityManager->persist($entity);
+        }
+        $entityManager->flush();
+        $entityIds = array_map(static fn (object $entity): array => [$entity::class, $entity->getId()], [$modele, $chirurgien, $modelSpeciality, $surgeonSpeciality, $utilisateur]);
+        $chirurgienId = $chirurgien->getId();
+
+        $client->request('POST', '/api/programmes-operatoires', ['json' => [
+            'dateProgrammee' => (new \DateTimeImmutable('tomorrow'))->format('Y-m-d'),
+            'salle' => 'Bloc 3',
+            'chirurgienId' => $chirurgienId,
+            'chirurgieModeleIds' => [$modele->getId()],
+        ]]);
+
+        self::assertResponseStatusCodeSame(422);
+        $registry = static::getContainer()->get(ManagerRegistry::class);
+        $registry->resetManager();
+        $entityManager = $registry->getManager();
+        self::assertInstanceOf(EntityManagerInterface::class, $entityManager);
+        $managedChirurgien = $entityManager->find(Chirurgien::class, $chirurgienId);
+        self::assertSame([], $entityManager->getRepository(ChirurgiePlanifiee::class)->findBy(['chirurgien' => $managedChirurgien]));
+
+        foreach ($entityIds as [$entityClass, $entityId]) {
+            $managed = $entityManager->find($entityClass, $entityId);
+            if (null !== $managed) {
+                $entityManager->remove($managed);
+            }
+        }
+        $entityManager->flush();
+    }
+
     public function testRoleUserPlansAndReadsAGroupedProgramme(): void
     {
         $client = $this->createApiClient();

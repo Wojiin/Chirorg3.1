@@ -11,6 +11,7 @@ use App\Error\ErrorMessage;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
 final readonly class ProgrammePlanificationService
 {
@@ -27,7 +28,11 @@ final readonly class ProgrammePlanificationService
         $salle = trim($input->salle);
         $models = [];
         foreach ($input->chirurgieModeleIds as $modelId) {
-            $models[] = $this->entityManager->find(ChirurgieModele::class, $modelId) ?? throw new NotFoundHttpException(ErrorMessage::chirurgieModeleNotFound($modelId));
+            $modele = $this->entityManager->find(ChirurgieModele::class, $modelId) ?? throw new NotFoundHttpException(ErrorMessage::chirurgieModeleNotFound($modelId));
+            if ($modele->getSpecialite() !== $chirurgien->getSpecialite()) {
+                throw new UnprocessableEntityHttpException(ErrorMessage::CHIRURGIE_MODELE_SPECIALITE_MISMATCH);
+            }
+            $models[] = $modele;
         }
 
         return $this->entityManager->wrapInTransaction(function () use ($input, $chirurgien, $models, $salle): ProgrammePlanificationOutput {

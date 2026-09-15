@@ -47,13 +47,32 @@ test('un utilisateur planifie puis prépare une intervention', async ({
   await expect(
     page.getByRole('heading', { name: 'Détail du programme' }),
   ).toBeVisible()
+
+  await page
+    .getByRole('button', { name: '+ Ajouter une chirurgie', exact: true })
+    .click()
+  const additionForm = page.locator('form').filter({
+    has: page.getByRole('heading', { name: 'Ajouter une chirurgie' }),
+  })
+  await expect(additionForm).toContainText(date)
+  await expect(additionForm).toContainText('Salle C')
+  await expect(additionForm).toContainText('Dr Nicolas Bernard')
+  await expect(additionForm).toContainText('Orthopédie')
+  await additionForm
+    .getByLabel('Chirurgie modèle')
+    .selectOption({ label: 'Prothèse totale de genou' })
+  await additionForm
+    .getByRole('button', { name: 'Ajouter la chirurgie' })
+    .click()
+  await expect(page.locator('article.programme-card')).toHaveCount(2)
+
   const chirurgie = page
     .locator('article.programme-card')
-    .filter({ hasText: 'Prothèse' })
+    .filter({ hasText: 'Prothèse totale de genou' })
     .last()
   await chirurgie.getByRole('link', { name: /parer/ }).click()
   await expect(
-    page.getByRole('heading', { name: 'Prothèse totale de hanche' }),
+    page.getByRole('heading', { name: 'Prothèse totale de genou' }),
   ).toBeVisible()
   const premierMateriel = await page
     .locator('.preparation-item .item-title')

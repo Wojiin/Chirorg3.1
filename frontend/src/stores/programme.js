@@ -165,6 +165,29 @@ export const useProgrammeStore = defineStore('programme', {
       }
     },
 
+    /** Ajoute une chirurgie à un programme existant et remplace immédiatement son détail local. */
+    async addSurgeryToProgramme(programme, chirurgieModeleId) {
+      this.planning = true
+      this.error = ''
+
+      try {
+        const data = await programmeApi.planProgram({
+          chirurgienId: Number(programme.chirurgien.id),
+          chirurgieModeleIds: [Number(chirurgieModeleId)],
+          dateProgrammee: programme.date,
+          salle: programme.salle,
+        })
+        const updatedProgramme = this.upsertProgramme(data)
+        this.selectedProgramme = updatedProgramme
+        return updatedProgramme
+      } catch (error) {
+        this.error = getApiErrorMessage(error, ERROR_MESSAGES.surgeryAdd)
+        return null
+      } finally {
+        this.planning = false
+      }
+    },
+
     /** Applique un ordre optimiste, le persiste côté API et le restaure en cas d'échec. */
     async reorderProgramme(programme, chirurgieIds) {
       const previousChirurgies = programme.chirurgies.map((chirurgie) => ({

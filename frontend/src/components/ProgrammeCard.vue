@@ -68,7 +68,8 @@ const isPartial = computed(
     <div class="my-5">
       <ProgressBar
         :total="progress.total"
-        :value="progress.traites ?? progress.coches"
+        :value="progress.coches"
+        danger-remainder
       />
     </div>
     <div
