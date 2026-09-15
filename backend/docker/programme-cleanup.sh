@@ -20,4 +20,5 @@ while true; do
 
     sleep "$wait_seconds"
     php bin/console app:programmes:purge-expired --no-interaction
+    php bin/console gesdinet:jwt:clear --no-interaction
 done
