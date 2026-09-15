@@ -114,6 +114,14 @@ test.describe('parcours administrateur et programme opératoire', () => {
         await page.getByLabel('Intitulé de la chirurgie').fill(surgeryModel)
         await page.getByLabel('Spécialité').selectOption({ label: speciality })
       })
+
+      await page.getByRole('combobox', { name: 'Spécialité' }).click()
+      await page.getByRole('option', { name: speciality }).click()
+      await expect(
+        page.getByRole('row').filter({ hasText: surgeryModel }),
+      ).toBeVisible()
+      await page.getByRole('link', { name: 'Retour aux référentiels' }).click()
+      await expect(page).toHaveURL(/\/admin$/)
     })
 
     await test.step('créer deux matériels associés à la spécialité', async () => {

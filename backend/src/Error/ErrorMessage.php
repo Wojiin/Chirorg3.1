@@ -20,6 +20,7 @@ final class ErrorMessage
     public const string DATE_RANGE_INVALID = 'dateFin doit être postérieure ou égale à dateDebut.';
     public const string DATE_MUST_BE_TOMORROW_OR_LATER = 'La date doit être au minimum celle de demain.';
     public const string DEFAULT_SPECIALITE_MISSING = 'La spécialité « Sans spécialité » est absente.';
+    public const string DEFAULT_SPECIALITE_IMMUTABLE = 'La spécialité « Sans spécialité » ne peut pas être modifiée.';
     public const string DEFAULT_SPECIALITE_PROTECTED = 'La spécialité « Sans spécialité » ne peut pas être supprimée.';
     public const string EMAIL_ALREADY_USED = 'Cette adresse email est déjà utilisée.';
     public const string EMAIL_INVALID = 'Cette adresse email n’est pas valide.';

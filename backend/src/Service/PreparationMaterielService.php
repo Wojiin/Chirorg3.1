@@ -5,7 +5,6 @@ namespace App\Service;
 use App\Dto\PreparationMaterielInput;
 use App\Entity\PreparationMateriel;
 use App\Error\ErrorMessage;
-use App\Repository\PreparationMaterielRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -13,13 +12,13 @@ use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
 final readonly class PreparationMaterielService
 {
-    public function __construct(private PreparationMaterielRepository $repository, private AuthenticatedUserProvider $authenticatedUser, private ChirurgieAuditTrail $auditTrail, private EntityManagerInterface $entityManager)
+    public function __construct(private AuthenticatedUserProvider $authenticatedUser, private ChirurgieAuditTrail $auditTrail, private EntityManagerInterface $entityManager)
     {
     }
 
     public function update(int $id, PreparationMaterielInput $input): PreparationMateriel
     {
-        $preparation = $this->repository->find($id) ?? throw new NotFoundHttpException(ErrorMessage::PREPARATION_NOT_FOUND);
+        $preparation = $this->entityManager->find(PreparationMateriel::class, $id) ?? throw new NotFoundHttpException(ErrorMessage::PREPARATION_NOT_FOUND);
         $chirurgie = $preparation->getChirurgiePlanifiee();
         if ($chirurgie?->isValide()) {
             throw new ConflictHttpException(ErrorMessage::PREPARATION_LOCKED);

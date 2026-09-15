@@ -12,9 +12,11 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\QueryParameter;
+use App\ApiFilter\MasquerSpecialiteParDefautFilter;
 use App\Error\ErrorMessage;
 use App\Repository\SpecialiteRepository;
 use App\State\SpecialiteDeleteProcessor;
+use App\State\SpecialiteWriteProcessor;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -33,6 +35,12 @@ use Symfony\Component\Validator\Constraints as Assert;
             parameters: [
                 'q' => new QueryParameter(filter: new FreeTextQueryFilter(new OrFilter(new PartialSearchFilter())), properties: ['intitule']),
                 'intitule' => new QueryParameter(property: 'intitule', filter: new PartialSearchFilter()),
+                'masquerSansSpecialite' => new QueryParameter(
+                    schema: ['type' => 'boolean'],
+                    description: 'Masque la spécialité technique réservée au repli des références supprimées.',
+                    filter: new MasquerSpecialiteParDefautFilter(),
+                    castToNativeType: true,
+                ),
             ],
         ),
         new Get(security: "is_granted('ROLE_USER')", normalizationContext: ['groups' => ['specialite:read']]),
@@ -45,6 +53,7 @@ use Symfony\Component\Validator\Constraints as Assert;
             security: "is_granted('ROLE_ADMIN')",
             normalizationContext: ['groups' => ['specialite:read']],
             denormalizationContext: ['groups' => ['specialite:write']],
+            processor: SpecialiteWriteProcessor::class,
         ),
         new Delete(security: "is_granted('ROLE_ADMIN')", processor: SpecialiteDeleteProcessor::class),
     ],

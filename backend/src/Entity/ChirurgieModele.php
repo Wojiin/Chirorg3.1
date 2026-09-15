@@ -14,7 +14,6 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\QueryParameter;
 use App\Error\ErrorMessage;
-use App\Repository\ChirurgieModeleRepository;
 use App\State\ReferenceDeleteProcessor;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -23,7 +22,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[ORM\Entity(repositoryClass: ChirurgieModeleRepository::class)]
+#[ORM\Entity]
 #[ORM\UniqueConstraint(name: 'uniq_chirurgie_modele_intitule_specialite', columns: ['intitule', 'specialite_id'])]
 #[UniqueEntity(fields: ['intitule', 'specialite'], message: ErrorMessage::CHIRURGIE_MODELE_ALREADY_EXISTS)]
 #[ApiResource(

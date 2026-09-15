@@ -30,13 +30,10 @@ final readonly class ChirurgieReadModelFactory
     }
 
     /** @return array<string, mixed> */
-    public function createProgrammeItem(ChirurgiePlanifiee $chirurgie, bool $technicalSheets = false): array
+    public function createProgrammeItem(ChirurgiePlanifiee $chirurgie): array
     {
         $progress = $this->progressCalculator->calculate($chirurgie->getPreparationsMateriel());
         $data = ['id' => $chirurgie->getId(), 'dateProgrammee' => $chirurgie->getDateProgrammee()?->format('Y-m-d'), 'ordre' => $chirurgie->getOrdre(), 'valide' => $chirurgie->isValide(), 'etatValidation' => $this->progressCalculator->validationState($chirurgie->isValide(), $progress), 'valideLe' => $chirurgie->getValideLe()?->format(\DateTimeInterface::ATOM), 'creeLe' => $chirurgie->getCreeLe()->format(\DateTimeInterface::ATOM), 'creePar' => $chirurgie->getCreePar(), 'modifieLe' => $chirurgie->getModifieLe()->format(\DateTimeInterface::ATOM), 'modifiePar' => $chirurgie->getModifiePar(), 'chirurgieModele' => $this->modelData($chirurgie), 'progressionPreparation' => $progress, 'preparationsMateriel' => $this->preparationRows($chirurgie)];
-        if ($technicalSheets) {
-            $data['fichesTechniques'] = $this->technicalSheetRows($chirurgie);
-        }
 
         return $data;
     }

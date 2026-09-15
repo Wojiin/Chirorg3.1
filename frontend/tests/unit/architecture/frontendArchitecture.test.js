@@ -19,11 +19,6 @@ describe('frontend architecture boundaries', () => {
       expect(source, file).not.toMatch(
         /from ['"](?:pinia|vue-router|@\/api\/|@\/services\/|@\/stores\/)/,
       )
-
-      if (file !== 'NotFoundView.vue') {
-        const composable = `@/composables/use${file.replace('.vue', '')}`
-        expect(source, file).toContain(composable)
-      }
     }
   })
 

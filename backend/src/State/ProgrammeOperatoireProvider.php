@@ -2,7 +2,6 @@
 
 namespace App\State;
 
-use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\Pagination\ArrayPaginator;
 use ApiPlatform\State\Pagination\Pagination;
@@ -28,9 +27,8 @@ final readonly class ProgrammeOperatoireProvider implements ProviderInterface
     {
         if (isset($uriVariables['date'], $uriVariables['salle'], $uriVariables['chirurgien'])) {
             $reference = $this->referenceResolver->resolve($uriVariables);
-            $final = $operation instanceof HttpOperation && str_ends_with($operation->getUriTemplate() ?? '', '/vue-finale');
 
-            return $this->service->one($reference->date, $reference->salle, $reference->chirurgienId, $final)
+            return $this->service->one($reference->date, $reference->salle, $reference->chirurgienId)
                 ?? throw new NotFoundHttpException(ErrorMessage::PROGRAMME_NOT_FOUND);
         }
         $date = $this->parameter($operation, 'date');

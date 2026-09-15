@@ -1,10 +1,11 @@
 const frenchCollator = new Intl.Collator('fr', { sensitivity: 'base' })
 
 const FILTERS_BY_RESOURCE = {
-  chirurgiens: { speciality: true, serverSide: true },
-  materiels: { speciality: true, serverSide: true },
-  'fiches-techniques': { speciality: true, serverSide: true },
-  'listes-materiel': { speciality: true, surgeon: true, serverSide: true },
+  chirurgiens: { speciality: true },
+  'chirurgie-modeles': { speciality: true },
+  materiels: { speciality: true },
+  'fiches-techniques': { speciality: true },
+  'listes-materiel': { speciality: true, surgeon: true },
 }
 
 /** Centralise la configuration des filtres disponibles pour chaque liste CRUD. */
@@ -45,34 +46,6 @@ export function getSurgeonFilterOptions(surgeons) {
   )
 }
 
-function getItemSpeciality(item) {
-  return (
-    item?.specialite ??
-    item?.chirurgieModele?.specialite ??
-    item?.chirurgien?.specialite ??
-    null
-  )
-}
-
-/** Applique localement les filtres déclarés pour la liste administrative. */
-export function filterAdminItems(
-  items,
-  { specialityId = '', surgeonId = '' } = {},
-) {
-  return items.filter((item) => {
-    if (
-      specialityId &&
-      String(getItemSpeciality(item)?.id) !== String(specialityId)
-    ) {
-      return false
-    }
-    if (surgeonId && String(item?.chirurgien?.id) !== String(surgeonId)) {
-      return false
-    }
-    return true
-  })
-}
-
 /** Construit les paramètres de filtrage compris par l'API des listes de matériel. */
 export function getAdminListFilterParams(
   resource,
@@ -81,6 +54,7 @@ export function getAdminListFilterParams(
   return {
     specialite: specialityId || undefined,
     chirurgien: surgeonId || undefined,
+    ...(resource === 'specialites' ? { masquerSansSpecialite: true } : {}),
   }
 }
 

@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test'
 function requiredEnvironment(name) {
   const value = process.env[name]
   if (!value)
-    throw new Error(`Missing required E2E environment variable: ${name}`)
+    throw new Error(`La variable d’environnement E2E ${name} est obligatoire.`)
   return value
 }
 
@@ -53,6 +53,9 @@ test.describe('administration ChirOrg', () => {
     await login(page, adminEmail, adminPassword)
     await page.getByRole('link', { name: 'Administration' }).click()
     await page.getByRole('link', { name: /Spécialités/ }).click()
+    await expect(
+      page.getByRole('row').filter({ hasText: 'Sans spécialité' }),
+    ).toHaveCount(0)
     await page.getByRole('link', { name: /Ajouter dans/ }).click()
     await page.getByLabel('Intitulé de la spécialité').fill(initialLabel)
     await page.getByRole('button', { name: 'Enregistrer' }).click()

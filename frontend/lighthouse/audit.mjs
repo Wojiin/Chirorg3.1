@@ -89,6 +89,12 @@ async function authenticate(context) {
     throw new Error("La connexion Lighthouse n'a retourné aucun jeton JWT.")
   }
 
+  await sessionCookieHeader(context)
+
+  return payload.token
+}
+
+async function sessionCookieHeader(context) {
   const cookies = await context.cookies(`${apiBaseUrl}/auth/refresh`)
   const cookieHeader = cookies
     .filter(({ path }) => '/api/auth/refresh'.startsWith(path))
@@ -101,7 +107,7 @@ async function authenticate(context) {
     )
   }
 
-  return { token: payload.token, cookieHeader }
+  return cookieHeader
 }
 
 async function apiGet(context, path, token) {
@@ -185,8 +191,7 @@ async function preparePartialValidation(context, surgeryId, token) {
 }
 
 /** Construit les routes métier depuis les données réelles chargées par les fixtures. */
-async function discoverWorkflowRoutes(context) {
-  const { token } = await authenticate(context)
+async function discoverWorkflowRoutes(context, token) {
   const collection = await apiGet(
     context,
     '/programmes-operatoires?itemsPerPage=100',
@@ -249,7 +254,6 @@ async function auditRoute(
   const results = []
 
   for (let run = 1; run <= runs; run += 1) {
-    const session = requiresAuthentication ? await authenticate(context) : null
     const url = new URL(route, baseUrl).href
     console.log(`[${run}/${runs}] ${url}`)
     const flags = {
@@ -258,7 +262,9 @@ async function auditRoute(
       logLevel: 'error',
       disableStorageReset: true,
     }
-    if (session) flags.extraHeaders = { Cookie: session.cookieHeader }
+    if (requiresAuthentication) {
+      flags.extraHeaders = { Cookie: await sessionCookieHeader(context) }
+    }
     const result = await lighthouse(url, flags)
 
     if (!result)
@@ -319,9 +325,14 @@ async function main() {
       summary['/login'] = await auditRoute('/login', port, context)
     }
 
-    const protectedRoutes = configuredRoutes
+    let protectedRoutes = configuredRoutes
       ? configuredRoutes.filter((route) => route !== '/login')
-      : await discoverWorkflowRoutes(context)
+      : null
+
+    if (!protectedRoutes || protectedRoutes.length > 0) {
+      const token = await authenticate(context)
+      protectedRoutes ??= await discoverWorkflowRoutes(context, token)
+    }
 
     if (!auditLogin && protectedRoutes.length === 0) {
       throw new Error('Aucune route Lighthouse configurée.')

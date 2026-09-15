@@ -1,7 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { createPinia, setActivePinia } from 'pinia'
 import {
-  normalizePlannedSurgery,
   normalizeProgramme,
   normalizeProgrammeSummaries,
 } from '@/mappers/programme'
@@ -20,9 +19,6 @@ const programmeSummary = {
   date: '2030-01-15',
   salle: 'Salle B',
   chirurgien: { id: 7, prenom: 'Ada', nom: 'Lovelace' },
-  chirurgies: [
-    { id: 99, ordre: 1, dateProgrammee: '2030-01-15', salle: 'Salle B' },
-  ],
 }
 
 const preparationPayload = {
@@ -75,11 +71,11 @@ describe('ChirOrg stores with API services', () => {
     expect(store.filters).toEqual({ date: '', room: '' })
     await store.fetchProgrammes()
 
-    expect(store.chirurgies.length).toBe(2)
+    expect(store.programmes).toHaveLength(2)
     store.setFilters({ room: 'Salle B' })
-    expect(
-      store.filteredChirurgies.every((item) => item.salle === 'Salle B'),
-    ).toBe(true)
+    expect(store.filteredProgrammes.map((item) => item.salle)).toEqual([
+      'Salle B',
+    ])
   })
 
   it('loads lightweight programme summaries without requesting every detail', async () => {
@@ -87,6 +83,7 @@ describe('ChirOrg stores with API services', () => {
     const api = {
       list: async () => [
         {
+          id: '2030-01-15|Salle Test|7',
           date: '2030-01-15',
           salle: 'Salle Test',
           chirurgien: { id: 7, prenom: 'Ada', nom: 'Lovelace' },
@@ -121,7 +118,8 @@ describe('ChirOrg stores with API services', () => {
     await store.fetchProgrammes({ date: '2030-01-15', room: 'Salle B' })
 
     expect(store.filteredProgrammes).toHaveLength(1)
-    expect(store.filteredProgrammes[0].chirurgies[0].id).toBe(99)
+    expect(store.filteredProgrammes[0].id).toBe('2030-01-15|Salle B|7')
+    expect(store.filteredProgrammes[0].chirurgies).toEqual([])
     expect(
       store.programmes.some((item) => item.id === 'temporary-programme'),
     ).toBe(false)
@@ -212,14 +210,19 @@ describe('ChirOrg stores with API services', () => {
   })
 
   it('keeps the planned surgery identifier used by preparation links', () => {
-    const chirurgie = normalizePlannedSurgery({
-      id: 42,
-      dateProgrammee: '2026-07-24',
+    const chirurgie = normalizeProgramme({
+      date: '2026-07-24',
       salle: 'Salle A',
-      chirurgieModele: { id: 3, intitule: 'Intervention' },
       chirurgien: { id: 2, prenom: 'Jean', nom: 'Dupont' },
-      progressionPreparation: { total: 2, coches: 1, complete: false },
-    })
+      chirurgies: [
+        {
+          id: 42,
+          dateProgrammee: '2026-07-24',
+          chirurgieModele: { id: 3, intitule: 'Intervention' },
+          progressionPreparation: { total: 2, coches: 1, complete: false },
+        },
+      ],
+    }).chirurgies[0]
 
     expect(chirurgie.id).toBe(42)
     expect(chirurgie.date).toBe('2026-07-24')
@@ -282,7 +285,12 @@ describe('ChirOrg stores with API services', () => {
 
   it('loads the selected programme detail', async () => {
     vi.spyOn(programmeApi, 'list').mockResolvedValue([programmeSummary])
-    vi.spyOn(programmeApi, 'getProgramme').mockResolvedValue(programmeSummary)
+    vi.spyOn(programmeApi, 'getProgramme').mockResolvedValue({
+      ...programmeSummary,
+      chirurgies: [
+        { id: 99, ordre: 1, dateProgrammee: '2030-01-15', salle: 'Salle B' },
+      ],
+    })
     const store = useProgrammeStore()
 
     await store.fetchProgrammes()
@@ -320,7 +328,7 @@ describe('ChirOrg stores with API services', () => {
       (item) => !item.coche,
     )
     const previousCount = store.preparation.progressionPreparation.coches
-    await store.toggleMaterial(firstUnchecked)
+    await store.setMaterialState(firstUnchecked, 'ready')
 
     expect(store.preparation.progressionPreparation.coches).toBe(
       previousCount + 1,
@@ -330,7 +338,7 @@ describe('ChirOrg stores with API services', () => {
     for (const item of store.preparation.preparations.filter(
       (entry) => !entry.coche,
     )) {
-      await store.toggleMaterial(item)
+      await store.setMaterialState(item, 'ready')
     }
 
     expect(store.isComplete).toBe(true)

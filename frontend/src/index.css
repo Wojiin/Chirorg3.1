@@ -85,7 +85,6 @@
 
   :where(
     .surface-panel,
-    .content-panel,
     .form-panel,
     .programme-card,
     .programme-group,
@@ -102,10 +101,6 @@
     .programme-filters
   ) {
     @apply rounded-2xl border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800;
-  }
-
-  .content-panel {
-    @apply p-5 shadow-card sm:p-7;
   }
 
   .form-panel {
@@ -678,6 +673,10 @@
 
   .progress-track {
     @apply h-2.5 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700;
+  }
+
+  .progress-track-danger {
+    @apply bg-red-600 dark:bg-red-700;
   }
 
   .progress-value {

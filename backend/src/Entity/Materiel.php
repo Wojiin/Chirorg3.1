@@ -14,7 +14,6 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\QueryParameter;
 use App\Error\ErrorMessage;
-use App\Repository\MaterielRepository;
 use App\State\ReferenceDeleteProcessor;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -22,7 +21,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[ORM\Entity(repositoryClass: MaterielRepository::class)]
+#[ORM\Entity]
 #[ORM\Index(name: 'idx_materiel_intitule', columns: ['intitule'])]
 #[ApiResource(
     operations: [

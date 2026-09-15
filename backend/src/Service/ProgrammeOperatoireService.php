@@ -18,8 +18,8 @@ final readonly class ProgrammeOperatoireService
         return $this->factory->createSummaries($this->repository->findProgrammes($date, $salle, $chirurgienId, $dateDebut, $dateFin));
     }
 
-    public function one(\DateTimeInterface $date, string $salle, int $chirurgienId, bool $final = false): ?ProgrammeOperatoire
+    public function one(\DateTimeInterface $date, string $salle, int $chirurgienId): ?ProgrammeOperatoire
     {
-        return $this->factory->create($this->repository->findProgrammes($date, $salle, $chirurgienId, valide: $final ? true : null, withFichesTechniques: $final), $final);
+        return $this->factory->create($this->repository->findProgrammes($date, $salle, $chirurgienId));
     }
 }

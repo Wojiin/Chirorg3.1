@@ -14,7 +14,6 @@ vi.mock('vue-router', async (importOriginal) => ({
   useRouter: () => router,
 }))
 
-import { useAdminDashboardView } from '@/composables/useAdminDashboardView'
 import { useAdminFormView } from '@/composables/useAdminFormView'
 import { useLoginView } from '@/composables/useLoginView'
 import { usePlanificationView } from '@/composables/usePlanificationView'
@@ -74,10 +73,6 @@ describe('workflow composables', () => {
     vi.restoreAllMocks()
     vi.clearAllMocks()
     setActivePinia(createPinia())
-  })
-
-  it('exposes the complete administrator resource catalogue', () => {
-    expect(useAdminDashboardView().resources).toHaveLength(7)
   })
 
   it('rejects an unknown administrator resource', async () => {
@@ -311,6 +306,65 @@ describe('workflow composables', () => {
     await result.confirmSurgeryRemoval()
     expect(router.push).toHaveBeenCalledWith({ name: 'programme' })
     expect(await result.confirmSurgeryRemoval()).toBe(false)
+  })
+
+  it('adds a surgery from programme detail using its existing context', async () => {
+    vi.spyOn(programmeApi, 'getProgramme').mockResolvedValue({
+      id: '2030-01-15|Salle A|7',
+      date: surgery.dateProgrammee,
+      salle: surgery.salle,
+      chirurgien: surgery.chirurgien,
+      chirurgies: [surgery],
+    })
+    vi.spyOn(adminApi, 'list').mockImplementation(async (resource) => {
+      if (resource === 'chirurgiens') {
+        return [
+          {
+            ...surgery.chirurgien,
+            specialite: { id: 2, intitule: 'Orthopédie' },
+          },
+        ]
+      }
+      if (resource === 'chirurgie-modeles') {
+        return [
+          { id: 3, intitule: 'Prothèse', specialite: { id: 2 } },
+          { id: 4, intitule: 'Pontage', specialite: { id: 9 } },
+        ]
+      }
+      return []
+    })
+    const plan = vi.spyOn(programmeApi, 'planProgram').mockResolvedValue({
+      id: '2030-01-15|Salle A|7',
+      date: surgery.dateProgrammee,
+      salle: surgery.salle,
+      chirurgien: surgery.chirurgien,
+      chirurgies: [surgery, { ...surgery, id: 43, ordre: 2 }],
+    })
+    const { result } = mountComposable(useProgrammeDetailView, {
+      date: surgery.dateProgrammee,
+      salle: surgery.salle,
+      chirurgienId: 7,
+    })
+    await flushPromises()
+
+    await result.openAddSurgeryForm()
+    expect(result.speciality.value.intitule).toBe('Orthopédie')
+    expect(result.surgeryModels.value).toEqual([
+      { value: 3, label: 'Prothèse' },
+    ])
+    expect(await result.submitSurgery()).toBe(false)
+    expect(result.displayedAddSurgeryError.value).toContain('Sélectionnez')
+
+    result.chirurgieModeleId.value = 3
+    expect(await result.submitSurgery()).toBe(true)
+    expect(plan).toHaveBeenCalledWith({
+      chirurgienId: 7,
+      chirurgieModeleIds: [3],
+      dateProgrammee: '2030-01-15',
+      salle: 'Salle A',
+    })
+    expect(result.programme.value.chirurgies).toHaveLength(2)
+    expect(result.addSurgeryFormOpen.value).toBe(false)
   })
 
   it('routes a loaded partial preparation and can return or validate it', async () => {

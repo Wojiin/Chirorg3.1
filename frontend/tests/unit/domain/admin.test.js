@@ -1,19 +1,28 @@
 import { describe, expect, it } from 'vitest'
-import { filterAdminItems, getMaterialsForSurgeon } from '@/domain/adminFilters'
+import {
+  getAdminListFilterConfig,
+  getAdminListFilterParams,
+  getMaterialsForSurgeon,
+} from '@/domain/adminFilters'
 import { getAdminFormFields } from '@/config/adminForms'
 import { buildAdminPayload, createAdminForm } from '@/mappers/admin'
 
 describe('speciality filters and material-list form', () => {
-  it('filters direct and surgery-related specialities', () => {
-    const items = [
-      { id: 1, specialite: { id: 4, intitule: 'Digestif' } },
-      {
-        id: 2,
-        chirurgieModele: { specialite: { id: 7, intitule: 'Orthopédie' } },
-      },
-    ]
-
-    expect(filterAdminItems(items, { specialityId: '7' })).toEqual([items[1]])
+  it('configures server-side filters for surgery models and specialities', () => {
+    expect(getAdminListFilterConfig('chirurgie-modeles')).toEqual({
+      speciality: true,
+    })
+    expect(
+      getAdminListFilterParams('chirurgie-modeles', { specialityId: '7' }),
+    ).toEqual({
+      specialite: '7',
+      chirurgien: undefined,
+    })
+    expect(getAdminListFilterParams('specialites')).toEqual({
+      specialite: undefined,
+      chirurgien: undefined,
+      masquerSansSpecialite: true,
+    })
   })
 
   it('normalizes selected material names into API relations', () => {
