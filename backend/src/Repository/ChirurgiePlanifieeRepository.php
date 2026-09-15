@@ -82,6 +82,17 @@ class ChirurgiePlanifieeRepository extends ServiceEntityRepository
             ->getSingleScalarResult();
     }
 
+    /** Supprime toutes les chirurgies appartenant aux programmes antérieurs à la date limite. */
+    public function deleteProgrammesBefore(\DateTimeInterface $dateLimite): int
+    {
+        return $this->createQueryBuilder('chirurgie')
+            ->delete()
+            ->where('chirurgie.dateProgrammee < :dateLimite')
+            ->setParameter('dateLimite', \DateTimeImmutable::createFromInterface($dateLimite), Types::DATE_IMMUTABLE)
+            ->getQuery()
+            ->execute();
+    }
+
     private function baseDataQuery(): QueryBuilder
     {
         return $this->createQueryBuilder('c')

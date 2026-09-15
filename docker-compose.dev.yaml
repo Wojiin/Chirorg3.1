@@ -60,6 +60,27 @@ services:
       database:
         condition: service_healthy
 
+  programme_cleanup:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    restart: unless-stopped
+    environment:
+      APP_ENV: dev
+      APP_SECRET: dev-only-secret
+      DATABASE_URL: mysql://${MYSQL_USER:-chirorg}:${MYSQL_PASSWORD:-chirorg}@database:3306/${MYSQL_DATABASE:-chirorg}?serverVersion=8.4.0&charset=utf8mb4
+      JWT_PASSPHRASE: dev-only-passphrase
+      PROGRAMME_CLEANUP_HOUR: ${PROGRAMME_CLEANUP_HOUR:-6}
+    command: ["sh", "docker/programme-cleanup.sh"]
+    volumes:
+      - ./backend:/var/www/html
+      - backend_vendor:/var/www/html/vendor
+      - backend_var:/var/www/html/var
+      - backend_jwt:/var/www/html/config/jwt
+    depends_on:
+      backend:
+        condition: service_healthy
+
   nginx:
     image: nginx:1.27-alpine
     ports:

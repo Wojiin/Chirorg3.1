@@ -22,6 +22,7 @@
         "nelmio/cors-bundle": "^2.6",
         "phpdocumentor/reflection-docblock": "^6.0",
         "symfony/asset": "8.1.*",
+        "symfony/clock": "8.1.*",
         "symfony/console": "8.1.*",
         "symfony/dotenv": "8.1.*",
         "symfony/expression-language": "8.1.*",
