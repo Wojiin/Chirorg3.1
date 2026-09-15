@@ -10,6 +10,7 @@ use App\Entity\FicheTechnique;
 use App\Entity\ListeMateriel;
 use App\Entity\Materiel;
 use App\Entity\PreparationMateriel;
+use App\Entity\Salle;
 use App\Entity\Specialite;
 use App\Entity\Utilisateur;
 use Doctrine\Persistence\ObjectManager;
@@ -43,6 +44,7 @@ final class AppFixturesTest extends TestCase
     public function testFixturesCoverEveryEntityWithProductionLikeVolumes(): void
     {
         self::assertCount(2, $this->entitiesOfType(Utilisateur::class));
+        self::assertCount(3, $this->entitiesOfType(Salle::class));
         self::assertCount(6, $this->entitiesOfType(Specialite::class));
         self::assertCount(25, $this->entitiesOfType(Chirurgien::class));
         self::assertCount(20, $this->entitiesOfType(ChirurgieModele::class));

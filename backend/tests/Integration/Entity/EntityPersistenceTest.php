@@ -6,6 +6,7 @@ use App\Entity\ChirurgieModele;
 use App\Entity\Chirurgien;
 use App\Entity\FicheTechnique;
 use App\Entity\ListeMateriel;
+use App\Entity\Salle;
 use App\Entity\Specialite;
 use App\Entity\Utilisateur;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
@@ -41,6 +42,17 @@ final class EntityPersistenceTest extends KernelTestCase
         $this->entityManager->persist((new Specialite())->setIntitule($intitule));
         $this->entityManager->flush();
         $this->entityManager->persist((new Specialite())->setIntitule($intitule));
+
+        $this->expectException(UniqueConstraintViolationException::class);
+        $this->entityManager->flush();
+    }
+
+    public function testSalleLabelIsUniqueInDatabase(): void
+    {
+        $intitule = 'Salle '.strtoupper($this->suffix());
+        $this->entityManager->persist((new Salle())->setIntitule($intitule));
+        $this->entityManager->flush();
+        $this->entityManager->persist((new Salle())->setIntitule($intitule));
 
         $this->expectException(UniqueConstraintViolationException::class);
         $this->entityManager->flush();

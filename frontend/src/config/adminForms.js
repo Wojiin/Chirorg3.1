@@ -54,6 +54,9 @@ export function getAdminFormFields(resource, collections = {}) {
     )
 
   const schemas = {
+    salles: [
+      { key: 'intitule', label: 'Intitulé de la salle', required: true },
+    ],
     specialites: [
       { key: 'intitule', label: 'Intitulé de la spécialité', required: true },
     ],

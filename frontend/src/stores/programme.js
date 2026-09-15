@@ -32,8 +32,6 @@ export const useProgrammeStore = defineStore('programme', {
     loading: (state) => state.pendingLoads > 0,
     chirurgies: (state) =>
       state.programmes.flatMap((programme) => programme.chirurgies),
-    rooms: (state) =>
-      [...new Set(state.programmes.map((item) => item.salle))].sort(),
     filteredProgrammes: (state) =>
       state.programmes.filter(
         (programme) =>

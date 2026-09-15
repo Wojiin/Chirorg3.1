@@ -96,6 +96,7 @@ export function useAdminListView(props) {
       pendingRemoval.value.id,
     )
     if (removed !== false) {
+      referenceStore.invalidate(props.resourceSlug)
       notifySuccess('Élément supprimé', getAdminItemTitle(pendingRemoval.value))
       cancelRemoval()
       if (!items.value.length && page.value > 1) page.value -= 1

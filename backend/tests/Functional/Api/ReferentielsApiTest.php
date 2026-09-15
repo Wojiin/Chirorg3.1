@@ -2,6 +2,9 @@
 
 namespace App\Tests\Functional\Api;
 
+use App\Entity\ChirurgieModele;
+use App\Entity\Chirurgien;
+use App\Entity\ChirurgiePlanifiee;
 use App\Entity\Specialite;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
@@ -14,6 +17,14 @@ final class ReferentielsApiTest extends AuthenticatedApiTestCase
         [$utilisateur, $password] = $this->persistUtilisateur();
         $this->useBearerToken($client, $this->login($client, $utilisateur, $password));
         $suffix = bin2hex(random_bytes(4));
+
+        $client->request('POST', '/api/salles', ['json' => ['intitule' => '   ']]);
+        self::assertResponseStatusCodeSame(422);
+
+        $salle = self::iri($client->request('POST', '/api/salles', [
+            'json' => ['intitule' => 'Salle '.$suffix],
+        ]));
+        self::assertResponseStatusCodeSame(201);
 
         $client->request('POST', '/api/specialites', ['json' => ['intitule' => '   ']]);
         self::assertResponseStatusCodeSame(422);
@@ -94,6 +105,7 @@ final class ReferentielsApiTest extends AuthenticatedApiTestCase
         self::assertResponseStatusCodeSame(201);
 
         foreach ([
+            [$salle, ['intitule' => 'Salle rénovée '.$suffix]],
             [$specialite, ['intitule' => 'Cardiologie adulte '.$suffix]],
             [$chirurgien, ['nom' => 'Martin-Lefèvre '.$suffix]],
             [$materiel, ['adresse' => 'Arsenal A-02']],
@@ -109,6 +121,36 @@ final class ReferentielsApiTest extends AuthenticatedApiTestCase
             $client->request('GET', $iri);
             self::assertResponseStatusCodeSame(200);
         }
+
+        $entityManager = static::getContainer()->get(EntityManagerInterface::class);
+        $chirurgiePlanifiee = (new ChirurgiePlanifiee())
+            ->setDateProgrammee(new \DateTimeImmutable('tomorrow'))
+            ->setSalle('Salle rénovée '.$suffix)
+            ->setOrdre(1)
+            ->setChirurgien($entityManager->find(Chirurgien::class, self::id($chirurgien)))
+            ->setChirurgieModele($entityManager->find(ChirurgieModele::class, self::id($chirurgieModele)));
+        $entityManager->persist($chirurgiePlanifiee);
+        $entityManager->flush();
+        $chirurgiePlanifieeId = $chirurgiePlanifiee->getId();
+        self::assertNotNull($chirurgiePlanifieeId);
+
+        $client->request('PATCH', $salle, [
+            'headers' => ['content-type' => 'application/merge-patch+json'],
+            'json' => ['intitule' => 'Salle définitive '.$suffix],
+        ]);
+        self::assertResponseIsSuccessful();
+        $entityManager->clear();
+        self::assertSame(
+            'Salle définitive '.$suffix,
+            $entityManager->find(ChirurgiePlanifiee::class, $chirurgiePlanifieeId)?->getSalle(),
+        );
+
+        $client->request('DELETE', $salle);
+        self::assertResponseStatusCodeSame(409);
+        $chirurgiePlanifiee = $entityManager->find(ChirurgiePlanifiee::class, $chirurgiePlanifieeId);
+        self::assertInstanceOf(ChirurgiePlanifiee::class, $chirurgiePlanifiee);
+        $entityManager->remove($chirurgiePlanifiee);
+        $entityManager->flush();
 
         $paginatedSearch = $client->request('GET', '/api/specialites?'.http_build_query([
             'q' => 'Cardiologie adulte '.$suffix,
@@ -130,7 +172,6 @@ final class ReferentielsApiTest extends AuthenticatedApiTestCase
             ]);
         }
 
-        $entityManager = static::getContainer()->get(EntityManagerInterface::class);
         $defaultSpecialite = $entityManager->getRepository(Specialite::class)->findOneBy([
             'intitule' => Specialite::SANS_SPECIALITE,
         ]);
@@ -172,6 +213,8 @@ final class ReferentielsApiTest extends AuthenticatedApiTestCase
             $client->request('DELETE', $iri);
             self::assertResponseStatusCodeSame(204);
         }
+        $client->request('DELETE', $salle);
+        self::assertResponseStatusCodeSame(204);
 
         $client->request('POST', '/api/auth/logout');
         self::assertResponseIsSuccessful();
@@ -186,5 +229,10 @@ final class ReferentielsApiTest extends AuthenticatedApiTestCase
         self::assertIsString($data['@id']);
 
         return $data['@id'];
+    }
+
+    private static function id(string $iri): int
+    {
+        return (int) basename($iri);
     }
 }
