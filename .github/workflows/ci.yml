@@ -95,7 +95,26 @@ jobs:
           retention-days: 14
 
       - name: Audit Composer dependencies
-        run: composer audit --locked --no-interaction
+        run: |
+          for attempt in 1 2 3; do
+            if composer audit --locked --no-interaction; then
+              exit 0
+            else
+              status=$?
+            fi
+
+            if [ "$status" -ne 100 ]; then
+              exit "$status"
+            fi
+
+            if [ "$attempt" -lt 3 ]; then
+              delay=$((attempt * 5))
+              echo "Packagist is temporarily unavailable; retrying in ${delay}s (${attempt}/3)."
+              sleep "$delay"
+            fi
+          done
+
+          exit "$status"
 
   frontend:
     name: Frontend quality
