@@ -4,6 +4,9 @@ services:
       APP_ENV: prod
       APP_DEBUG: 0
       JWT_REFRESH_SINGLE_USE: 0
+      # Lighthouse recharge chaque vue et peut renouveler la session plus de
+      # 20 fois par minute. Cette surcharge reste limitée à la pile d'audit.
+      JWT_REFRESH_RATE_LIMIT: 100
     volumes:
       - backend_var_lighthouse:/var/www/html/var
     command: >-
