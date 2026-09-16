@@ -6,5 +6,5 @@ framework:
             interval: '15 minutes'
         refresh:
             policy: sliding_window
-            limit: 20
+            limit: '%env(int:JWT_REFRESH_RATE_LIMIT)%'
             interval: '1 minute'
