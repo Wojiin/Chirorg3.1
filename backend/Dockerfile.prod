@@ -1,6 +1,6 @@
 FROM php:8.4-fpm-alpine AS php-base
 
-RUN apk add --no-cache icu-libs libzip \
+RUN apk add --no-cache icu-libs libzip su-exec \
     && apk add --no-cache --virtual .build-deps icu-dev libzip-dev \
     && docker-php-ext-install intl opcache pdo_mysql zip \
     && apk del .build-deps
@@ -32,8 +32,6 @@ RUN mkdir -p var/cache var/log public/uploads \
 
 ENV APP_ENV=prod \
     APP_DEBUG=0
-
-USER www-data
 
 ENTRYPOINT ["chirorg-entrypoint"]
 CMD ["php-fpm"]

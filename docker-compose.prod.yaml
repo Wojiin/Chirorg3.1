@@ -47,8 +47,8 @@ services:
       CORS_ALLOW_ORIGIN: ${CORS_ALLOW_ORIGIN:?CORS_ALLOW_ORIGIN is required}
       TRUSTED_PROXIES: ${TRUSTED_PROXIES:-private_ranges}
       TRUSTED_HOSTS: ${TRUSTED_HOSTS:?TRUSTED_HOSTS is required}
-      JWT_SECRET_KEY: /run/secrets/jwt_private.pem
-      JWT_PUBLIC_KEY: /run/secrets/jwt_public.pem
+      JWT_SECRET_KEY: /run/chirorg/jwt_private.pem
+      JWT_PUBLIC_KEY: /run/chirorg/jwt_public.pem
       JWT_PASSPHRASE: ${JWT_PASSPHRASE:?JWT_PASSPHRASE is required}
       JWT_REFRESH_COOKIE_SECURE: 1
       JWT_REFRESH_SINGLE_USE: 1
@@ -83,8 +83,8 @@ services:
       CORS_ALLOW_ORIGIN: ${CORS_ALLOW_ORIGIN:?CORS_ALLOW_ORIGIN is required}
       TRUSTED_PROXIES: ${TRUSTED_PROXIES:-private_ranges}
       TRUSTED_HOSTS: ${TRUSTED_HOSTS:?TRUSTED_HOSTS is required}
-      JWT_SECRET_KEY: /run/secrets/jwt_private.pem
-      JWT_PUBLIC_KEY: /run/secrets/jwt_public.pem
+      JWT_SECRET_KEY: /run/chirorg/jwt_private.pem
+      JWT_PUBLIC_KEY: /run/chirorg/jwt_public.pem
       JWT_PASSPHRASE: ${JWT_PASSPHRASE:?JWT_PASSPHRASE is required}
       JWT_REFRESH_COOKIE_SECURE: 1
       JWT_REFRESH_SINGLE_USE: 1
