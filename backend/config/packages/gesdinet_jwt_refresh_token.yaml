@@ -1,8 +1,27 @@
 gesdinet_jwt_refresh_token:
     refresh_token_class: App\Entity\RefreshToken
     ttl: 1209600
+    max_session_lifetime: 2592000
+    max_tokens_per_user: 5
     single_use: '%env(bool:JWT_REFRESH_SINGLE_USE)%'
     return_expiration: true
+    hash_tokens:
+        enabled: true
+        accept_stored_in_the_clear: true
+    reuse_detection:
+        enabled: true
+        cache: cache.app
+        ttl: 1209600
+    block_jwts_on_revocation:
+        enabled: true
+        cache: cache.app
+        ttl: 900
+        user_claim: username
+    rate_limiter:
+        enabled: true
+        limiter: limiter.refresh
+        key: ip
+    block_previous_jwt: true
     cookie:
         enabled: true
         same_site: strict

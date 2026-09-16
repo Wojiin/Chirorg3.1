@@ -5,6 +5,7 @@ namespace App\Tests\Functional\Api;
 use App\Entity\RefreshToken;
 use App\Repository\RefreshTokenRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Gesdinet\JWTRefreshTokenBundle\Model\RefreshTokenManagerInterface;
 
 final class AuthentificationApiTest extends AuthenticatedApiTestCase
 {
@@ -63,8 +64,10 @@ final class AuthentificationApiTest extends AuthenticatedApiTestCase
         $entityManager = static::getContainer()->get(EntityManagerInterface::class);
         $repository = $entityManager->getRepository(RefreshToken::class);
         self::assertInstanceOf(RefreshTokenRepository::class, $repository);
-        self::assertNull($repository->findOneBy(['refreshToken' => $firstRefreshToken]));
-        self::assertInstanceOf(RefreshToken::class, $repository->findOneBy(['refreshToken' => $rotatedCookie->getValue()]));
+        $refreshTokenManager = static::getContainer()->get(RefreshTokenManagerInterface::class);
+        self::assertInstanceOf(RefreshTokenManagerInterface::class, $refreshTokenManager);
+        self::assertNull($refreshTokenManager->get($firstRefreshToken));
+        self::assertInstanceOf(RefreshToken::class, $refreshTokenManager->get($rotatedCookie->getValue()));
 
         $client->setDefaultOptions([
             'headers' => [
@@ -75,7 +78,7 @@ final class AuthentificationApiTest extends AuthenticatedApiTestCase
         $client->request('POST', '/api/auth/logout');
         self::assertResponseIsSuccessful();
         self::assertNull($client->getCookieJar()->get('refresh_token', '/api/auth/refresh'));
-        self::assertNull($repository->findOneBy(['refreshToken' => $rotatedCookie->getValue()]));
+        self::assertNull($refreshTokenManager->get($rotatedCookie->getValue()));
 
         $client->request('POST', '/api/auth/refresh');
         self::assertResponseStatusCodeSame(401);

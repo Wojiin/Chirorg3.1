@@ -3,6 +3,12 @@ set -eu
 
 cleanup_hour=${PROGRAMME_CLEANUP_HOUR:-6}
 
+run_cleanup() {
+    if ! "$@"; then
+        echo "Échec de la tâche de maintenance : $*" >&2
+    fi
+}
+
 while true; do
     wait_seconds=$(PROGRAMME_CLEANUP_HOUR="$cleanup_hour" php -r '
         $timezone = new DateTimeZone("Europe/Paris");
@@ -19,5 +25,7 @@ while true; do
     ')
 
     sleep "$wait_seconds"
-    php bin/console app:programmes:purge-expired --no-interaction
+    run_cleanup php bin/console app:programmes:purge-expired --no-interaction
+    run_cleanup php bin/console app:fiches-techniques:purge-orphan-images --older-than=86400 --no-interaction
+    run_cleanup php bin/console gesdinet:jwt:clear --no-interaction
 done
