@@ -34,17 +34,28 @@ final readonly class UtilisateurWriteProcessor implements ProcessorInterface
         if ($creating && (null === $data->email || null === $data->motDePasse)) {
             throw new BadRequestHttpException(ErrorMessage::CREDENTIALS_REQUIRED);
         }
+
+        $emailChanged = null !== $data->email && mb_strtolower(trim($data->email)) !== $utilisateur->getEmail();
+        $rolesChanged = null !== $data->roles && $this->normalizeRoles($data->roles) !== $this->normalizeRoles($utilisateur->getRoles());
+        $activeChanged = null !== $data->actif && $data->actif !== $utilisateur->isActif();
+        $credentialsChanged = null !== $data->motDePasse;
+
+        if (!$creating && $utilisateur === $this->authenticatedUser->getUser()) {
+            if (false === $data->actif || (null !== $data->roles && !in_array('ROLE_ADMIN', $data->roles, true))) {
+                throw new ConflictHttpException(ErrorMessage::ADMIN_SELF_UPDATE_FORBIDDEN);
+            }
+        }
+
+        if (!$creating && ($emailChanged || $rolesChanged || $activeChanged || $credentialsChanged)) {
+            $this->refreshTokenRevoker->revokeFor($utilisateur);
+        }
+
         if (null !== $data->email) {
             $existing = $this->repository->findOneBy(['email' => mb_strtolower(trim($data->email))]);
             if (null !== $existing && $existing !== $utilisateur) {
                 throw new ConflictHttpException(ErrorMessage::EMAIL_ALREADY_USED);
             }
             $utilisateur->setEmail($data->email);
-        }
-        if (!$creating && $utilisateur === $this->authenticatedUser->getUser()) {
-            if (false === $data->actif || (null !== $data->roles && !in_array('ROLE_ADMIN', $data->roles, true))) {
-                throw new ConflictHttpException(ErrorMessage::ADMIN_SELF_UPDATE_FORBIDDEN);
-            }
         }
         if (null !== $data->roles) {
             $utilisateur->setRoles(array_values(array_unique($data->roles)));
@@ -56,13 +67,23 @@ final readonly class UtilisateurWriteProcessor implements ProcessorInterface
             $utilisateur->setPassword($this->passwordHasher->hashPassword($utilisateur, $data->motDePasse));
         }
 
-        if (!$creating && (false === $data->actif || null !== $data->motDePasse)) {
-            $this->refreshTokenRevoker->revokeFor($utilisateur);
-        }
-
         $this->entityManager->persist($utilisateur);
         $this->entityManager->flush();
 
         return $utilisateur;
+    }
+
+    /**
+     * @param array<string> $roles
+     *
+     * @return list<string>
+     */
+    private function normalizeRoles(array $roles): array
+    {
+        $roles[] = 'ROLE_USER';
+        $roles = array_values(array_unique($roles));
+        sort($roles);
+
+        return $roles;
     }
 }

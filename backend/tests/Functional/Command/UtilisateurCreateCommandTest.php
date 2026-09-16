@@ -24,7 +24,7 @@ final class UtilisateurCreateCommandTest extends KernelTestCase
         $status = $tester->execute(['email' => strtoupper($email), '--admin' => true]);
 
         self::assertSame(Command::SUCCESS, $status);
-        self::assertStringContainsString('created', $tester->getDisplay());
+        self::assertStringContainsString('créé', $tester->getDisplay());
         $repository = static::getContainer()->get(UtilisateurRepository::class);
         $utilisateur = $repository->findOneBy(['email' => $email]);
         self::assertInstanceOf(Utilisateur::class, $utilisateur);
