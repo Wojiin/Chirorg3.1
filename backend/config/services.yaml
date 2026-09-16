@@ -19,6 +19,27 @@ services:
     App\:
         resource: '../src/'
 
+    # Gesdinet v3.0.0 stores these cache service ids in parameters. Symfony 8.1
+    # no longer resolves those parameterized service references while compiling
+    # the vendor definitions, so bind the concrete services explicitly.
+    gesdinet_jwt_refresh_token.jwt_revocation_registry:
+        class: Gesdinet\JWTRefreshTokenBundle\Security\Revocation\CacheJWTRevocationRegistry
+        arguments:
+            $pool: '@cache.app'
+            $ttl: '%gesdinet_jwt_refresh_token.block_jwts_on_revocation.ttl%'
+
+    gesdinet_jwt_refresh_token.spent_refresh_token_registry:
+        class: Gesdinet\JWTRefreshTokenBundle\Security\ReuseDetection\CacheSpentRefreshTokenRegistry
+        arguments:
+            $pool: '@cache.app'
+            $ttl: '%gesdinet_jwt_refresh_token.reuse_detection.ttl%'
+
+    gesdinet_jwt_refresh_token.refresh_rate_limiter:
+        class: Gesdinet\JWTRefreshTokenBundle\Security\RateLimiting\RefreshRateLimiter
+        arguments:
+            $limiterFactory: '@limiter.refresh'
+            $key: '%gesdinet_jwt_refresh_token.rate_limiter.key%'
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
 

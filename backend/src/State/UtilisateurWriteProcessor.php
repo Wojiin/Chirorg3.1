@@ -40,6 +40,12 @@ final readonly class UtilisateurWriteProcessor implements ProcessorInterface
         $activeChanged = null !== $data->actif && $data->actif !== $utilisateur->isActif();
         $credentialsChanged = null !== $data->motDePasse;
 
+        if (!$creating && $utilisateur === $this->authenticatedUser->getUser()) {
+            if (false === $data->actif || (null !== $data->roles && !in_array('ROLE_ADMIN', $data->roles, true))) {
+                throw new ConflictHttpException(ErrorMessage::ADMIN_SELF_UPDATE_FORBIDDEN);
+            }
+        }
+
         if (!$creating && ($emailChanged || $rolesChanged || $activeChanged || $credentialsChanged)) {
             $this->refreshTokenRevoker->revokeFor($utilisateur);
         }
@@ -50,11 +56,6 @@ final readonly class UtilisateurWriteProcessor implements ProcessorInterface
                 throw new ConflictHttpException(ErrorMessage::EMAIL_ALREADY_USED);
             }
             $utilisateur->setEmail($data->email);
-        }
-        if (!$creating && $utilisateur === $this->authenticatedUser->getUser()) {
-            if (false === $data->actif || (null !== $data->roles && !in_array('ROLE_ADMIN', $data->roles, true))) {
-                throw new ConflictHttpException(ErrorMessage::ADMIN_SELF_UPDATE_FORBIDDEN);
-            }
         }
         if (null !== $data->roles) {
             $utilisateur->setRoles(array_values(array_unique($data->roles)));
@@ -72,7 +73,11 @@ final readonly class UtilisateurWriteProcessor implements ProcessorInterface
         return $utilisateur;
     }
 
-    /** @param list<string> $roles */
+    /**
+     * @param array<string> $roles
+     *
+     * @return list<string>
+     */
     private function normalizeRoles(array $roles): array
     {
         $roles[] = 'ROLE_USER';

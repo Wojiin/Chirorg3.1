@@ -56,6 +56,10 @@ final class PurgeOrphanTechnicalSheetImagesCommand extends Command
         $threshold = time() - $olderThan;
         $removed = 0;
         foreach (new \FilesystemIterator($directory, \FilesystemIterator::SKIP_DOTS) as $file) {
+            if (!$file instanceof \SplFileInfo) {
+                continue;
+            }
+
             if (!$file->isFile() || $file->getMTime() > $threshold) {
                 continue;
             }
