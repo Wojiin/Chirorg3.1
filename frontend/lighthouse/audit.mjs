@@ -89,6 +89,8 @@ async function authenticate(context) {
     throw new Error("La connexion Lighthouse n'a retourné aucun jeton JWT.")
   }
 
+  // La requête API partage le stockage de cookies du contexte persistant.
+  // Chromium doit ensuite gérer lui-même la rotation du refresh token à usage unique.
   await sessionCookieHeader(context)
 
   return payload.token
@@ -245,12 +247,7 @@ async function discoverWorkflowRoutes(context, token) {
   ]
 }
 
-async function auditRoute(
-  route,
-  port,
-  context,
-  requiresAuthentication = false,
-) {
+async function auditRoute(route, port) {
   const results = []
 
   for (let run = 1; run <= runs; run += 1) {
@@ -261,9 +258,6 @@ async function auditRoute(
       output: 'html',
       logLevel: 'error',
       disableStorageReset: true,
-    }
-    if (requiresAuthentication) {
-      flags.extraHeaders = { Cookie: await sessionCookieHeader(context) }
     }
     const result = await lighthouse(url, flags)
 
@@ -322,7 +316,7 @@ async function main() {
     const auditLogin = !configuredRoutes || configuredRoutes.includes('/login')
 
     if (auditLogin) {
-      summary['/login'] = await auditRoute('/login', port, context)
+      summary['/login'] = await auditRoute('/login', port)
     }
 
     let protectedRoutes = configuredRoutes
@@ -339,7 +333,7 @@ async function main() {
     }
 
     for (const route of protectedRoutes) {
-      summary[route] = await auditRoute(route, port, context, true)
+      summary[route] = await auditRoute(route, port)
     }
 
     const global = Object.fromEntries(
