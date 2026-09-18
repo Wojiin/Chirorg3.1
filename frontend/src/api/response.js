@@ -24,8 +24,21 @@ function isTechnicalApiMessage(message) {
   )
 }
 
+function getValidationMessage(data) {
+  if (!Array.isArray(data?.violations)) return ''
+
+  const messages = data.violations
+    .map((violation) => violation?.message?.trim())
+    .filter(Boolean)
+
+  return [...new Set(messages)].join(' ')
+}
+
 /** Extrait le message métier le plus utile des différents formats d'erreur API Platform. */
 export function getApiErrorMessage(error, fallback = ERROR_MESSAGES.generic) {
+  const validationMessage = getValidationMessage(error?.response?.data)
+  if (validationMessage) return validationMessage
+
   const message =
     error?.response?.data?.detail ||
     error?.response?.data?.message ||

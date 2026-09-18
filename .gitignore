@@ -18,3 +18,6 @@ frontend/lighthouse-reports/
 .deploy/
 backups/
 secrets/
+/docs/
+/tests/load/results/
+/tests/security/reports/

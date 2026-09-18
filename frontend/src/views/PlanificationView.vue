@@ -33,7 +33,7 @@ const {
       description="Choisissez une spécialité pour filtrer le chirurgien et les interventions, puis définissez leur ordre initial."
     />
 
-    <form class="form-panel" @submit.prevent="submit">
+    <form class="form-panel" novalidate @submit.prevent="submit">
       <ErrorMessage v-if="displayedError" :message="displayedError" />
 
       <fieldset class="programme-form-section">

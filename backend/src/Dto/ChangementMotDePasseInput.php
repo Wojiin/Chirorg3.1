@@ -3,6 +3,7 @@
 namespace App\Dto;
 
 use App\Error\ErrorMessage;
+use App\Security\PasswordRequirements;
 use Symfony\Component\Validator\Constraints as Assert;
 
 final readonly class ChangementMotDePasseInput
@@ -10,12 +11,10 @@ final readonly class ChangementMotDePasseInput
     public function __construct(
         #[Assert\NotBlank(message: ErrorMessage::REQUIRED_FIELD)]
         public string $motDePasseActuel = '',
-        #[Assert\NotBlank(message: ErrorMessage::REQUIRED_FIELD)]
-        #[Assert\Length(min: 12, max: 4096, minMessage: ErrorMessage::TEXT_TOO_SHORT, maxMessage: ErrorMessage::TEXT_TOO_LONG)]
-        #[Assert\Regex(pattern: '/[a-z]/', message: ErrorMessage::NEW_PASSWORD_REQUIRES_LOWERCASE)]
-        #[Assert\Regex(pattern: '/[A-Z]/', message: ErrorMessage::NEW_PASSWORD_REQUIRES_UPPERCASE)]
-        #[Assert\Regex(pattern: '/\d/', message: ErrorMessage::NEW_PASSWORD_REQUIRES_DIGIT)]
-        #[Assert\Regex(pattern: '/[^a-zA-Z\d]/', message: ErrorMessage::NEW_PASSWORD_REQUIRES_SPECIAL_CHARACTER)]
+        #[Assert\Sequentially([
+            new Assert\NotBlank(message: ErrorMessage::REQUIRED_FIELD),
+            new Assert\Regex(pattern: PasswordRequirements::PATTERN, message: ErrorMessage::NEW_PASSWORD_REQUIREMENTS),
+        ])]
         public string $nouveauMotDePasse = '',
     ) {
     }

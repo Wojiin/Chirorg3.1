@@ -75,6 +75,7 @@ const {
       <form
         v-if="addSurgeryFormOpen"
         class="form-panel mb-6"
+        novalidate
         @submit.prevent="submitSurgery"
       >
         <div>

@@ -1,0 +1,87 @@
+name: Test de charge
+
+on:
+  workflow_dispatch:
+    inputs:
+      virtual_users:
+        description: Nombre d'utilisateurs virtuels
+        required: true
+        default: "2"
+        type: string
+      duration:
+        description: Durée du palier k6
+        required: true
+        default: 30s
+        type: string
+  schedule:
+    - cron: "20 5 * * 1"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: performance-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  load-smoke:
+    name: Charge légère avec k6
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Récupérer le dépôt
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Démarrer la pile isolée
+        run: >
+          docker compose
+          --env-file .env.example
+          -f docker-compose.dev.yaml
+          up -d --build --wait --wait-timeout 180
+
+      - name: Préparer la base et le compte éphémères
+        shell: bash
+        run: |
+          docker compose --env-file .env.example -f docker-compose.dev.yaml exec -T backend php bin/console doctrine:migrations:migrate --no-interaction
+          docker compose --env-file .env.example -f docker-compose.dev.yaml exec -T backend php bin/console doctrine:fixtures:load --no-interaction
+          LOAD_PASSWORD="Load-$(openssl rand -hex 16)!"
+          printf '%s\n' "$LOAD_PASSWORD" | docker compose --env-file .env.example -f docker-compose.dev.yaml exec -T backend php bin/console app:utilisateur:create load.performance@chirorg.test
+          echo "::add-mask::$LOAD_PASSWORD"
+          echo "K6_TEST_PASSWORD=$LOAD_PASSWORD" >> "$GITHUB_ENV"
+
+      - name: Exécuter le scénario k6 borné
+        shell: bash
+        env:
+          CHIRORG_VUS: ${{ inputs.virtual_users || '2' }}
+          CHIRORG_DURATION: ${{ inputs.duration || '30s' }}
+        run: |
+          mkdir -p tests/load/results
+          docker run --rm --network host \
+            -e API_BASE_URL=http://127.0.0.1:8080/api \
+            -e TEST_EMAIL=load.performance@chirorg.test \
+            -e TEST_PASSWORD="$K6_TEST_PASSWORD" \
+            -e CHIRORG_VUS="$CHIRORG_VUS" \
+            -e CHIRORG_DURATION="$CHIRORG_DURATION" \
+            -v "$PWD/tests/load:/scripts:ro" \
+            -v "$PWD/tests/load/results:/results" \
+            grafana/k6:1.8.1 run \
+            --summary-export=/results/smoke-summary.json \
+            /scripts/smoke.js
+
+      - name: Publier le bilan k6
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: k6-summary
+          path: tests/load/results
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Afficher les journaux en cas d'échec
+        if: failure()
+        run: docker compose --env-file .env.example -f docker-compose.dev.yaml logs --no-color
+
+      - name: Arrêter et nettoyer la pile isolée
+        if: always()
+        run: docker compose --env-file .env.example -f docker-compose.dev.yaml down --volumes

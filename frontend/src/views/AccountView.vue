@@ -9,7 +9,6 @@ import StatusBadge from '@/components/ui/StatusBadge.vue'
 import ConfirmationModal from '@/components/ui/ConfirmationModal.vue'
 
 const {
-  PASSWORD_PATTERN_SOURCE,
   PASSWORD_REQUIREMENTS,
   apiError,
   confirmationOpen,
@@ -49,6 +48,7 @@ const {
 
       <form
         class="form-panel account-password-panel"
+        novalidate
         @submit.prevent="submitPassword"
       >
         <div>
@@ -76,9 +76,7 @@ const {
             label="Nouveau mot de passe"
             type="password"
             autocomplete="new-password"
-            :minlength="12"
             :maxlength="128"
-            :pattern="PASSWORD_PATTERN_SOURCE"
             :error="fieldErrors.newPassword"
             required
           />
@@ -87,9 +85,7 @@ const {
             label="Confirmer le nouveau mot de passe"
             type="password"
             autocomplete="new-password"
-            :minlength="12"
             :maxlength="128"
-            :pattern="PASSWORD_PATTERN_SOURCE"
             :error="fieldErrors.newPasswordConfirmation"
             required
           />

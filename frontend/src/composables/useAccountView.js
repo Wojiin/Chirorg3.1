@@ -5,11 +5,7 @@ import { getApiErrorMessage } from '@/api/response'
 import { ERROR_MESSAGES } from '@/config/errorMessages'
 import { useAuthStore } from '@/stores/auth'
 import { notifyError, notifySuccess } from '@/services/notifications'
-import {
-  PASSWORD_PATTERN_SOURCE,
-  PASSWORD_REQUIREMENTS,
-  validatePasswordChange,
-} from '@/utils/password'
+import { PASSWORD_REQUIREMENTS, validatePasswordChange } from '@/utils/password'
 
 /** Orchestre l'affichage du compte et le changement de mot de passe. */
 export function useAccountView() {
@@ -63,7 +59,6 @@ export function useAccountView() {
   }
 
   return {
-    PASSWORD_PATTERN_SOURCE,
     PASSWORD_REQUIREMENTS,
     apiError,
     confirmationOpen,

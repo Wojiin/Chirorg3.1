@@ -3,6 +3,7 @@
 namespace App\Tests\Functional\Api;
 
 use App\Entity\Utilisateur;
+use App\Error\ErrorMessage;
 use Doctrine\ORM\EntityManagerInterface;
 
 final class UtilisateurApiTest extends AuthenticatedApiTestCase
@@ -41,16 +42,40 @@ final class UtilisateurApiTest extends AuthenticatedApiTestCase
         $this->removeUtilisateur($utilisateur);
     }
 
+    public function testWeakNewPasswordReturnsOneCompleteViolation(): void
+    {
+        $client = $this->createApiClient();
+        [$utilisateur, $password] = $this->persistUtilisateur(roles: []);
+        $this->useBearerToken($client, $this->login($client, $utilisateur, $password));
+
+        try {
+            $response = $client->request('PATCH', '/api/me/mot-de-passe', [
+                'headers' => ['content-type' => 'application/merge-patch+json'],
+                'json' => ['motDePasseActuel' => $password, 'nouveauMotDePasse' => 'faible'],
+            ]);
+
+            self::assertResponseStatusCodeSame(422);
+            $payload = $response->toArray(false);
+            self::assertCount(1, $payload['violations']);
+            self::assertSame(ErrorMessage::NEW_PASSWORD_REQUIREMENTS, $payload['violations'][0]['message']);
+        } finally {
+            $this->removeUtilisateur($utilisateur);
+        }
+    }
+
     public function testOnlyAdminCanManageUtilisateurs(): void
     {
         $client = $this->createApiClient();
         [$admin, $adminPassword] = $this->persistUtilisateur();
         $this->useBearerToken($client, $this->login($client, $admin, $adminPassword));
 
-        $client->request('POST', '/api/utilisateurs', [
+        $response = $client->request('POST', '/api/utilisateurs', [
             'json' => ['email' => 'faible@chirorg.local', 'motDePasse' => 'faible'],
         ]);
         self::assertResponseStatusCodeSame(422);
+        $invalidPasswordPayload = $response->toArray(false);
+        self::assertCount(1, $invalidPasswordPayload['violations']);
+        self::assertSame(ErrorMessage::PASSWORD_REQUIREMENTS, $invalidPasswordPayload['violations'][0]['message']);
 
         $email = 'api-'.bin2hex(random_bytes(5)).'@chirorg.local';
         $response = $client->request('POST', '/api/utilisateurs', [

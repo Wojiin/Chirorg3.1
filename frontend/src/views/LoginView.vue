@@ -34,7 +34,7 @@ const { isDark, toggleTheme } = useTheme()
         <p class="text-muted mt-3">Connexion à l’espace bloc opératoire</p>
       </header>
 
-      <form class="login-panel" @submit.prevent="submit">
+      <form class="login-panel" novalidate @submit.prevent="submit">
         <div>
           <h2 class="section-title">Connexion</h2>
           <p class="text-muted mt-1">
