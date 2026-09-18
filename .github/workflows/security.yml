@@ -46,6 +46,7 @@ jobs:
           test -n "$ACCESS_TOKEN"
           echo "::add-mask::$ACCESS_TOKEN"
           echo "SCHEMATHESIS_TOKEN=$ACCESS_TOKEN" >> "$GITHUB_ENV"
+          echo "SCHEMATHESIS_PROGRAMME_DATE=$(date -u +%F)" >> "$GITHUB_ENV"
 
       - name: Installer la version épinglée de Schemathesis
         run: pipx install schemathesis==4.27.1

@@ -21,3 +21,4 @@ secrets/
 /docs/
 /tests/load/results/
 /tests/security/reports/
+/.schemathesis/

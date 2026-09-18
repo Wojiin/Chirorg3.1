@@ -17,4 +17,8 @@ Les contrôles de sécurité sont répartis entre plusieurs niveaux :
 | Charge HTML affichée sans exécution                  | OWASP A05:2025            |
 | Bornes et formats générés depuis OpenAPI             | API4:2023, A10:2025       |
 
-Le fuzzing s'exécute exclusivement sur la pile Docker éphémère de la CI. Le mode par défaut se limite aux méthodes `GET`. Toute campagne incluant des mutations doit employer une base jetable et des identifiants temporaires.
+Le fuzzing s'exécute exclusivement sur la pile Docker éphémère de la CI. Il se limite aux méthodes `GET`, utilise les identifiants déterministes des fixtures définis dans `schemathesis.toml` et vérifie explicitement deux propriétés de sécurité : aucune entrée ne doit provoquer d'erreur serveur et les valeurs invalides décrites par OpenAPI doivent être rejetées.
+
+Les paramètres de pagination sont fixés à des valeurs sûres pendant cette campagne : API Platform borne déjà `itemsPerPage` côté serveur en ramenant les dépassements au maximum configuré, tandis que le contrôle Schemathesis attend par défaut un rejet HTTP. La limite serveur reste donc active sans produire ce faux positif.
+
+La conformité complète du contrat OpenAPI (statuts et schémas de réponse) constitue un contrôle distinct. Elle n'est volontairement pas mélangée à ce job afin qu'un écart documentaire ne masque pas une régression de sécurité. Toute campagne incluant des mutations doit employer une base jetable et des identifiants temporaires.
