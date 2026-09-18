@@ -33,6 +33,9 @@ describe('AccountView', () => {
     expect(wrapper.text()).not.toContain('Identifiant')
     expect(wrapper.text()).not.toContain('9876')
     expect(inputs).toHaveLength(3)
+    expect(wrapper.get('form').attributes()).toHaveProperty('novalidate')
+    expect(inputs[1].attributes('pattern')).toBeUndefined()
+    expect(inputs[1].attributes('minlength')).toBeUndefined()
 
     await inputs[0].setValue('password')
     await inputs[1].setValue('trop-faible')

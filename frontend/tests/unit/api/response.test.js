@@ -25,6 +25,46 @@ describe('API error messages', () => {
     ).toBe('Violation métier.')
   })
 
+  it('displays validation messages without technical property prefixes', () => {
+    expect(
+      getApiErrorMessage({
+        response: {
+          status: 422,
+          data: {
+            detail:
+              'motDePasse: Le mot de passe est invalide. email: Cette adresse email est invalide.',
+            violations: [
+              {
+                propertyPath: 'motDePasse',
+                message: 'Le mot de passe est invalide.',
+              },
+              {
+                propertyPath: 'email',
+                message: 'Cette adresse email est invalide.',
+              },
+            ],
+          },
+        },
+      }),
+    ).toBe('Le mot de passe est invalide. Cette adresse email est invalide.')
+  })
+
+  it('does not repeat identical validation messages', () => {
+    expect(
+      getApiErrorMessage({
+        response: {
+          status: 422,
+          data: {
+            violations: [
+              { propertyPath: 'champA', message: 'Valeur invalide.' },
+              { propertyPath: 'champB', message: 'Valeur invalide.' },
+            ],
+          },
+        },
+      }),
+    ).toBe('Valeur invalide.')
+  })
+
   it.each([
     [400, 'Syntax error', ERROR_MESSAGES.invalidRequest],
     [403, 'Access Denied.', ERROR_MESSAGES.accessDenied],

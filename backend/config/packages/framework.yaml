@@ -4,6 +4,9 @@ framework:
     trusted_proxies: '%env(TRUSTED_PROXIES)%'
     trusted_headers: ['x-forwarded-for', 'x-forwarded-host', 'x-forwarded-proto', 'x-forwarded-port', 'x-forwarded-prefix']
     trusted_hosts: ['%env(TRUSTED_HOSTS)%']
+    serializer:
+        default_context:
+            allow_extra_attributes: false
 
     # Note that the session will be started ONLY if you read or write from it.
     session: true

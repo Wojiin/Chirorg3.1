@@ -43,6 +43,7 @@ const {
     <form
       aria-label="Filtrer les programmes"
       class="programme-filters"
+      novalidate
       @submit.prevent="loadProgrammes"
     >
       <BaseInput v-model="filters.date" label="Date" type="date" />

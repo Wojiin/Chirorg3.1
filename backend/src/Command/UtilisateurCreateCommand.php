@@ -4,6 +4,7 @@ namespace App\Command;
 
 use App\Entity\Utilisateur;
 use App\Repository\UtilisateurRepository;
+use App\Security\PasswordRequirements;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -85,9 +86,6 @@ final class UtilisateurCreateCommand extends Command
 
         return $length >= 12
             && $length <= 4096
-            && 1 === preg_match('/[a-z]/', $password)
-            && 1 === preg_match('/[A-Z]/', $password)
-            && 1 === preg_match('/\d/', $password)
-            && 1 === preg_match('/[^a-zA-Z\d]/', $password);
+            && 1 === preg_match(PasswordRequirements::PATTERN, $password);
     }
 }

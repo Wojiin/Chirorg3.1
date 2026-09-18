@@ -45,7 +45,12 @@ const {
       description="Renseignez les informations du référentiel."
     />
 
-    <form v-if="resource" class="form-panel" @submit.prevent="submit">
+    <form
+      v-if="resource"
+      class="form-panel"
+      novalidate
+      @submit.prevent="submit"
+    >
       <ErrorMessage v-if="displayedError" :message="displayedError" />
       <fieldset class="form-grid" :disabled="loading">
         <legend class="sr-only">Informations de la ressource</legend>

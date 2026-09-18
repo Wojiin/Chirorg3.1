@@ -1,0 +1,20 @@
+[checks]
+enabled = false
+not_a_server_error.enabled = true
+negative_data_rejection.enabled = true
+
+[parameters]
+"path.id" = 1
+"path.date" = "${SCHEMATHESIS_PROGRAMME_DATE}"
+"path.salle" = "Salle A"
+"path.chirurgien" = 1
+"query.page" = 1
+"query.itemsPerPage" = 10
+
+[[operations]]
+include-name = "GET /api/salles/{id}"
+parameters = { "path.id" = 4 }
+
+[[operations]]
+include-name = "GET /api/specialites/{id}"
+parameters = { "path.id" = 2 }

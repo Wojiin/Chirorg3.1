@@ -38,14 +38,8 @@ final class ErrorMessage
     public const string MATERIEL_SPECIALITE_MISMATCH = 'Tous les matériels doivent appartenir à la spécialité du chirurgien.';
     public const string MATERIEL_STATE_CONFLICT = 'Un matériel ne peut pas être à la fois prêt et absent.';
     public const string NEW_PASSWORD_MUST_DIFFER = 'Le nouveau mot de passe doit être différent du mot de passe actuel.';
-    public const string NEW_PASSWORD_REQUIRES_DIGIT = 'Le nouveau mot de passe doit contenir un chiffre.';
-    public const string NEW_PASSWORD_REQUIRES_LOWERCASE = 'Le nouveau mot de passe doit contenir une minuscule.';
-    public const string NEW_PASSWORD_REQUIRES_SPECIAL_CHARACTER = 'Le nouveau mot de passe doit contenir un caractère spécial.';
-    public const string NEW_PASSWORD_REQUIRES_UPPERCASE = 'Le nouveau mot de passe doit contenir une majuscule.';
-    public const string PASSWORD_REQUIRES_DIGIT = 'Le mot de passe doit contenir un chiffre.';
-    public const string PASSWORD_REQUIRES_LOWERCASE = 'Le mot de passe doit contenir une minuscule.';
-    public const string PASSWORD_REQUIRES_SPECIAL_CHARACTER = 'Le mot de passe doit contenir un caractère spécial.';
-    public const string PASSWORD_REQUIRES_UPPERCASE = 'Le mot de passe doit contenir une majuscule.';
+    public const string NEW_PASSWORD_REQUIREMENTS = 'Le nouveau mot de passe doit contenir au moins 12 caractères, dont une minuscule, une majuscule, un chiffre et un caractère spécial, sans espace.';
+    public const string PASSWORD_REQUIREMENTS = 'Le mot de passe doit contenir au moins 12 caractères, dont une minuscule, une majuscule, un chiffre et un caractère spécial, sans espace.';
     public const string PREPARATION_LOCKED = 'La préparation d’une chirurgie validée est verrouillée.';
     public const string PREPARATION_NOT_FOUND = 'Préparation de matériel introuvable.';
     public const string PREPARATION_STATE_REQUIRED = 'Un état prêt ou absent doit être fourni.';
