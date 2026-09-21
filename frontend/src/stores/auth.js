@@ -86,6 +86,20 @@ export const useAuthStore = defineStore('auth', {
       }
     },
 
+    /** Remplace silencieusement la session révoquée après un changement de mot de passe. */
+    async renewSession(credentials) {
+      try {
+        const data = await authApi.login(credentials)
+        this.setAccessToken(data.token)
+        await this.hydrateUser(data.token)
+        this.initialized = true
+        return true
+      } catch (error) {
+        this.clearSession()
+        throw error
+      }
+    },
+
     /** Tente une restauration silencieuse de session une seule fois au démarrage de la SPA. */
     initialize() {
       if (this.initialized) return Promise.resolve(this.isAuthenticated)

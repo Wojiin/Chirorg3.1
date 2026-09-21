@@ -209,6 +209,27 @@ describe('ChirOrg stores with API services', () => {
     expect(storageSpy).not.toHaveBeenCalled()
   })
 
+  it('silently replaces the session after a password change', async () => {
+    const store = useAuthStore()
+    store.user = {
+      email: 'user@chirorg.test',
+      roles: ['ROLE_USER'],
+    }
+    store.setAccessToken('revoked-token')
+    vi.spyOn(authApi, 'login').mockResolvedValue({ token: 'renewed-token' })
+    vi.spyOn(store, 'hydrateUser').mockResolvedValue(store.user)
+
+    await expect(
+      store.renewSession({
+        email: 'user@chirorg.test',
+        password: 'NouveauMotDePasse1!',
+      }),
+    ).resolves.toBe(true)
+
+    expect(store.token).toBe('renewed-token')
+    expect(store.isAuthenticated).toBe(true)
+  })
+
   it('keeps the planned surgery identifier used by preparation links', () => {
     const chirurgie = normalizeProgramme({
       date: '2026-07-24',

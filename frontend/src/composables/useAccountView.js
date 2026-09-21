@@ -44,7 +44,10 @@ export function useAccountView() {
 
     saving.value = true
     try {
+      const email = user.value?.email
+      const newPassword = form.newPassword
       await accountApi.changePassword({ ...form })
+      await authStore.renewSession({ email, password: newPassword })
       form.currentPassword = ''
       form.newPassword = ''
       form.newPasswordConfirmation = ''

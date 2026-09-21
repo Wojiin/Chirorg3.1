@@ -60,7 +60,9 @@ function setAuthorizationHeader(config, token) {
 }
 
 apiClient.interceptors.request.use((config) => {
-  setAuthorizationHeader(config, authSession.getAccessToken())
+  if (!isAuthenticationRequest(config.url)) {
+    setAuthorizationHeader(config, authSession.getAccessToken())
+  }
   return config
 })
 
