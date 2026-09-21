@@ -14,6 +14,22 @@ use Doctrine\Persistence\ManagerRegistry;
 
 final class ProgrammeOperatoireApiTest extends AuthenticatedApiTestCase
 {
+    public function testCollectionRejectsInvalidSurgeonFilter(): void
+    {
+        $client = $this->createApiClient();
+        [$utilisateur, $password] = $this->persistUtilisateur(roles: []);
+        $this->useBearerToken($client, $this->login($client, $utilisateur, $password));
+
+        try {
+            foreach (['N', '0', '-1'] as $invalidValue) {
+                $response = $client->request('GET', '/api/programmes-operatoires?chirurgien='.$invalidValue);
+                self::assertContains($response->getStatusCode(), [400, 422]);
+            }
+        } finally {
+            $this->removeUtilisateur($utilisateur);
+        }
+    }
+
     public function testDirectPlanningWritesAreNotExposed(): void
     {
         $client = $this->createApiClient();

@@ -40,9 +40,9 @@ final readonly class ProgrammeOperatoireProvider implements ProviderInterface
             throw new BadRequestHttpException(ErrorMessage::DATE_RANGE_INVALID);
         }
         $salle = $this->parameter($operation, 'salle');
-        $chirurgien = $this->parameter($operation, 'chirurgien');
+        $chirurgien = $this->positiveIntegerParameter($operation, 'chirurgien');
 
-        $programmes = $this->service->list(null === $date ? null : $this->referenceResolver->date((string) $date), null === $salle ? null : trim((string) $salle), null === $chirurgien ? null : (int) $chirurgien, $start, $end);
+        $programmes = $this->service->list(null === $date ? null : $this->referenceResolver->date((string) $date), null === $salle ? null : trim((string) $salle), $chirurgien, $start, $end);
         [, $offset, $limit] = $this->pagination->getPagination($operation, $context);
 
         return new ArrayPaginator($programmes, $offset, $limit);
@@ -53,5 +53,20 @@ final readonly class ProgrammeOperatoireProvider implements ProviderInterface
         $value = $operation->getParameters()?->get($name)?->getValue();
 
         return $value instanceof ParameterNotFound ? null : $value;
+    }
+
+    private function positiveIntegerParameter(Operation $operation, string $name): ?int
+    {
+        $value = $this->parameter($operation, $name);
+        if (null === $value) {
+            return null;
+        }
+
+        $integer = filter_var($value, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+        if (false === $integer) {
+            throw new BadRequestHttpException(ErrorMessage::POSITIVE_NUMBER_REQUIRED);
+        }
+
+        return $integer;
     }
 }
