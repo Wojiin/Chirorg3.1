@@ -38,6 +38,8 @@ final class UtilisateurApiTest extends AuthenticatedApiTestCase
         $freshClient->request('POST', '/api/auth/login', ['json' => ['email' => $utilisateur->getEmail(), 'password' => $password]]);
         self::assertResponseStatusCodeSame(401);
         $this->login($freshClient, $utilisateur, 'New-password-84!');
+        $freshClient->request('POST', '/api/auth/refresh');
+        self::assertResponseIsSuccessful();
 
         $this->removeUtilisateur($utilisateur);
     }

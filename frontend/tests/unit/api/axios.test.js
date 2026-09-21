@@ -60,6 +60,19 @@ describe('central Axios authentication', () => {
     expect(create).toHaveBeenCalledTimes(2)
   })
 
+  it('does not send a stale bearer token to authentication endpoints', async () => {
+    const { configureApiAuth } = await loadAxiosModule()
+    configureApiAuth({
+      getAccessToken: () => 'revoked-token',
+      setAccessToken: vi.fn(),
+      onSessionExpired: vi.fn(),
+    })
+
+    const loginRequest = requestHandler({ url: '/auth/login', headers: {} })
+
+    expect(loginRequest.headers.Authorization).toBeUndefined()
+  })
+
   it('leaves headers untouched without a token and keeps valid callbacks', async () => {
     const { configureApiAuth } = await loadAxiosModule()
     configureApiAuth({

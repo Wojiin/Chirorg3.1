@@ -23,6 +23,9 @@ describe('AccountView', () => {
     const changePassword = vi
       .spyOn(accountApi, 'changePassword')
       .mockResolvedValue()
+    const renewSession = vi
+      .spyOn(useAuthStore(), 'renewSession')
+      .mockResolvedValue(true)
     const wrapper = mount(AccountView, {
       global: {
         stubs: { DialogPortal: { template: '<div><slot /></div>' } },
@@ -68,6 +71,10 @@ describe('AccountView', () => {
       currentPassword: 'password',
       newPassword: 'NouveauMotDePasse1!',
       newPasswordConfirmation: 'NouveauMotDePasse1!',
+    })
+    expect(renewSession).toHaveBeenCalledWith({
+      email: 'user@chirorg.test',
+      password: 'NouveauMotDePasse1!',
     })
     expect(wrapper.text()).toContain('Votre mot de passe a été modifié.')
     expect(inputs.every((input) => input.element.value === '')).toBe(true)
