@@ -32,11 +32,13 @@ const availableOptions = computed(() => {
   )
 })
 
+// Ajoute un matériel chirurgical à la sélection. Dépendances utilisées : aucune dépendance importée directe.
 function add(value) {
   if (!selectedIds.value.has(String(value)))
     model.value = [...model.value, value]
 }
 
+// Retire un matériel chirurgical de la sélection. Dépendances utilisées : aucune dépendance importée directe.
 function remove(value) {
   model.value = model.value.filter(
     (selected) => String(selected) !== String(value),
@@ -45,15 +47,18 @@ function remove(value) {
 </script>
 
 <template>
+  <!-- Regroupe les champs métier de la sélection du matériel chirurgical. -->
   <fieldset class="md:col-span-2">
     <legend class="field-label">
       {{ label }}
       <span v-if="required" aria-hidden="true" class="field-required">*</span>
     </legend>
 
+    <!-- Organise les informations de la sélection du matériel chirurgical dans une grille responsive. -->
     <div
       class="mt-2 grid gap-4 rounded-xl border border-gray-200 p-4 dark:border-gray-700 lg:grid-cols-2"
     >
+      <!-- Délimite la section consacrée à la sélection du matériel chirurgical. -->
       <section aria-labelledby="selected-materials-title">
         <h3
           id="selected-materials-title"
@@ -70,6 +75,7 @@ function remove(value) {
             :key="option.value"
             class="flex items-center justify-between gap-3 rounded-lg bg-gray-100 px-3 py-2 dark:bg-gray-800"
           >
+            <!-- Regroupe les informations affichées par la sélection du matériel chirurgical. -->
             <div class="min-w-0">
               <p class="truncate text-sm font-semibold">{{ option.label }}</p>
               <p
@@ -91,6 +97,7 @@ function remove(value) {
         </ul>
       </section>
 
+      <!-- Délimite la section consacrée à la sélection du matériel chirurgical. -->
       <section aria-labelledby="available-materials-title">
         <h3 id="available-materials-title" class="sr-only">
           Matériels disponibles
@@ -110,6 +117,7 @@ function remove(value) {
             :key="option.value"
             class="flex items-center justify-between gap-3 rounded-lg border border-gray-200 px-3 py-2 dark:border-gray-700"
           >
+            <!-- Regroupe les informations affichées par la sélection du matériel chirurgical. -->
             <div class="min-w-0">
               <p class="truncate text-sm font-semibold">{{ option.label }}</p>
               <p

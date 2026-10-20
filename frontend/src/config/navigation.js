@@ -27,6 +27,7 @@ export const navigationItems = [
   },
 ]
 
+// Construit la route du détail d'un programme opératoire. Dépendances utilisées : aucune dépendance importée directe.
 /** Construit la destination stable du programme auquel appartient une chirurgie. */
 export function getProgrammeDetailRoute(surgery) {
   return {

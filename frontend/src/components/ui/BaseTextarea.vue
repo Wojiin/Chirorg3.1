@@ -16,6 +16,7 @@ const errorId = computed(() => `${id}-error`)
 </script>
 
 <template>
+  <!-- Regroupe les informations affichées par la zone de texte. -->
   <div>
     <label :for="id" class="field-label">
       {{ label }}

@@ -4,6 +4,7 @@ defineProps({ label: { type: String, default: 'Chargement en cours…' } })
 </script>
 
 <template>
+  <!-- Regroupe les informations affichées par l'indicateur de chargement. -->
   <div role="status" class="loading-state">
     <span
       aria-hidden="true"

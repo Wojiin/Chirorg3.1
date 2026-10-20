@@ -9,6 +9,7 @@ defineProps({
 
 <template>
   <RouterLink :to="`/admin/${resource.slug}`" class="resource-card group">
+    <!-- Regroupe les informations affichées par l'accès à un référentiel administré. -->
     <div>
       <h3
         class="font-bold text-gray-950 group-hover:text-chirorg-700 dark:text-white dark:group-hover:text-chirorg-500"

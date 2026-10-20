@@ -24,6 +24,7 @@ const authSession = {
   onSessionExpired: () => {},
 }
 
+// Relie le client Axios au store Pinia chargé de la session utilisateur. Dépendances utilisées : aucune dépendance importée directe.
 /** Branche le client HTTP sur le store d'authentification sans créer de dépendance circulaire. */
 export function configureApiAuth({
   getAccessToken,
@@ -44,6 +45,7 @@ export function configureApiAuth({
       : authSession.onSessionExpired
 }
 
+// Ajoute ou retire le JWT d'accès dans l'en-tête Authorization. Dépendances utilisées : aucune dépendance importée directe.
 /** Ajoute le Bearer token en supportant les deux formes d'en-têtes Axios. */
 function setAuthorizationHeader(config, token) {
   if (!token) return
@@ -68,6 +70,7 @@ apiClient.interceptors.request.use((config) => {
 
 let refreshPromise = null
 
+// Renouvelle le JWT d'accès à partir du cookie de renouvellement. Dépendances utilisées : ERROR_MESSAGES, refreshClient.
 /** Partage une même requête de refresh entre toutes les requêtes simultanément expirées. */
 export function refreshAccessToken() {
   refreshPromise ??= refreshClient
@@ -87,6 +90,7 @@ export function refreshAccessToken() {
   return refreshPromise
 }
 
+// Détecte les routes de connexion, de renouvellement et de déconnexion. Dépendances utilisées : aucune dépendance importée directe.
 /** Identifie les routes qui ne doivent jamais déclencher une boucle de renouvellement. */
 function isAuthenticationRequest(url = '') {
   return ['/auth/login', '/auth/refresh', '/auth/logout'].some(

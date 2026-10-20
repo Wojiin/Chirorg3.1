@@ -96,21 +96,25 @@ class ListeMateriel
     #[Groups(['liste_materiel:read', 'liste_materiel:write'])]
     private Collection $materiels;
 
+    // Initialise l'entité ListeMateriel représentant la liste de matériel. Dépendances utilisées : ArrayCollection, Collection.
     public function __construct()
     {
         $this->materiels = new ArrayCollection();
     }
 
+    // Retourne l'identifiant de la liste de matériel. Dépendances utilisées : aucune dépendance de service directe.
     public function getId(): ?int
     {
         return $this->id;
     }
 
+    // Retourne l'intitulé de la liste de matériel. Dépendances utilisées : aucune dépendance de service directe.
     public function getIntitule(): ?string
     {
         return $this->intitule;
     }
 
+    // Met à jour l'intitulé de la liste de matériel. Dépendances utilisées : aucune dépendance de service directe.
     public function setIntitule(string $intitule): static
     {
         $this->intitule = trim($intitule);
@@ -118,11 +122,13 @@ class ListeMateriel
         return $this;
     }
 
+    // Retourne le chirurgien de la liste de matériel. Dépendances utilisées : Chirurgien.
     public function getChirurgien(): ?Chirurgien
     {
         return $this->chirurgien;
     }
 
+    // Met à jour le chirurgien de la liste de matériel. Dépendances utilisées : Chirurgien.
     public function setChirurgien(?Chirurgien $chirurgien): static
     {
         $this->chirurgien = $chirurgien;
@@ -130,11 +136,13 @@ class ListeMateriel
         return $this;
     }
 
+    // Retourne le modèle de chirurgie de la liste de matériel. Dépendances utilisées : ChirurgieModele.
     public function getChirurgieModele(): ?ChirurgieModele
     {
         return $this->chirurgieModele;
     }
 
+    // Met à jour le modèle de chirurgie de la liste de matériel. Dépendances utilisées : ChirurgieModele.
     public function setChirurgieModele(?ChirurgieModele $chirurgieModele): static
     {
         $this->chirurgieModele = $chirurgieModele;
@@ -142,6 +150,7 @@ class ListeMateriel
         return $this;
     }
 
+    // Retourne les matériels chirurgicaux de la liste de matériel. Dépendances utilisées : Collection.
     /**
      * @return Collection<int, Materiel>
      */
@@ -150,6 +159,7 @@ class ListeMateriel
         return $this->materiels;
     }
 
+    // Ajoute le matériel chirurgical à la liste de matériel. Dépendances utilisées : Collection, Materiel.
     public function addMateriel(Materiel $materiel): static
     {
         if (!$this->materiels->contains($materiel)) {
@@ -160,6 +170,7 @@ class ListeMateriel
         return $this;
     }
 
+    // Retire le matériel chirurgical de la liste de matériel. Dépendances utilisées : Collection, Materiel.
     public function removeMateriel(Materiel $materiel): static
     {
         if ($this->materiels->removeElement($materiel)) {
@@ -170,6 +181,7 @@ class ListeMateriel
     }
 
     #[Assert\Callback]
+    // Vérifie que le chirurgien et le modèle de chirurgie appartiennent à la même spécialité. Dépendances utilisées : ChirurgieModele, Chirurgien, Collection, ErrorMessage, ExecutionContextInterface.
     public function validateSpecialites(ExecutionContextInterface $context): void
     {
         $specialite = $this->chirurgien?->getSpecialite();

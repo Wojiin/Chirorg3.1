@@ -10,10 +10,12 @@ use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 /** Réaffecte les références d'une spécialité avant sa suppression. */
 final readonly class SpecialiteDeletionService
 {
+    // Injecte les services nécessaires au traitement de la spécialité. Dépendances utilisées : SpecialiteRepository.
     public function __construct(private SpecialiteRepository $repository)
     {
     }
 
+    // Réaffecte les chirurgiens vers la spécialité par défaut avant suppression. Dépendances utilisées : ConflictHttpException, ErrorMessage, Specialite, SpecialiteRepository.
     public function reassignReferences(Specialite $specialite): void
     {
         if (Specialite::SANS_SPECIALITE === $specialite->getIntitule()) {

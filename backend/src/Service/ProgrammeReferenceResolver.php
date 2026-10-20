@@ -8,6 +8,7 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 final class ProgrammeReferenceResolver
 {
+    // Construit la référence du programme à partir de la date, de la salle et du chirurgien. Dépendances utilisées : BadRequestHttpException, ErrorMessage, ProgrammeReference.
     /** @param array<string, mixed> $uriVariables */
     public function resolve(array $uriVariables): ProgrammeReference
     {
@@ -20,6 +21,7 @@ final class ProgrammeReferenceResolver
         return new ProgrammeReference($this->date((string) ($uriVariables['date'] ?? '')), $salle, $chirurgien);
     }
 
+    // Valide et convertit la date du programme opératoire. Dépendances utilisées : BadRequestHttpException, ErrorMessage.
     public function date(string $value): \DateTimeImmutable
     {
         $date = \DateTimeImmutable::createFromFormat('!Y-m-d', $value);

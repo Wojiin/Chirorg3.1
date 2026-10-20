@@ -3,6 +3,7 @@ import { storeToRefs } from 'pinia'
 import { useProgrammeStore } from '@/stores/programme'
 import { useReferenceStore } from '@/stores/references'
 
+// Regroupe l'état réactif et les actions de la page consacrée au programme opératoire. Dépendances utilisées : computed, onMounted, programmeStore, reactive, referenceStore, storeToRefs, useProgrammeStore, useReferenceStore, watch.
 /** Orchestre les filtres et le chargement de la liste des programmes. */
 export function useProgrammeOperatoireView() {
   const programmeStore = useProgrammeStore()
@@ -28,10 +29,12 @@ export function useProgrammeOperatoireView() {
   )
   const error = computed(() => programmeError.value || referencesError.value)
 
+  // Charge programmes du programme opératoire. Dépendances utilisées : programmeStore.
   function loadProgrammes() {
     return programmeStore.fetchProgrammes({ ...filters }, page.value)
   }
 
+  // Réinitialise les filtres du programme opératoire. Dépendances utilisées : aucune dépendance importée directe.
   function clearFilters() {
     filters.date = ''
     filters.room = ''

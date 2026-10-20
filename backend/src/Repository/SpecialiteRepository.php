@@ -11,11 +11,13 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class SpecialiteRepository extends ServiceEntityRepository
 {
+    // Configure le repository Doctrine chargé de la spécialité. Dépendances utilisées : ManagerRegistry, Specialite.
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Specialite::class);
     }
 
+    // Recherche la spécialité selon default. Dépendances utilisées : Specialite.
     public function findDefault(): ?Specialite
     {
         return $this->findOneBy(['intitule' => Specialite::SANS_SPECIALITE]);

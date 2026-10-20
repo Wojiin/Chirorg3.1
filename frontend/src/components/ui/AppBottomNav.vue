@@ -7,7 +7,9 @@ const { links } = useAppNavigation()
 </script>
 
 <template>
+  <!-- Propose les liens de la navigation mobile. -->
   <nav aria-label="Navigation mobile" class="bottom-navigation">
+    <!-- Aligne les informations et les commandes de la navigation mobile. -->
     <div class="mx-auto flex h-17 max-w-xl items-stretch justify-around">
       <RouterLink
         v-for="link in links"

@@ -4,6 +4,7 @@ namespace App\Dto;
 
 final readonly class ChirurgiePreparation
 {
+    // Initialise le DTO ChirurgiePreparation avec les valeurs décrivant la préparation du matériel. Dépendances utilisées : aucune dépendance de service directe.
     /**
      * @param array<string, mixed>                                                       $chirurgien
      * @param array<string, mixed>                                                       $chirurgieModele

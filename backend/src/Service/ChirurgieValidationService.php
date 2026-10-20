@@ -9,10 +9,12 @@ use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
 final readonly class ChirurgieValidationService
 {
+    // Injecte les services nécessaires au traitement de la chirurgie planifiée. Dépendances utilisées : AuthenticatedUserProvider, ChirurgieAuditTrail, EntityManagerInterface.
     public function __construct(private AuthenticatedUserProvider $authenticatedUser, private ChirurgieAuditTrail $auditTrail, private EntityManagerInterface $entityManager)
     {
     }
 
+    // Valide la chirurgie planifiée selon les règles métier. Dépendances utilisées : AuthenticatedUserProvider, ChirurgieAuditTrail, ChirurgiePlanifiee, EntityManagerInterface, ErrorMessage, UnprocessableEntityHttpException.
     public function validate(ChirurgiePlanifiee $chirurgie): ChirurgiePlanifiee
     {
         if ($chirurgie->isValide()) {

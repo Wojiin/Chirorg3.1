@@ -6,6 +6,7 @@ import { ERROR_MESSAGES } from '@/config/errorMessages'
 
 <template>
   <PageContainer>
+    <!-- Présente l'erreur de navigation et le lien de retour vers les programmes opératoires. -->
     <section
       class="surface-panel mx-auto max-w-2xl p-8 text-center shadow-card"
     >

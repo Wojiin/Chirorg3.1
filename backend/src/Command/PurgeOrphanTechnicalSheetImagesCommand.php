@@ -18,6 +18,7 @@ use Symfony\Component\Filesystem\Filesystem;
 )]
 final class PurgeOrphanTechnicalSheetImagesCommand extends Command
 {
+    // Injecte les services nécessaires à la commande PurgeOrphanTechnicalSheetImagesCommand. Dépendances utilisées : EntityManagerInterface, Filesystem.
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly Filesystem $filesystem,
@@ -27,11 +28,13 @@ final class PurgeOrphanTechnicalSheetImagesCommand extends Command
         parent::__construct();
     }
 
+    // Déclare les arguments et options de la commande liée à la fiche technique. Dépendances utilisées : InputOption.
     protected function configure(): void
     {
         $this->addOption('older-than', null, InputOption::VALUE_REQUIRED, 'Âge minimal en secondes', '86400');
     }
 
+    // Exécute la commande concernant la fiche technique. Dépendances utilisées : Command, EntityManagerInterface, Filesystem, InputInterface, OutputInterface, SymfonyStyle.
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);

@@ -3,6 +3,7 @@ import { unwrapCollection } from '@/api/response'
 
 /** Centralise les lectures et téléversements propres aux fiches techniques. */
 export const technicalSheetApi = {
+  // Retourne les fiches techniques du modèle de chirurgie. Dépendances utilisées : apiClient, unwrapCollection.
   /** Retourne les consignes ordonnées du modèle de chirurgie demandé. */
   async listForSurgeryModel(surgeryModelId) {
     const { data } = await apiClient.get(
@@ -11,6 +12,7 @@ export const technicalSheetApi = {
     return unwrapCollection(data)
   },
 
+  // Téléverse l'image associée à la fiche technique. Dépendances utilisées : apiClient.
   /** Téléverse une illustration et retourne son chemin public contrôlé par l'API. */
   async uploadImage(image) {
     const body = new FormData()

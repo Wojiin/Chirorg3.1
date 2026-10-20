@@ -16,6 +16,7 @@ final class MasquerSpecialiteParDefautFilter implements FilterInterface
 {
     use BackwardCompatibleFilterDescriptionTrait;
 
+    // Applique les règles de filtrage de la spécialité. Dépendances utilisées : Operation, QueryBuilder, QueryNameGeneratorInterface, Specialite.
     /** @param array<string, mixed> $context */
     public function apply(
         QueryBuilder $queryBuilder,

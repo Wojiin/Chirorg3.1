@@ -68,6 +68,7 @@ export const TECHNICAL_API_MESSAGE_PREFIXES = Object.freeze([
   'No route found for',
 ])
 
+// Construit le message de validation d'un champ obligatoire. Dépendances utilisées : aucune dépendance importée directe.
 export function requiredFieldMessage(label) {
   return `Le champ « ${label} » est obligatoire.`
 }

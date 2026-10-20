@@ -11,10 +11,12 @@ use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
 final readonly class PreparationMaterielInitializer
 {
+    // Injecte les services nécessaires au traitement de la préparation du matériel. Dépendances utilisées : EntityManagerInterface, ListeMaterielRepository.
     public function __construct(private ListeMaterielRepository $listes, private EntityManagerInterface $entityManager)
     {
     }
 
+    // Crée les lignes de préparation à partir de la liste de matériel. Dépendances utilisées : ChirurgiePlanifiee, EntityManagerInterface, ErrorMessage, ListeMaterielRepository, PreparationMateriel, UnprocessableEntityHttpException.
     public function initialize(ChirurgiePlanifiee $chirurgie): void
     {
         if ($chirurgie->isValide()) {

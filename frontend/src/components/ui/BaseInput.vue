@@ -21,6 +21,7 @@ const errorId = computed(() => `${id}-error`)
 </script>
 
 <template>
+  <!-- Regroupe les informations affichées par le champ de saisie. -->
   <div>
     <label :for="id" class="field-label">
       {{ label }}

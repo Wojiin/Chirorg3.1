@@ -8,6 +8,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 final readonly class ChangementMotDePasseInput
 {
+    // Reçoit le mot de passe actuel et le nouveau mot de passe soumis par l'utilisateur, avec leurs contraintes de validation. Dépendances utilisées : Assert, ErrorMessage, PasswordRequirements.
     public function __construct(
         #[Assert\NotBlank(message: ErrorMessage::REQUIRED_FIELD)]
         public string $motDePasseActuel = '',

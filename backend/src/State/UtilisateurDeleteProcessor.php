@@ -14,11 +14,13 @@ use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 /** @implements ProcessorInterface<Utilisateur, void> */
 final readonly class UtilisateurDeleteProcessor implements ProcessorInterface
 {
+    // Injecte les services nécessaires au traitement de la session de l'utilisateur. Dépendances utilisées : AuthenticatedUserProvider, ProcessorInterface, ReferenceDeletionGuard.
     /** @param ProcessorInterface<object, void> $remove */
     public function __construct(#[Autowire(service: 'api_platform.doctrine.orm.state.remove_processor')] private ProcessorInterface $remove, private AuthenticatedUserProvider $authenticatedUser, private ReferenceDeletionGuard $guard)
     {
     }
 
+    // Applique l'opération d'écriture demandée pour la session de l'utilisateur. Dépendances utilisées : AuthenticatedUserProvider, ConflictHttpException, ErrorMessage, Operation, ProcessorInterface, ReferenceDeletionGuard.
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): void
     {
         if ($data === $this->authenticatedUser->getUser()) {

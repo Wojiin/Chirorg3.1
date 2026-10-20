@@ -64,16 +64,19 @@ class Salle
     #[Groups(['salle:list', 'salle:read', 'salle:write'])]
     private ?string $intitule = null;
 
+    // Retourne l'identifiant de la salle opératoire. Dépendances utilisées : aucune dépendance de service directe.
     public function getId(): ?int
     {
         return $this->id;
     }
 
+    // Retourne l'intitulé de la salle opératoire. Dépendances utilisées : aucune dépendance de service directe.
     public function getIntitule(): ?string
     {
         return $this->intitule;
     }
 
+    // Met à jour l'intitulé de la salle opératoire. Dépendances utilisées : aucune dépendance de service directe.
     public function setIntitule(string $intitule): static
     {
         $this->intitule = trim($intitule);

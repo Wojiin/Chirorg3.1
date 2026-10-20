@@ -35,6 +35,7 @@ const normalizedOptions = computed(() =>
   ),
 )
 
+// Retourne le libellé affiché par le champ de recherche et de sélection. Dépendances utilisées : aucune dépendance importée directe.
 function displayValue(value) {
   return (
     normalizedOptions.value.find(
@@ -45,6 +46,7 @@ function displayValue(value) {
 </script>
 
 <template>
+  <!-- Regroupe les informations affichées par le champ de recherche et de sélection. -->
   <div>
     <label :for="id" class="field-label">
       {{ label }}

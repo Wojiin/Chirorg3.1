@@ -16,6 +16,7 @@ import { notifyError, notifySuccess } from '@/services/notifications'
 const acceptedImageTypes = ['image/jpeg', 'image/png', 'image/webp']
 const maximumImageSize = 5 * 1024 * 1024
 
+// Regroupe l'état réactif et les actions de la page consacrée aux référentiels administrés. Dépendances utilisées : ERROR_MESSAGES, adminStore, buildAdminPayload, computed, createAdminForm, getAdminFormFields, getAdminResource, getApiErrorMessage, getMaterialsForSurgeon, notifyError, notifySuccess, reactive, ref, referenceStore, referencesByResource, requiredFieldMessage, resolveApiAssetUrl, router, storeToRefs, technicalSheetApi, useAdminStore, useReferenceStore, useRouter, watch.
 /** Orchestre le formulaire CRUD, ses référentiels et le téléversement éventuel. */
 export function useAdminFormView(props) {
   let formLoadId = 0
@@ -65,11 +66,13 @@ export function useAdminFormView(props) {
   })
   const currentImageUrl = computed(() => resolveApiAssetUrl(form.lienImage))
 
+  // Réinitialise le formulaire avec les valeurs du référentiel administré. Dépendances utilisées : aucune dépendance importée directe.
   function replaceForm(values) {
     for (const key of Object.keys(form)) delete form[key]
     Object.assign(form, values)
   }
 
+  // Charge le référentiel et les listes nécessaires au formulaire d'administration. Dépendances utilisées : adminStore, createAdminForm, referenceStore, referencesByResource.
   async function loadForm() {
     const requestId = ++formLoadId
     formError.value = ''
@@ -100,6 +103,7 @@ export function useAdminFormView(props) {
     }
   }
 
+  // Valide l'image choisie pour la fiche technique. Dépendances utilisées : ERROR_MESSAGES.
   function selectImage(event) {
     const image = event.target.files?.[0] ?? null
     formError.value = ''
@@ -118,12 +122,14 @@ export function useAdminFormView(props) {
     form.imageFile = image
   }
 
+  // Retire l'image sélectionnée de la fiche technique. Dépendances utilisées : aucune dépendance importée directe.
   function removeImage() {
     form.imageFile = null
     form.lienImage = null
     fileInputKey.value += 1
   }
 
+  // Contrôle les champs du formulaire d'administration avant enregistrement. Dépendances utilisées : ERROR_MESSAGES, requiredFieldMessage.
   function validateForm() {
     const missingField = fields.value.find(
       (field) =>
@@ -144,6 +150,7 @@ export function useAdminFormView(props) {
     return ''
   }
 
+  // Téléverse l'image associée à la fiche technique. Dépendances utilisées : ERROR_MESSAGES, getApiErrorMessage, notifyError, technicalSheetApi.
   async function uploadImage(payload) {
     if (props.resourceSlug !== 'fiches-techniques' || !form.imageFile)
       return payload
@@ -163,16 +170,19 @@ export function useAdminFormView(props) {
     }
   }
 
+  // Valide puis envoie le formulaire consacré aux référentiels administrés. Dépendances utilisées : aucune dépendance importée directe.
   function submit() {
     formError.value = validateForm()
     if (formError.value) return
     confirmationOpen.value = true
   }
 
+  // Ferme la confirmation sans enregistrer le référentiel administré. Dépendances utilisées : aucune dépendance importée directe.
   function cancelConfirmation() {
     confirmationOpen.value = false
   }
 
+  // Enregistre le référentiel administré après confirmation. Dépendances utilisées : adminStore, buildAdminPayload, notifySuccess, referenceStore, router.
   async function confirmSubmit() {
     confirmationOpen.value = false
 
@@ -197,6 +207,7 @@ export function useAdminFormView(props) {
     }
   }
 
+  // Revient à la page précédente depuis la vue consacrée aux référentiels administrés. Dépendances utilisées : router.
   function goBack() {
     return router.push({
       name: 'admin-list',

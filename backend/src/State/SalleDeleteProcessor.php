@@ -13,6 +13,7 @@ use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 /** @implements ProcessorInterface<object, mixed> */
 final readonly class SalleDeleteProcessor implements ProcessorInterface
 {
+    // Injecte les services nécessaires au traitement de la salle opératoire. Dépendances utilisées : ChirurgiePlanifieeRepository, ProcessorInterface.
     /** @param ProcessorInterface<object, mixed> $removeProcessor */
     public function __construct(
         #[Autowire(service: 'api_platform.doctrine.orm.state.remove_processor')]
@@ -21,6 +22,7 @@ final readonly class SalleDeleteProcessor implements ProcessorInterface
     ) {
     }
 
+    // Applique l'opération d'écriture demandée pour la salle opératoire. Dépendances utilisées : ChirurgiePlanifieeRepository, ConflictHttpException, ErrorMessage, Operation, ProcessorInterface.
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): mixed
     {
         if (!$data instanceof Salle) {

@@ -6,6 +6,7 @@ import { useReferenceStore } from '@/stores/references'
 import { ERROR_MESSAGES } from '@/config/errorMessages'
 import { getTomorrowDateValue } from '@/utils/date'
 
+// Regroupe l'état réactif et les actions de la page consacrée au programme opératoire. Dépendances utilisées : ERROR_MESSAGES, computed, getTomorrowDateValue, onMounted, programmeStore, reactive, ref, referenceStore, router, storeToRefs, useProgrammeStore, useReferenceStore, useRouter, watch.
 /** Orchestre le formulaire de planification et ses référentiels dépendants. */
 export function usePlanificationView() {
   const router = useRouter()
@@ -63,19 +64,23 @@ export function usePlanificationView() {
     () => formError.value || programmeError.value || referenceError.value,
   )
 
+  // Ajoute chirurgie au programme opératoire. Dépendances utilisées : aucune dépendance importée directe.
   function addSurgery() {
     form.chirurgieModeleIds.push('')
   }
 
+  // Retire chirurgie du programme opératoire. Dépendances utilisées : aucune dépendance importée directe.
   function removeSurgery(index) {
     if (form.chirurgieModeleIds.length > 1)
       form.chirurgieModeleIds.splice(index, 1)
   }
 
+  // Annule la modification du programme opératoire. Dépendances utilisées : router.
   function cancel() {
     router.back()
   }
 
+  // Valide puis envoie le formulaire consacré au programme opératoire. Dépendances utilisées : ERROR_MESSAGES, programmeStore, router.
   async function submit() {
     formError.value = ''
     const surgeryModelIds = form.chirurgieModeleIds.map(Number)

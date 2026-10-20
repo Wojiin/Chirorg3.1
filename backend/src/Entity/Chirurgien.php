@@ -86,22 +86,26 @@ class Chirurgien
     #[ORM\OneToMany(targetEntity: ChirurgiePlanifiee::class, mappedBy: 'chirurgien')]
     private Collection $chirurgiesPlanifiees;
 
+    // Initialise l'entité Chirurgien représentant le chirurgien. Dépendances utilisées : ArrayCollection, Collection.
     public function __construct()
     {
         $this->listesMateriel = new ArrayCollection();
         $this->chirurgiesPlanifiees = new ArrayCollection();
     }
 
+    // Retourne l'identifiant du chirurgien. Dépendances utilisées : aucune dépendance de service directe.
     public function getId(): ?int
     {
         return $this->id;
     }
 
+    // Retourne le prénom du chirurgien. Dépendances utilisées : aucune dépendance de service directe.
     public function getPrenom(): ?string
     {
         return $this->prenom;
     }
 
+    // Met à jour le prénom du chirurgien. Dépendances utilisées : aucune dépendance de service directe.
     public function setPrenom(string $prenom): static
     {
         $this->prenom = trim($prenom);
@@ -109,11 +113,13 @@ class Chirurgien
         return $this;
     }
 
+    // Retourne le nom du chirurgien. Dépendances utilisées : aucune dépendance de service directe.
     public function getNom(): ?string
     {
         return $this->nom;
     }
 
+    // Met à jour le nom du chirurgien. Dépendances utilisées : aucune dépendance de service directe.
     public function setNom(string $nom): static
     {
         $this->nom = trim($nom);
@@ -121,11 +127,13 @@ class Chirurgien
         return $this;
     }
 
+    // Retourne la spécialité du chirurgien. Dépendances utilisées : Specialite.
     public function getSpecialite(): ?Specialite
     {
         return $this->specialite;
     }
 
+    // Met à jour la spécialité du chirurgien. Dépendances utilisées : Specialite.
     public function setSpecialite(?Specialite $specialite): static
     {
         $this->specialite = $specialite;
@@ -133,6 +141,7 @@ class Chirurgien
         return $this;
     }
 
+    // Retourne les listes de matériel du chirurgien. Dépendances utilisées : Collection.
     /**
      * @return Collection<int, ListeMateriel>
      */
@@ -141,6 +150,7 @@ class Chirurgien
         return $this->listesMateriel;
     }
 
+    // Ajoute la liste de matériel au chirurgien. Dépendances utilisées : Collection, ListeMateriel.
     public function addListeMateriel(ListeMateriel $listeMateriel): static
     {
         if (!$this->listesMateriel->contains($listeMateriel)) {
@@ -151,10 +161,11 @@ class Chirurgien
         return $this;
     }
 
+    // Retire la liste de matériel du chirurgien. Dépendances utilisées : Collection, ListeMateriel.
     public function removeListeMateriel(ListeMateriel $listeMateriel): static
     {
         if ($this->listesMateriel->removeElement($listeMateriel)) {
-            // set the owning side to null (unless already changed)
+            // Détache la liste de matériel du chirurgien si elle pointe encore vers celui-ci.
             if ($listeMateriel->getChirurgien() === $this) {
                 $listeMateriel->setChirurgien(null);
             }
@@ -163,12 +174,14 @@ class Chirurgien
         return $this;
     }
 
+    // Retourne les chirurgies planifiées du chirurgien. Dépendances utilisées : Collection.
     /** @return Collection<int, ChirurgiePlanifiee> */
     public function getChirurgiesPlanifiees(): Collection
     {
         return $this->chirurgiesPlanifiees;
     }
 
+    // Ajoute la chirurgie planifiée au chirurgien. Dépendances utilisées : ChirurgiePlanifiee, Collection.
     public function addChirurgiePlanifiee(ChirurgiePlanifiee $chirurgie): static
     {
         if (!$this->chirurgiesPlanifiees->contains($chirurgie)) {
@@ -179,6 +192,7 @@ class Chirurgien
         return $this;
     }
 
+    // Retire la chirurgie planifiée du chirurgien. Dépendances utilisées : ChirurgiePlanifiee, Collection.
     public function removeChirurgiePlanifiee(ChirurgiePlanifiee $chirurgie): static
     {
         $this->chirurgiesPlanifiees->removeElement($chirurgie);

@@ -99,6 +99,7 @@ class ChirurgiePlanifiee
     #[Groups(['chirurgie_planifiee:read'])]
     private Collection $preparationsMateriel;
 
+    // Initialise l'entité ChirurgiePlanifiee représentant la chirurgie planifiée. Dépendances utilisées : ArrayCollection, Collection.
     public function __construct()
     {
         $this->preparationsMateriel = new ArrayCollection();
@@ -107,16 +108,19 @@ class ChirurgiePlanifiee
         $this->modifieLe = $now;
     }
 
+    // Retourne l'identifiant de la chirurgie planifiée. Dépendances utilisées : aucune dépendance de service directe.
     public function getId(): ?int
     {
         return $this->id;
     }
 
+    // Retourne la date programmée de la chirurgie planifiée. Dépendances utilisées : aucune dépendance de service directe.
     public function getDateProgrammee(): ?\DateTimeImmutable
     {
         return $this->dateProgrammee;
     }
 
+    // Met à jour la date programmée de la chirurgie planifiée. Dépendances utilisées : aucune dépendance de service directe.
     public function setDateProgrammee(\DateTimeImmutable $value): static
     {
         $this->dateProgrammee = $value;
@@ -124,11 +128,13 @@ class ChirurgiePlanifiee
         return $this;
     }
 
+    // Retourne la salle opératoire de la chirurgie planifiée. Dépendances utilisées : aucune dépendance de service directe.
     public function getSalle(): ?string
     {
         return $this->salle;
     }
 
+    // Met à jour la salle opératoire de la chirurgie planifiée. Dépendances utilisées : aucune dépendance de service directe.
     public function setSalle(string $value): static
     {
         $this->salle = trim($value);
@@ -136,11 +142,13 @@ class ChirurgiePlanifiee
         return $this;
     }
 
+    // Retourne l'ordre de la chirurgie planifiée. Dépendances utilisées : aucune dépendance de service directe.
     public function getOrdre(): ?int
     {
         return $this->ordre;
     }
 
+    // Met à jour l'ordre de la chirurgie planifiée. Dépendances utilisées : aucune dépendance de service directe.
     public function setOrdre(?int $value): static
     {
         $this->ordre = $value;
@@ -148,11 +156,13 @@ class ChirurgiePlanifiee
         return $this;
     }
 
+    // Indique si la chirurgie planifiée a été validée. Dépendances utilisées : aucune dépendance de service directe.
     public function isValide(): bool
     {
         return $this->valide;
     }
 
+    // Met à jour le statut de validation de la chirurgie planifiée. Dépendances utilisées : aucune dépendance de service directe.
     public function setValide(bool $value): static
     {
         $this->valide = $value;
@@ -160,11 +170,13 @@ class ChirurgiePlanifiee
         return $this;
     }
 
+    // Retourne la date de validation de la chirurgie planifiée. Dépendances utilisées : aucune dépendance de service directe.
     public function getValideLe(): ?\DateTimeImmutable
     {
         return $this->valideLe;
     }
 
+    // Met à jour la date de validation de la chirurgie planifiée. Dépendances utilisées : aucune dépendance de service directe.
     public function setValideLe(?\DateTimeImmutable $value): static
     {
         $this->valideLe = $value;
@@ -172,11 +184,13 @@ class ChirurgiePlanifiee
         return $this;
     }
 
+    // Retourne le chirurgien de la chirurgie planifiée. Dépendances utilisées : Chirurgien.
     public function getChirurgien(): ?Chirurgien
     {
         return $this->chirurgien;
     }
 
+    // Met à jour le chirurgien de la chirurgie planifiée. Dépendances utilisées : Chirurgien.
     public function setChirurgien(?Chirurgien $value): static
     {
         $this->chirurgien = $value;
@@ -184,11 +198,13 @@ class ChirurgiePlanifiee
         return $this;
     }
 
+    // Retourne le modèle de chirurgie de la chirurgie planifiée. Dépendances utilisées : ChirurgieModele.
     public function getChirurgieModele(): ?ChirurgieModele
     {
         return $this->chirurgieModele;
     }
 
+    // Met à jour le modèle de chirurgie de la chirurgie planifiée. Dépendances utilisées : ChirurgieModele.
     public function setChirurgieModele(?ChirurgieModele $value): static
     {
         $this->chirurgieModele = $value;
@@ -196,11 +212,13 @@ class ChirurgiePlanifiee
         return $this;
     }
 
+    // Retourne l'utilisateur ayant effectué la validation de la chirurgie planifiée. Dépendances utilisées : Utilisateur.
     public function getValidePar(): ?Utilisateur
     {
         return $this->validePar;
     }
 
+    // Met à jour l'utilisateur ayant effectué la validation de la chirurgie planifiée. Dépendances utilisées : Utilisateur.
     public function setValidePar(?Utilisateur $value): static
     {
         $this->validePar = $value;
@@ -208,11 +226,13 @@ class ChirurgiePlanifiee
         return $this;
     }
 
+    // Retourne la date de création de la chirurgie planifiée. Dépendances utilisées : aucune dépendance de service directe.
     public function getCreeLe(): \DateTimeImmutable
     {
         return $this->creeLe;
     }
 
+    // Met à jour la date de création de la chirurgie planifiée. Dépendances utilisées : aucune dépendance de service directe.
     public function setCreeLe(\DateTimeImmutable $value): static
     {
         $this->creeLe = $value;
@@ -220,11 +240,13 @@ class ChirurgiePlanifiee
         return $this;
     }
 
+    // Retourne la date de modification de la chirurgie planifiée. Dépendances utilisées : aucune dépendance de service directe.
     public function getModifieLe(): \DateTimeImmutable
     {
         return $this->modifieLe;
     }
 
+    // Met à jour la date de modification de la chirurgie planifiée. Dépendances utilisées : aucune dépendance de service directe.
     public function setModifieLe(\DateTimeImmutable $value): static
     {
         $this->modifieLe = $value;
@@ -232,11 +254,13 @@ class ChirurgiePlanifiee
         return $this;
     }
 
+    // Retourne l'auteur de la création de la chirurgie planifiée. Dépendances utilisées : aucune dépendance de service directe.
     public function getCreePar(): ?string
     {
         return $this->creePar;
     }
 
+    // Met à jour l'auteur de la création de la chirurgie planifiée. Dépendances utilisées : aucune dépendance de service directe.
     public function setCreePar(?string $value): static
     {
         $this->creePar = $value;
@@ -244,11 +268,13 @@ class ChirurgiePlanifiee
         return $this;
     }
 
+    // Retourne l'auteur de la dernière modification de la chirurgie planifiée. Dépendances utilisées : aucune dépendance de service directe.
     public function getModifiePar(): ?string
     {
         return $this->modifiePar;
     }
 
+    // Met à jour l'auteur de la dernière modification de la chirurgie planifiée. Dépendances utilisées : aucune dépendance de service directe.
     public function setModifiePar(?string $value): static
     {
         $this->modifiePar = $value;
@@ -256,12 +282,14 @@ class ChirurgiePlanifiee
         return $this;
     }
 
+    // Retourne les préparations de matériel de la chirurgie planifiée. Dépendances utilisées : Collection.
     /** @return Collection<int, PreparationMateriel> */
     public function getPreparationsMateriel(): Collection
     {
         return $this->preparationsMateriel;
     }
 
+    // Ajoute la préparation du matériel à la chirurgie planifiée. Dépendances utilisées : Collection, PreparationMateriel.
     public function addPreparationMateriel(PreparationMateriel $value): static
     {
         if (!$this->preparationsMateriel->contains($value)) {
@@ -272,6 +300,7 @@ class ChirurgiePlanifiee
         return $this;
     }
 
+    // Retire la préparation du matériel de la chirurgie planifiée. Dépendances utilisées : Collection, PreparationMateriel.
     public function removePreparationMateriel(PreparationMateriel $value): static
     {
         if ($this->preparationsMateriel->removeElement($value) && $value->getChirurgiePlanifiee() === $this) {

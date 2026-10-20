@@ -10,6 +10,7 @@ final class PreparationProgressCalculator
     public const string STATE_PARTIAL = 'VALIDATION_PARTIELLE';
     public const string STATE_PREPARING = 'EN_PREPARATION';
 
+    // Calcule la progression de préparation du matériel. Dépendances utilisées : aucune dépendance de service directe.
     /**
      * @param iterable<PreparationMateriel> $preparations
      *
@@ -28,6 +29,7 @@ final class PreparationProgressCalculator
         return ['total' => $total, 'coches' => $coches, 'absents' => $absents, 'traites' => $traites, 'complete' => $total > 0 && $total === $traites];
     }
 
+    // Détermine l'état complet, partiel ou incomplet de la préparation. Dépendances utilisées : aucune dépendance de service directe.
     /** @param array{total: int, coches: int, absents: int, traites: int, complete: bool} $progress */
     public function validationState(bool $validated, array $progress): string
     {

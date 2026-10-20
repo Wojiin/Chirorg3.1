@@ -46,11 +46,13 @@ const adminResourcesBySlug = new Map(
   adminResources.map((resource) => [resource.slug, resource]),
 )
 
+// Retourne la configuration du référentiel administré demandé. Dépendances utilisées : aucune dépendance importée directe.
 /** Retourne la définition unique d'un référentiel à partir de son segment d'URL. */
 export function getAdminResource(slug) {
   return adminResourcesBySlug.get(slug) ?? null
 }
 
+// Retourne le libellé du référentiel administré demandé. Dépendances utilisées : aucune dépendance importée directe.
 /** Produit le libellé d'un référentiel sans dupliquer les titres dans les vues. */
 export function getAdminResourceLabel(slug, fallback = 'Référentiel') {
   return getAdminResource(slug)?.label ?? fallback

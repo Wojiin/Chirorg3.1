@@ -47,7 +47,9 @@ const {
       title="Détail du programme"
       description="Consultez les chirurgies et modifiez leur ordre de passage."
     >
+      <!-- Contrôle l'affichage conditionnel de la page consacrée au programme opératoire. -->
       <template #action>
+        <!-- Aligne les informations et les commandes de la page consacrée au programme opératoire. -->
         <div class="flex flex-wrap gap-3">
           <RouterLink
             :to="{ name: 'programme' }"
@@ -72,26 +74,31 @@ const {
     />
     <ErrorMessage v-else-if="error" :message="error" />
     <template v-else-if="programme">
+      <!-- Regroupe les champs et la soumission de la page consacrée au programme opératoire. -->
       <form
         v-if="addSurgeryFormOpen"
         class="form-panel mb-6"
         novalidate
         @submit.prevent="submitSurgery"
       >
+        <!-- Regroupe les informations affichées par la page consacrée au programme opératoire. -->
         <div>
           <h2 class="section-title">Ajouter une chirurgie</h2>
           <p class="text-muted mt-2">
             Le nouvel élément sera ajouté à la fin du programme en cours.
           </p>
           <dl class="programme-summary-data">
+            <!-- Regroupe les informations affichées par la page consacrée au programme opératoire. -->
             <div>
               <dt>Date</dt>
               <dd>{{ programme.date }}</dd>
             </div>
+            <!-- Regroupe les informations affichées par la page consacrée au programme opératoire. -->
             <div>
               <dt>Salle</dt>
               <dd>{{ programme.salle }}</dd>
             </div>
+            <!-- Regroupe les informations affichées par la page consacrée au programme opératoire. -->
             <div>
               <dt>Chirurgien</dt>
               <dd>
@@ -99,6 +106,7 @@ const {
                 {{ programme.chirurgien.nom }}
               </dd>
             </div>
+            <!-- Regroupe les informations affichées par la page consacrée au programme opératoire. -->
             <div>
               <dt>Spécialité</dt>
               <dd>{{ speciality?.intitule ?? 'Chargement…' }}</dd>
@@ -123,6 +131,7 @@ const {
           required
         />
 
+        <!-- Regroupe les informations affichées par la page consacrée au programme opératoire. -->
         <div class="form-actions">
           <BaseButton
             type="button"

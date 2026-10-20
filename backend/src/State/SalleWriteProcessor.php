@@ -13,6 +13,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 /** @implements ProcessorInterface<object, mixed> */
 final readonly class SalleWriteProcessor implements ProcessorInterface
 {
+    // Injecte les services nécessaires au traitement de la salle opératoire. Dépendances utilisées : ChirurgiePlanifieeRepository, EntityManagerInterface, ProcessorInterface.
     /** @param ProcessorInterface<object, mixed> $persistProcessor */
     public function __construct(
         #[Autowire(service: 'api_platform.doctrine.orm.state.persist_processor')]
@@ -22,6 +23,7 @@ final readonly class SalleWriteProcessor implements ProcessorInterface
     ) {
     }
 
+    // Applique l'opération d'écriture demandée pour la salle opératoire. Dépendances utilisées : ChirurgiePlanifieeRepository, EntityManagerInterface, ErrorMessage, Operation, ProcessorInterface.
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): mixed
     {
         if (!$data instanceof Salle) {

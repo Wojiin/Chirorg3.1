@@ -17,6 +17,7 @@ use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
  */
 final readonly class SpecialiteWriteProcessor implements ProcessorInterface
 {
+    // Injecte les services nécessaires au traitement de la spécialité. Dépendances utilisées : EntityManagerInterface, ProcessorInterface.
     /** @param ProcessorInterface<object, mixed> $persistProcessor */
     public function __construct(
         #[Autowire(service: 'api_platform.doctrine.orm.state.persist_processor')]
@@ -25,6 +26,7 @@ final readonly class SpecialiteWriteProcessor implements ProcessorInterface
     ) {
     }
 
+    // Applique l'opération d'écriture demandée pour la spécialité. Dépendances utilisées : ConflictHttpException, EntityManagerInterface, ErrorMessage, Operation, ProcessorInterface, Specialite.
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): mixed
     {
         if (!$data instanceof Specialite) {

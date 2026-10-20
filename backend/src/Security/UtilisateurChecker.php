@@ -11,6 +11,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 final class UtilisateurChecker implements UserCheckerInterface
 {
+    // Refuse la connexion lorsque le compte utilisateur est désactivé. Dépendances utilisées : DisabledException, ErrorMessage, UserInterface.
     public function checkPreAuth(UserInterface $user): void
     {
         if ($user instanceof Utilisateur && !$user->isActif()) {
@@ -18,6 +19,7 @@ final class UtilisateurChecker implements UserCheckerInterface
         }
     }
 
+    // Conserve le point d'extension exécuté après l'authentification. Dépendances utilisées : TokenInterface, UserInterface.
     public function checkPostAuth(UserInterface $user, ?TokenInterface $token = null): void
     {
     }

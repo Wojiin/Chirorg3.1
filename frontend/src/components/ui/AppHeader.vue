@@ -8,10 +8,13 @@ const { isDark, toggleTheme } = useTheme()
 </script>
 
 <template>
+  <!-- Regroupe le titre et les actions de l'en-tête de l'application. -->
   <header class="app-header">
+    <!-- Aligne les informations et les commandes de l'en-tête de l'application. -->
     <div
       class="flex h-full items-center justify-between gap-4 px-5 sm:px-7 lg:px-10"
     >
+      <!-- Regroupe les informations affichées par l'en-tête de l'application. -->
       <div class="min-w-0">
         <p
           class="truncate text-xs font-semibold uppercase tracking-[0.18em] text-chirorg-700 lg:hidden dark:text-chirorg-300"
@@ -24,7 +27,9 @@ const { isDark, toggleTheme } = useTheme()
           {{ title }}
         </h1>
       </div>
+      <!-- Aligne les informations et les commandes de l'en-tête de l'application. -->
       <div class="flex items-center gap-3">
+        <!-- Regroupe les informations affichées par l'en-tête de l'application. -->
         <div class="hidden text-right sm:block">
           <p class="text-sm font-medium text-gray-900 dark:text-white">
             {{ displayName }}

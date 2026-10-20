@@ -13,6 +13,7 @@ use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 
 final class ReferenceDeletionGuard
 {
+    // Refuse la suppression d'un référentiel encore utilisé. Dépendances utilisées : ConflictHttpException, ErrorMessage.
     public function assertCanDelete(object $resource): void
     {
         $isUsed = match (true) {
@@ -35,6 +36,7 @@ final class ReferenceDeletionGuard
         }
     }
 
+    // Indique si la liste de matériel correspond à une chirurgie planifiée pour le même chirurgien et le même modèle de chirurgie. Dépendances utilisées : ListeMateriel.
     private function isListeUsed(ListeMateriel $liste): bool
     {
         $chirurgien = $liste->getChirurgien();

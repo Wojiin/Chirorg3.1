@@ -3,6 +3,7 @@ const PASSWORD_PATTERN = new RegExp(`^${PASSWORD_PATTERN_SOURCE}$`)
 export const PASSWORD_REQUIREMENTS =
   '12 caractères minimum, avec au moins une minuscule, une majuscule, un chiffre et un caractère spécial, sans espace.'
 
+// Contrôle l'ancien mot de passe, le nouveau mot de passe et sa confirmation. Dépendances utilisées : ERROR_MESSAGES.
 /** Retourne les erreurs par champ avant tout appel à l'API. */
 export function validatePasswordChange(form) {
   const errors = {}

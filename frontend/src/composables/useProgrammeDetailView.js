@@ -6,6 +6,7 @@ import { useReferenceStore } from '@/stores/references'
 import { ERROR_MESSAGES } from '@/config/errorMessages'
 import { notifySuccess } from '@/services/notifications'
 
+// Regroupe l'état réactif et les actions de la page consacrée au programme opératoire. Dépendances utilisées : ERROR_MESSAGES, computed, notifySuccess, programmeStore, ref, referenceStore, router, storeToRefs, useProgrammeStore, useReferenceStore, useRouter, watch.
 /** Orchestre le chargement et le réordonnancement du programme affiché. */
 export function useProgrammeDetailView(props) {
   const router = useRouter()
@@ -54,11 +55,13 @@ export function useProgrammeDetailView(props) {
     { immediate: true },
   )
 
+  // Réordonne les chirurgies au sein du programme opératoire. Dépendances utilisées : programmeStore.
   function reorder(chirurgieIds) {
     if (!programme.value) return false
     return programmeStore.reorderProgramme(programme.value, chirurgieIds)
   }
 
+  // Ouvre le formulaire d'ajout d'une chirurgie au programme opératoire. Dépendances utilisées : referenceStore.
   async function openAddSurgeryForm() {
     addSurgeryFormOpen.value = true
     addSurgeryError.value = ''
@@ -69,12 +72,14 @@ export function useProgrammeDetailView(props) {
     }
   }
 
+  // Ferme le formulaire sans ajouter de chirurgie. Dépendances utilisées : aucune dépendance importée directe.
   function cancelAddSurgery() {
     addSurgeryFormOpen.value = false
     chirurgieModeleId.value = ''
     addSurgeryError.value = ''
   }
 
+  // Ajoute la chirurgie validée au programme opératoire. Dépendances utilisées : ERROR_MESSAGES, notifySuccess, programmeStore.
   async function submitSurgery() {
     addSurgeryError.value = ''
     const modelId = Number(chirurgieModeleId.value)
@@ -105,14 +110,17 @@ export function useProgrammeDetailView(props) {
     return true
   }
 
+  // Ouvre la confirmation de suppression d'une chirurgie. Dépendances utilisées : aucune dépendance importée directe.
   function requestSurgeryRemoval(chirurgie) {
     if (!chirurgie.valide) pendingSurgeryRemoval.value = chirurgie
   }
 
+  // Ferme la confirmation sans supprimer la chirurgie. Dépendances utilisées : aucune dépendance importée directe.
   function cancelSurgeryRemoval() {
     pendingSurgeryRemoval.value = null
   }
 
+  // Supprime la chirurgie puis recharge le programme opératoire. Dépendances utilisées : programmeStore, router.
   async function confirmSurgeryRemoval() {
     const chirurgie = pendingSurgeryRemoval.value
     if (!programme.value || !chirurgie) return false

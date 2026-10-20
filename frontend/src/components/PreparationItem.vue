@@ -8,6 +8,7 @@ defineEmits(['set-state'])
 </script>
 
 <template>
+  <!-- Présente la préparation d'un matériel comme une unité autonome. -->
   <article
     class="preparation-item"
     :class="

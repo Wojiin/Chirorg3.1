@@ -38,6 +38,7 @@ const page = defineModel('page', { type: Number, required: true })
       >
         Précédent
       </PaginationPrev>
+      <!-- Contrôle l'affichage conditionnel de la pagination. -->
       <template v-for="(item, index) in items" :key="index">
         <PaginationListItem
           v-if="item.type === 'page'"

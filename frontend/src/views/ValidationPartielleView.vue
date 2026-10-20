@@ -40,6 +40,7 @@ const {
       </p>
 
       <SurgeryOverview :surgery="surgery" status="Validation partielle">
+        <!-- Place l'action de retour dans le résumé de la chirurgie en validation partielle. -->
         <template #action>
           <BaseButton variant="secondary" @click="goBack">Retour</BaseButton>
         </template>
@@ -47,6 +48,7 @@ const {
 
       <ErrorMessage v-if="error" :message="error" />
 
+      <!-- Regroupe les matériels encore absents qui empêchent la validation définitive de la chirurgie. -->
       <section aria-labelledby="absent-materials-title">
         <h2 id="absent-materials-title" class="section-title">
           Matériel absent
@@ -55,6 +57,7 @@ const {
           Cliquez sur un matériel dès qu’il est disponible pour le passer à «
           Prêt ».
         </p>
+        <!-- Permet de déclarer prêt chaque matériel initialement signalé comme absent. -->
         <ul class="absent-material-list">
           <li v-for="item in absentMaterials" :key="item.id">
             <button

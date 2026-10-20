@@ -25,6 +25,7 @@ export const useAdminStore = defineStore('admin', {
   },
 
   actions: {
+    // Charge entrées des référentiels administrés. Dépendances utilisées : ERROR_MESSAGES, adminApi, getApiErrorMessage.
     /** Charge la collection du référentiel demandé et remplace les résultats précédents. */
     async loadItems(resource, params = {}) {
       this.resource = resource
@@ -59,7 +60,8 @@ export const useAdminStore = defineStore('admin', {
       }
     },
 
-    /** Charge un élément à modifier tout en réinitialisant l'élément courant. */
+    // Charge entrée des référentiels administrés. Dépendances utilisées : ERROR_MESSAGES, adminApi, getApiErrorMessage.
+    /** Charge le référentiel administratif à modifier et réinitialise la sélection précédente. */
     async loadItem(resource, id) {
       this.resource = resource
       this.current = null
@@ -81,7 +83,8 @@ export const useAdminStore = defineStore('admin', {
       }
     },
 
-    /** Crée ou met à jour un élément selon la présence de son identifiant. */
+    // Enregistre entrée des référentiels administrés. Dépendances utilisées : ERROR_MESSAGES, adminApi, getApiErrorMessage.
+    /** Crée ou met à jour une salle, une spécialité, un chirurgien, un matériel, une chirurgie modèle, une liste de matériel ou un utilisateur. */
     async saveItem(resource, id, payload) {
       this.saving = true
       this.error = ''
@@ -100,7 +103,8 @@ export const useAdminStore = defineStore('admin', {
       }
     },
 
-    /** Supprime un élément puis retire immédiatement sa représentation de la liste locale. */
+    // Retire entrée des référentiels administrés. Dépendances utilisées : ERROR_MESSAGES, adminApi, getApiErrorMessage.
+    /** Supprime le référentiel administratif puis le retire immédiatement de la liste affichée. */
     async removeItem(resource, id) {
       this.deletingId = id
       this.error = ''

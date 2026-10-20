@@ -8,10 +8,12 @@ use App\Entity\ChirurgiePlanifiee;
 
 final readonly class ProgrammeOperatoireFactory
 {
+    // Injecte les services nécessaires au traitement du programme opératoire. Dépendances utilisées : ChirurgieReadModelFactory, PreparationProgressCalculator.
     public function __construct(private ChirurgieReadModelFactory $chirurgieFactory, private PreparationProgressCalculator $progressCalculator)
     {
     }
 
+    // Crée le programme opératoire à partir des valeurs du formulaire. Dépendances utilisées : ChirurgieReadModelFactory, ProgrammeOperatoire.
     /** @param list<ChirurgiePlanifiee> $chirurgies */
     public function create(array $chirurgies): ?ProgrammeOperatoire
     {
@@ -32,6 +34,7 @@ final readonly class ProgrammeOperatoireFactory
         );
     }
 
+    // Construit les résumés des programmes opératoires. Dépendances utilisées : PreparationProgressCalculator, ProgrammeOperatoireResume.
     /**
      * @param list<ChirurgiePlanifiee> $chirurgies
      *

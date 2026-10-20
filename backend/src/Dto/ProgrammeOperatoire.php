@@ -29,6 +29,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 ])]
 final readonly class ProgrammeOperatoire
 {
+    // Initialise le DTO ProgrammeOperatoire avec les valeurs décrivant le programme opératoire. Dépendances utilisées : aucune dépendance de service directe.
     /**
      * @param array{id: int, prenom: string, nom: string} $chirurgien
      * @param list<array<string, mixed>>                  $chirurgies

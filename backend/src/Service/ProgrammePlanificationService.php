@@ -16,10 +16,12 @@ use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
 final readonly class ProgrammePlanificationService
 {
+    // Injecte les services nécessaires au traitement du programme opératoire. Dépendances utilisées : ChirurgieAuditTrail, EntityManagerInterface, PreparationMaterielInitializer, ProgrammeOperatoireService, ProgrammeOrderAllocator.
     public function __construct(private ProgrammeOrderAllocator $orderAllocator, private PreparationMaterielInitializer $initializer, private ProgrammeOperatoireService $programmes, private ChirurgieAuditTrail $auditTrail, private EntityManagerInterface $entityManager)
     {
     }
 
+    // Crée les chirurgies planifiées et retourne le programme opératoire mis à jour. Dépendances utilisées : BadRequestHttpException, ChirurgieAuditTrail, ChirurgieModele, ChirurgiePlanifiee, Chirurgien, EntityManagerInterface, ErrorMessage, NotFoundHttpException, PreparationMaterielInitializer, ProgrammeOperatoireService, ProgrammeOrderAllocator, ProgrammePlanificationInput, ProgrammePlanificationOutput, Salle, UnprocessableEntityHttpException.
     public function plan(ProgrammePlanificationInput $input): ProgrammePlanificationOutput
     {
         if (null === $input->dateProgrammee || null === $input->salle || null === $input->chirurgienId) {

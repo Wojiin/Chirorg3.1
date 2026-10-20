@@ -7,6 +7,7 @@ import { useAuthStore } from '@/stores/auth'
 import { notifyError, notifySuccess } from '@/services/notifications'
 import { PASSWORD_REQUIREMENTS, validatePasswordChange } from '@/utils/password'
 
+// Regroupe l'état réactif et les actions de la page consacrée à la session de l'utilisateur. Dépendances utilisées : ERROR_MESSAGES, PASSWORD_REQUIREMENTS, accountApi, authStore, getApiErrorMessage, notifyError, notifySuccess, reactive, ref, storeToRefs, useAuthStore, validatePasswordChange.
 /** Orchestre l'affichage du compte et le changement de mot de passe. */
 export function useAccountView() {
   const authStore = useAuthStore()
@@ -22,11 +23,13 @@ export function useAccountView() {
   const saving = ref(false)
   const confirmationOpen = ref(false)
 
+  // Remplace les erreurs affichées dans le formulaire de mot de passe. Dépendances utilisées : aucune dépendance importée directe.
   function replaceErrors(errors) {
     for (const key of Object.keys(fieldErrors)) delete fieldErrors[key]
     Object.assign(fieldErrors, errors)
   }
 
+  // Valide le formulaire de changement de mot de passe. Dépendances utilisées : validatePasswordChange.
   function submitPassword() {
     apiError.value = ''
     success.value = ''
@@ -35,10 +38,12 @@ export function useAccountView() {
     confirmationOpen.value = true
   }
 
+  // Ferme la confirmation sans modifier le mot de passe. Dépendances utilisées : aucune dépendance importée directe.
   function cancelConfirmation() {
     confirmationOpen.value = false
   }
 
+  // Enregistre le nouveau mot de passe puis renouvelle la session. Dépendances utilisées : ERROR_MESSAGES, accountApi, authStore, getApiErrorMessage, notifyError, notifySuccess.
   async function confirmPasswordChange() {
     confirmationOpen.value = false
 

@@ -90,6 +90,7 @@ class ChirurgieModele
     #[ORM\OneToMany(targetEntity: ChirurgiePlanifiee::class, mappedBy: 'chirurgieModele')]
     private Collection $chirurgiesPlanifiees;
 
+    // Initialise le modèle de chirurgie avec ses fiches techniques, ses listes de matériel et ses chirurgies planifiées. Dépendances utilisées : ArrayCollection, Collection.
     public function __construct()
     {
         $this->fichesTechniques = new ArrayCollection();
@@ -97,16 +98,19 @@ class ChirurgieModele
         $this->chirurgiesPlanifiees = new ArrayCollection();
     }
 
+    // Retourne l'identifiant de la chirurgie planifiée. Dépendances utilisées : aucune dépendance de service directe.
     public function getId(): ?int
     {
         return $this->id;
     }
 
+    // Retourne l'intitulé de la chirurgie planifiée. Dépendances utilisées : aucune dépendance de service directe.
     public function getIntitule(): ?string
     {
         return $this->intitule;
     }
 
+    // Met à jour l'intitulé de la chirurgie planifiée. Dépendances utilisées : aucune dépendance de service directe.
     public function setIntitule(string $intitule): static
     {
         $this->intitule = trim($intitule);
@@ -114,11 +118,13 @@ class ChirurgieModele
         return $this;
     }
 
+    // Retourne la spécialité de la chirurgie planifiée. Dépendances utilisées : Specialite.
     public function getSpecialite(): ?Specialite
     {
         return $this->specialite;
     }
 
+    // Met à jour la spécialité de la chirurgie planifiée. Dépendances utilisées : Specialite.
     public function setSpecialite(?Specialite $specialite): static
     {
         $this->specialite = $specialite;
@@ -126,6 +132,7 @@ class ChirurgieModele
         return $this;
     }
 
+    // Retourne les fiches techniques de la chirurgie planifiée. Dépendances utilisées : Collection.
     /**
      * @return Collection<int, FicheTechnique>
      */
@@ -134,6 +141,7 @@ class ChirurgieModele
         return $this->fichesTechniques;
     }
 
+    // Ajoute la fiche technique à la chirurgie planifiée. Dépendances utilisées : Collection, FicheTechnique.
     public function addFicheTechnique(FicheTechnique $ficheTechnique): static
     {
         if (!$this->fichesTechniques->contains($ficheTechnique)) {
@@ -144,10 +152,11 @@ class ChirurgieModele
         return $this;
     }
 
+    // Retire la fiche technique de la chirurgie planifiée. Dépendances utilisées : Collection, FicheTechnique.
     public function removeFicheTechnique(FicheTechnique $ficheTechnique): static
     {
         if ($this->fichesTechniques->removeElement($ficheTechnique)) {
-            // set the owning side to null (unless already changed)
+            // Détache la fiche technique du modèle de chirurgie si elle pointe encore vers celui-ci.
             if ($ficheTechnique->getChirurgieModele() === $this) {
                 $ficheTechnique->setChirurgieModele(null);
             }
@@ -156,6 +165,7 @@ class ChirurgieModele
         return $this;
     }
 
+    // Retourne les listes de matériel de la chirurgie planifiée. Dépendances utilisées : Collection.
     /**
      * @return Collection<int, ListeMateriel>
      */
@@ -164,6 +174,7 @@ class ChirurgieModele
         return $this->listesMateriel;
     }
 
+    // Ajoute la liste de matériel à la chirurgie planifiée. Dépendances utilisées : Collection, ListeMateriel.
     public function addListeMateriel(ListeMateriel $listeMateriel): static
     {
         if (!$this->listesMateriel->contains($listeMateriel)) {
@@ -174,10 +185,11 @@ class ChirurgieModele
         return $this;
     }
 
+    // Retire la liste de matériel de la chirurgie planifiée. Dépendances utilisées : Collection, ListeMateriel.
     public function removeListeMateriel(ListeMateriel $listeMateriel): static
     {
         if ($this->listesMateriel->removeElement($listeMateriel)) {
-            // set the owning side to null (unless already changed)
+            // Détache la liste de matériel du modèle de chirurgie si elle pointe encore vers celui-ci.
             if ($listeMateriel->getChirurgieModele() === $this) {
                 $listeMateriel->setChirurgieModele(null);
             }
@@ -186,12 +198,14 @@ class ChirurgieModele
         return $this;
     }
 
+    // Retourne les chirurgies planifiées de la chirurgie planifiée. Dépendances utilisées : Collection.
     /** @return Collection<int, ChirurgiePlanifiee> */
     public function getChirurgiesPlanifiees(): Collection
     {
         return $this->chirurgiesPlanifiees;
     }
 
+    // Ajoute la chirurgie planifiée à la chirurgie planifiée. Dépendances utilisées : ChirurgiePlanifiee, Collection.
     public function addChirurgiePlanifiee(ChirurgiePlanifiee $chirurgie): static
     {
         if (!$this->chirurgiesPlanifiees->contains($chirurgie)) {
@@ -202,6 +216,7 @@ class ChirurgieModele
         return $this;
     }
 
+    // Retire la chirurgie planifiée de la chirurgie planifiée. Dépendances utilisées : ChirurgiePlanifiee, Collection.
     public function removeChirurgiePlanifiee(ChirurgiePlanifiee $chirurgie): static
     {
         $this->chirurgiesPlanifiees->removeElement($chirurgie);

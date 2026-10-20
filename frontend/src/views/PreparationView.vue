@@ -36,8 +36,11 @@ const {
       label="Chargement de la checklist…"
     />
     <template v-else-if="surgery">
+      <!-- Délimite la section consacrée à la page consacrée à la préparation du matériel. -->
       <section class="preparation-overview">
+        <!-- Regroupe les informations affichées par la page consacrée à la préparation du matériel. -->
         <div>
+          <!-- Aligne les informations et les commandes de la page consacrée à la préparation du matériel. -->
           <div class="flex flex-wrap items-center gap-3">
             <StatusBadge
               :status="
@@ -65,6 +68,7 @@ const {
             Dr {{ surgery.chirurgien.prenom }} {{ surgery.chirurgien.nom }}
           </p>
         </div>
+        <!-- Regroupe les informations affichées par la page consacrée à la préparation du matériel. -->
         <div class="preparation-progress">
           <ProgressBar
             :total="progress.total"
@@ -76,7 +80,9 @@ const {
 
       <ErrorMessage v-if="error" :message="error" />
 
+      <!-- Regroupe les informations affichées par la page consacrée à la préparation du matériel. -->
       <div class="preparation-layout">
+        <!-- Délimite la section consacrée à la page consacrée à la préparation du matériel. -->
         <section aria-labelledby="materials-title">
           <h2 id="materials-title" class="section-title">
             Matériel à préparer
@@ -84,6 +90,7 @@ const {
           <p class="page-description">
             Pour chaque élément, indiquez s’il est prêt ou absent.
           </p>
+          <!-- Affiche la liste associée à la page consacrée à la préparation du matériel. -->
           <ul class="mt-4 space-y-3">
             <li v-for="item in preparation.preparations" :key="item.id">
               <PreparationItem
@@ -95,6 +102,7 @@ const {
           </ul>
         </section>
 
+        <!-- Affiche les informations complémentaires de la page consacrée à la préparation du matériel. -->
         <aside class="validation-panel">
           <h2 class="item-title">Validation</h2>
           <p class="text-muted mt-2 leading-6">
@@ -108,6 +116,7 @@ const {
           <p v-else-if="!isResolved" class="feedback-error-soft mt-4">
             {{ ERROR_MESSAGES.preparationUnresolved }}
           </p>
+          <!-- Aligne les informations et les commandes de la page consacrée à la préparation du matériel. -->
           <div class="mt-5 flex flex-col gap-3">
             <BaseButton
               class="w-full"

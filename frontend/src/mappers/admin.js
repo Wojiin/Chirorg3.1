@@ -1,3 +1,4 @@
+// Normalise initiale valeur reçu de l'API pour les référentiels administrés. Dépendances utilisées : aucune dépendance importée directe.
 /** Transforme une relation API en identifiant sélectionnable par le formulaire. */
 function normalizeInitialValue(value) {
   if (value && typeof value === 'object') {
@@ -10,7 +11,8 @@ function normalizeInitialValue(value) {
   return value ?? ''
 }
 
-/** Crée l'état éditable d'un formulaire depuis son schéma et une éventuelle ressource existante. */
+// Construit administration formulaire pour les référentiels administrés. Dépendances utilisées : aucune dépendance importée directe.
+/** Crée les valeurs éditables d'un formulaire de salle, spécialité, chirurgien, matériel, chirurgie modèle, liste de matériel ou utilisateur. */
 export function createAdminForm(fields, existing = null) {
   return Object.fromEntries(
     fields.map((field) => {
@@ -33,6 +35,7 @@ export function createAdminForm(fields, existing = null) {
   )
 }
 
+// Construit administration payload pour les référentiels administrés. Dépendances utilisées : aucune dépendance importée directe.
 /** Convertit les valeurs du formulaire en payload API Platform. */
 export function buildAdminPayload(form) {
   const payload = { ...form }

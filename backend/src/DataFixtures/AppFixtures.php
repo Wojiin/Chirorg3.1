@@ -24,10 +24,12 @@ final class AppFixtures extends Fixture
     public const USER_EMAIL = 'user@chirorg.test';
     public const USER_PASSWORD = 'UserFixture-2026!';
 
+    // Injecte le service qui chiffre les mots de passe des utilisateurs de démonstration. Dépendances utilisées : UserPasswordHasherInterface.
     public function __construct(private readonly UserPasswordHasherInterface $passwordHasher)
     {
     }
 
+    // Enregistre le jeu de démonstration composé des utilisateurs, salles, spécialités, chirurgiens, chirurgies, listes et préparations de matériel. Dépendances utilisées : ChirurgieModele, ListeMateriel, Materiel, ObjectManager, PreparationMateriel, Salle, Specialite.
     public function load(ObjectManager $manager): void
     {
         $admin = $this->createUtilisateur(self::ADMIN_EMAIL, ['ROLE_ADMIN'], self::ADMIN_PASSWORD);
@@ -134,6 +136,7 @@ final class AppFixtures extends Fixture
         $manager->flush();
     }
 
+    // Crée un utilisateur de démonstration avec ses rôles et son mot de passe chiffré. Dépendances utilisées : UserPasswordHasherInterface, Utilisateur.
     /** @param list<string> $roles */
     private function createUtilisateur(string $email, array $roles, string $plainPassword): Utilisateur
     {
@@ -142,6 +145,7 @@ final class AppFixtures extends Fixture
         return $utilisateur->setPassword($this->passwordHasher->hashPassword($utilisateur, $plainPassword));
     }
 
+    // Crée les chirurgiens de démonstration et les rattache à leur spécialité. Dépendances utilisées : Chirurgien, Specialite.
     /** @param list<Specialite> $specialites
      *
      * @return list<Chirurgien>
@@ -166,6 +170,7 @@ final class AppFixtures extends Fixture
         );
     }
 
+    // Planifie une chirurgie de démonstration à une date, dans une salle et à un ordre donnés. Dépendances utilisées : ChirurgieModele, ChirurgiePlanifiee, Chirurgien.
     private function createChirurgie(\DateTimeImmutable $date, string $salle, int $ordre, Chirurgien $chirurgien, ChirurgieModele $modele): ChirurgiePlanifiee
     {
         $now = new \DateTimeImmutable();
@@ -182,11 +187,13 @@ final class AppFixtures extends Fixture
             ->setModifiePar(self::ADMIN_EMAIL);
     }
 
+    // Marque un matériel comme prêt et conserve l'utilisateur ainsi que la date de ce contrôle. Dépendances utilisées : PreparationMateriel, Utilisateur.
     private function markReady(PreparationMateriel $preparation, Utilisateur $utilisateur): void
     {
         $preparation->setCoche(true)->setAbsent(false)->setCocheLe(new \DateTimeImmutable())->setCochePar($utilisateur);
     }
 
+    // Définit les modèles de chirurgie utilisés par les fixtures. Dépendances utilisées : aucune dépendance de service directe.
     /** @return list<array{string, int}> */
     private function chirurgieModeleData(): array
     {
@@ -199,6 +206,7 @@ final class AppFixtures extends Fixture
         ];
     }
 
+    // Crée les fiches techniques textuelles et illustrées associées à un modèle de chirurgie. Dépendances utilisées : ChirurgieModele, FicheTechnique.
     /** @return list<FicheTechnique> */
     private function createFichesTechniques(ChirurgieModele $modele, string $intitule): array
     {
@@ -219,6 +227,7 @@ final class AppFixtures extends Fixture
         );
     }
 
+    // Définit les matériels chirurgicaux utilisés par les fixtures. Dépendances utilisées : aucune dépendance de service directe.
     /** @return list<array{string, string, string}> */
     private function materielData(): array
     {
@@ -244,6 +253,7 @@ final class AppFixtures extends Fixture
         );
     }
 
+    // Sélectionne les matériels associés au chirurgien et au modèle de chirurgie. Dépendances utilisées : aucune dépendance de service directe.
     /** @param list<Materiel> $materiels
      *
      * @return list<Materiel>

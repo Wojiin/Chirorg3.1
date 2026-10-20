@@ -38,6 +38,7 @@ export const useProgrammeStore = defineStore('programme', {
           (!state.filters.date || programme.date === state.filters.date) &&
           (!state.filters.room || programme.salle === state.filters.room),
       ),
+    // Retourne les chirurgies correspondant aux filtres du programme opératoire. Dépendances utilisées : aucune dépendance importée directe.
     filteredChirurgies() {
       return this.filteredProgrammes.flatMap(
         (programme) => programme.chirurgies,
@@ -48,16 +49,19 @@ export const useProgrammeStore = defineStore('programme', {
   },
 
   actions: {
+    // Met à jour les filtres du programme opératoire. Dépendances utilisées : aucune dépendance importée directe.
     /** Remplace les filtres de liste de manière atomique. */
     setFilters({ date = this.filters.date, room = this.filters.room } = {}) {
       this.filters = { date, room }
     },
 
+    // Réinitialise les filtres du programme opératoire. Dépendances utilisées : aucune dépendance importée directe.
     /** Réinitialise les filtres facultatifs de programme. */
     clearFilters() {
       this.filters = { date: '', room: '' }
     },
 
+    // Ajoute ou remplace un programme opératoire dans le store Pinia. Dépendances utilisées : aucune dépendance importée directe.
     /** Insère ou remplace un programme dans le cache local à partir de la réponse API. */
     upsertProgramme(data) {
       const programme = normalizeProgramme(data)
@@ -74,6 +78,7 @@ export const useProgrammeStore = defineStore('programme', {
       return programme
     },
 
+    // Charge la liste paginée des programmes opératoires. Dépendances utilisées : ERROR_MESSAGES, getApiErrorMessage, programmeApi.
     /** Charge la liste filtrée et expose toute erreur métier à l'interface. */
     async fetchProgrammes(filters = this.filters, page = this.page) {
       this.setFilters(filters)
@@ -112,6 +117,7 @@ export const useProgrammeStore = defineStore('programme', {
       }
     },
 
+    // Charge le détail d'un programme opératoire. Dépendances utilisées : ERROR_MESSAGES, getApiErrorMessage, programmeApi.
     /** Charge le détail d'un programme sélectionné pour sa consultation ou son réordonnancement. */
     async loadProgramme({ date, salle, chirurgien }) {
       const requestId = ++this.detailRequestId
@@ -142,6 +148,7 @@ export const useProgrammeStore = defineStore('programme', {
       }
     },
 
+    // Planifie les chirurgies et mémorise le programme opératoire obtenu. Dépendances utilisées : ERROR_MESSAGES, getApiErrorMessage, programmeApi.
     /** Planifie un programme multi-chirurgies, met à jour le cache puis cible ses filtres. */
     async planProgramme(payload) {
       this.planning = true
@@ -163,6 +170,7 @@ export const useProgrammeStore = defineStore('programme', {
       }
     },
 
+    // Ajoute une chirurgie au programme opératoire chargé. Dépendances utilisées : ERROR_MESSAGES, getApiErrorMessage, programmeApi.
     /** Ajoute une chirurgie à un programme existant et remplace immédiatement son détail local. */
     async addSurgeryToProgramme(programme, chirurgieModeleId) {
       this.planning = true
@@ -186,6 +194,7 @@ export const useProgrammeStore = defineStore('programme', {
       }
     },
 
+    // Enregistre le nouvel ordre des chirurgies du programme opératoire. Dépendances utilisées : ERROR_MESSAGES, getApiErrorMessage, programmeApi.
     /** Applique un ordre optimiste, le persiste côté API et le restaure en cas d'échec. */
     async reorderProgramme(programme, chirurgieIds) {
       const previousChirurgies = programme.chirurgies.map((chirurgie) => ({
@@ -222,6 +231,7 @@ export const useProgrammeStore = defineStore('programme', {
       }
     },
 
+    // Supprime une chirurgie non validée du programme opératoire. Dépendances utilisées : ERROR_MESSAGES, getApiErrorMessage, programmeApi.
     /** Supprime une chirurgie non validée puis synchronise les programmes déjà chargés. */
     async deleteSurgery(programme, chirurgieId) {
       this.deletingSurgeryId = chirurgieId

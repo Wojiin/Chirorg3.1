@@ -28,6 +28,7 @@ export const usePreparationStore = defineStore('preparation', {
   },
 
   actions: {
+    // Recalcule la progression de préparation du matériel. Dépendances utilisées : aucune dépendance importée directe.
     /** Recalcule localement les compteurs utilisés par la barre de progression. */
     updateProgress() {
       if (!this.preparation) return
@@ -49,6 +50,7 @@ export const usePreparationStore = defineStore('preparation', {
       }
     },
 
+    // Charge la préparation du matériel de la chirurgie. Dépendances utilisées : ERROR_MESSAGES, getApiErrorMessage, normalizePreparation, preparationApi.
     /** Charge la checklist fraîche d'une chirurgie et réinitialise les vues incompatibles. */
     async loadPreparation(id) {
       const requestId = ++this.loadRequestId
@@ -73,6 +75,7 @@ export const usePreparationStore = defineStore('preparation', {
       }
     },
 
+    // Enregistre l'état coché ou absent du matériel préparé. Dépendances utilisées : ERROR_MESSAGES, getApiErrorMessage, preparationApi.
     /** Bascule l'état d'un matériel de façon optimiste puis restaure l'ancien état si l'API échoue. */
     async setMaterialState(item, state) {
       const previous = { coche: item.coche, absent: item.absent }
@@ -108,6 +111,7 @@ export const usePreparationStore = defineStore('preparation', {
       }
     },
 
+    // Valide la chirurgie lorsque la préparation du matériel est complète. Dépendances utilisées : ERROR_MESSAGES, getApiErrorMessage, preparationApi.
     /** Valide une chirurgie uniquement lorsque toutes ses lignes sont cochées. */
     async validateSurgery() {
       if (!this.isResolved || !this.preparation) return false
@@ -133,6 +137,7 @@ export const usePreparationStore = defineStore('preparation', {
       }
     },
 
+    // Charge la vue finale de la chirurgie validée. Dépendances utilisées : ERROR_MESSAGES, getApiErrorMessage, normalizeFinalView, preparationApi.
     /** Charge la vue finale et vide la checklist de travail devenue obsolète. */
     async loadFinalView(id) {
       const requestId = ++this.loadRequestId

@@ -8,7 +8,9 @@ defineProps({
 </script>
 
 <template>
+  <!-- Regroupe le titre et les actions de l'en-tête de page. -->
   <header class="page-heading">
+    <!-- Regroupe les informations affichées par l'en-tête de page. -->
     <div>
       <p class="page-eyebrow">{{ eyebrow }}</p>
       <p class="page-title">{{ title }}</p>

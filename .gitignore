@@ -22,3 +22,15 @@ secrets/
 /tests/load/results/
 /tests/security/reports/
 /.schemathesis/
+
+# Outils locaux de génération des maquettes et des preuves du dossier
+/figma/
+/scripts/build_demonstrative_project_docx.py
+/scripts/build_evidence_campaign_report.py
+/scripts/capture_final_application.mjs
+/scripts/complete_revised_dossier.py
+/scripts/export_dependency_licenses.py
+/scripts/integrate_evidence_docx.py
+/scripts/measure_response_volumes.mjs
+/scripts/run_accessibility_evidence.mjs
+/scripts/run_browser_security_evidence.mjs

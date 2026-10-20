@@ -11,10 +11,12 @@ use App\Repository\ChirurgiePlanifieeRepository;
 
 final readonly class ChirurgieReadModelFactory
 {
+    // Injecte les services nécessaires au traitement de la chirurgie planifiée. Dépendances utilisées : ChirurgiePlanifieeRepository, PreparationProgressCalculator.
     public function __construct(private PreparationProgressCalculator $progressCalculator, private ChirurgiePlanifieeRepository $repository)
     {
     }
 
+    // Construit le DTO de préparation du matériel de la chirurgie. Dépendances utilisées : ChirurgiePlanifiee, ChirurgiePlanifieeRepository, ChirurgiePreparation, PreparationProgressCalculator.
     public function createPreparation(ChirurgiePlanifiee $chirurgie): ChirurgiePreparation
     {
         $progress = $this->progressCalculator->calculate($chirurgie->getPreparationsMateriel());
@@ -22,6 +24,7 @@ final readonly class ChirurgieReadModelFactory
         return new ChirurgiePreparation($chirurgie->getId() ?? 0, $chirurgie->getDateProgrammee()?->format('Y-m-d') ?? '', $chirurgie->getSalle() ?? '', $chirurgie->getOrdre(), $this->repository->countProgrammeSurgeries($chirurgie), $chirurgie->isValide(), $this->progressCalculator->validationState($chirurgie->isValide(), $progress), $this->surgeonData($chirurgie), $this->modelData($chirurgie), $this->preparationRows($chirurgie), $progress);
     }
 
+    // Construit le DTO de la vue finale de la chirurgie validée. Dépendances utilisées : ChirurgiePlanifiee, ChirurgieVueFinale.
     public function createFinalView(ChirurgiePlanifiee $chirurgie): ChirurgieVueFinale
     {
         $user = $chirurgie->getValidePar();
@@ -29,6 +32,7 @@ final readonly class ChirurgieReadModelFactory
         return new ChirurgieVueFinale($chirurgie->getId() ?? 0, $chirurgie->getDateProgrammee()?->format('Y-m-d') ?? '', $chirurgie->getSalle() ?? '', $chirurgie->getOrdre(), $chirurgie->isValide(), $chirurgie->getValideLe()?->format(\DateTimeInterface::ATOM), null === $user ? null : ['id' => $user->getId(), 'email' => $user->getEmail()], $this->surgeonData($chirurgie), $this->modelData($chirurgie), $this->validatedMaterialRows($chirurgie), $this->technicalSheetRows($chirurgie));
     }
 
+    // Construit le résumé d'une chirurgie pour le programme opératoire. Dépendances utilisées : ChirurgiePlanifiee, PreparationProgressCalculator.
     /** @return array<string, mixed> */
     public function createProgrammeItem(ChirurgiePlanifiee $chirurgie): array
     {
@@ -38,6 +42,7 @@ final readonly class ChirurgieReadModelFactory
         return $data;
     }
 
+    // Construit l'identité du chirurgien affichée dans la chirurgie. Dépendances utilisées : ChirurgiePlanifiee.
     /** @return array{id: int, prenom: string, nom: string} */
     public function surgeonData(ChirurgiePlanifiee $chirurgie): array
     {
@@ -46,12 +51,14 @@ final readonly class ChirurgieReadModelFactory
         return ['id' => $surgeon?->getId() ?? 0, 'prenom' => $surgeon?->getPrenom() ?? '', 'nom' => $surgeon?->getNom() ?? ''];
     }
 
+    // Construit les informations du modèle de chirurgie. Dépendances utilisées : ChirurgiePlanifiee.
     /** @return array{id: int|null, intitule: string|null} */
     private function modelData(ChirurgiePlanifiee $chirurgie): array
     {
         return ['id' => $chirurgie->getChirurgieModele()?->getId(), 'intitule' => $chirurgie->getChirurgieModele()?->getIntitule()];
     }
 
+    // Construit les lignes de préparation du matériel. Dépendances utilisées : ChirurgiePlanifiee.
     /** @return list<array<string, mixed>> */
     private function preparationRows(ChirurgiePlanifiee $chirurgie): array
     {
@@ -62,6 +69,7 @@ final readonly class ChirurgieReadModelFactory
         }, $chirurgie->getPreparationsMateriel()->toArray()));
     }
 
+    // Construit la liste des matériels validés pour la vue finale. Dépendances utilisées : ChirurgiePlanifiee.
     /** @return list<array<string, mixed>> */
     private function validatedMaterialRows(ChirurgiePlanifiee $chirurgie): array
     {
@@ -76,6 +84,7 @@ final readonly class ChirurgieReadModelFactory
         return $rows;
     }
 
+    // Construit la liste des fiches techniques de la chirurgie. Dépendances utilisées : ChirurgiePlanifiee.
     /** @return list<array<string, mixed>> */
     private function technicalSheetRows(ChirurgiePlanifiee $chirurgie): array
     {
