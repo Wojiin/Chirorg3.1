@@ -1,3 +1,4 @@
+// Retourne utilisateur from accès jeton de la session de l'utilisateur. Dépendances utilisées : aucune dépendance importée directe.
 /**
  * Décode uniquement les données publiques du JWT déjà reçu du serveur.
  * La sécurité reste assurée par le backend, qui vérifie la signature à chaque appel.

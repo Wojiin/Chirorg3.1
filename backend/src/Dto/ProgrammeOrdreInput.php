@@ -7,6 +7,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 final readonly class ProgrammeOrdreInput
 {
+    // Initialise le DTO ProgrammeOrdreInput avec les valeurs décrivant le programme opératoire. Dépendances utilisées : aucune dépendance de service directe.
     /** @param list<int> $chirurgieIds */
     public function __construct(
         #[Assert\Count(min: 1, max: 100, minMessage: ErrorMessage::LIST_REQUIRES_ITEM, maxMessage: ErrorMessage::LIST_TOO_LONG)]

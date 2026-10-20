@@ -91,22 +91,26 @@ class Materiel
     #[ORM\OneToMany(targetEntity: PreparationMateriel::class, mappedBy: 'materiel')]
     private Collection $preparationsMateriel;
 
+    // Initialise l'entité Materiel représentant le matériel chirurgical. Dépendances utilisées : ArrayCollection, Collection.
     public function __construct()
     {
         $this->listesMateriel = new ArrayCollection();
         $this->preparationsMateriel = new ArrayCollection();
     }
 
+    // Retourne l'identifiant du matériel chirurgical. Dépendances utilisées : aucune dépendance de service directe.
     public function getId(): ?int
     {
         return $this->id;
     }
 
+    // Retourne l'intitulé du matériel chirurgical. Dépendances utilisées : aucune dépendance de service directe.
     public function getIntitule(): ?string
     {
         return $this->intitule;
     }
 
+    // Met à jour l'intitulé du matériel chirurgical. Dépendances utilisées : aucune dépendance de service directe.
     public function setIntitule(string $intitule): static
     {
         $this->intitule = trim($intitule);
@@ -114,11 +118,13 @@ class Materiel
         return $this;
     }
 
+    // Retourne l'adresse du matériel chirurgical. Dépendances utilisées : aucune dépendance de service directe.
     public function getAdresse(): ?string
     {
         return $this->adresse;
     }
 
+    // Met à jour l'adresse du matériel chirurgical. Dépendances utilisées : aucune dépendance de service directe.
     public function setAdresse(?string $adresse): static
     {
         $adresse = null === $adresse ? '' : trim($adresse);
@@ -127,11 +133,13 @@ class Materiel
         return $this;
     }
 
+    // Retourne le type de matériel du matériel chirurgical. Dépendances utilisées : aucune dépendance de service directe.
     public function getTypeMateriel(): ?string
     {
         return $this->typeMateriel;
     }
 
+    // Met à jour le type de matériel du matériel chirurgical. Dépendances utilisées : aucune dépendance de service directe.
     public function setTypeMateriel(?string $typeMateriel): static
     {
         $typeMateriel = null === $typeMateriel ? '' : trim($typeMateriel);
@@ -140,11 +148,13 @@ class Materiel
         return $this;
     }
 
+    // Retourne la spécialité du matériel chirurgical. Dépendances utilisées : Specialite.
     public function getSpecialite(): ?Specialite
     {
         return $this->specialite;
     }
 
+    // Met à jour la spécialité du matériel chirurgical. Dépendances utilisées : Specialite.
     public function setSpecialite(?Specialite $specialite): static
     {
         $this->specialite = $specialite;
@@ -152,6 +162,7 @@ class Materiel
         return $this;
     }
 
+    // Retourne les listes de matériel du matériel chirurgical. Dépendances utilisées : Collection.
     /**
      * @return Collection<int, ListeMateriel>
      */
@@ -160,6 +171,7 @@ class Materiel
         return $this->listesMateriel;
     }
 
+    // Ajoute la liste de matériel au matériel chirurgical. Dépendances utilisées : Collection, ListeMateriel.
     public function addListeMateriel(ListeMateriel $listeMateriel): static
     {
         if (!$this->listesMateriel->contains($listeMateriel)) {
@@ -170,6 +182,7 @@ class Materiel
         return $this;
     }
 
+    // Retire la liste de matériel du matériel chirurgical. Dépendances utilisées : Collection, ListeMateriel.
     public function removeListeMateriel(ListeMateriel $listeMateriel): static
     {
         if ($this->listesMateriel->removeElement($listeMateriel)) {
@@ -179,12 +192,14 @@ class Materiel
         return $this;
     }
 
+    // Retourne les préparations de matériel du matériel chirurgical. Dépendances utilisées : Collection.
     /** @return Collection<int, PreparationMateriel> */
     public function getPreparationsMateriel(): Collection
     {
         return $this->preparationsMateriel;
     }
 
+    // Ajoute la préparation du matériel au matériel chirurgical. Dépendances utilisées : Collection, PreparationMateriel.
     public function addPreparationMateriel(PreparationMateriel $preparation): static
     {
         if (!$this->preparationsMateriel->contains($preparation)) {
@@ -195,6 +210,7 @@ class Materiel
         return $this;
     }
 
+    // Retire la préparation du matériel du matériel chirurgical. Dépendances utilisées : Collection, PreparationMateriel.
     public function removePreparationMateriel(PreparationMateriel $preparation): static
     {
         $this->preparationsMateriel->removeElement($preparation);

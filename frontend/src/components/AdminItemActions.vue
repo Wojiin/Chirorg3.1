@@ -22,6 +22,7 @@ const deletionDisabled = computed(
 </script>
 
 <template>
+  <!-- Regroupe les informations affichées par les actions d'administration d'un référentiel. -->
   <div class="admin-item-actions" :class="{ 'justify-end': alignEnd }">
     <RouterLink
       :to="{

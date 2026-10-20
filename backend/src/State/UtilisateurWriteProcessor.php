@@ -20,10 +20,12 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 /** @implements ProcessorInterface<UtilisateurInput, Utilisateur> */
 final readonly class UtilisateurWriteProcessor implements ProcessorInterface
 {
+    // Injecte les services nécessaires au traitement de la session de l'utilisateur. Dépendances utilisées : AuthenticatedUserProvider, EntityManagerInterface, RefreshTokenRevoker, UserPasswordHasherInterface, UtilisateurRepository.
     public function __construct(private UtilisateurRepository $repository, private AuthenticatedUserProvider $authenticatedUser, private RefreshTokenRevoker $refreshTokenRevoker, private UserPasswordHasherInterface $passwordHasher, private EntityManagerInterface $entityManager)
     {
     }
 
+    // Applique l'opération d'écriture demandée pour la session de l'utilisateur. Dépendances utilisées : AuthenticatedUserProvider, BadRequestHttpException, ConflictHttpException, EntityManagerInterface, ErrorMessage, NotFoundHttpException, Operation, RefreshTokenRevoker, UserPasswordHasherInterface, Utilisateur, UtilisateurRepository.
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): Utilisateur
     {
         $creating = $operation instanceof Post;
@@ -73,6 +75,7 @@ final readonly class UtilisateurWriteProcessor implements ProcessorInterface
         return $utilisateur;
     }
 
+    // Normalise et déduplique les rôles de l'utilisateur. Dépendances utilisées : aucune dépendance de service directe.
     /**
      * @param array<string> $roles
      *

@@ -15,6 +15,7 @@ export const referencesByResource = {
   'listes-materiel': ['chirurgiens', 'chirurgie-modeles', 'materiels'],
 }
 
+// Transforme un référentiel métier en options de formulaire. Dépendances utilisées : aucune dépendance importée directe.
 /** Convertit un référentiel en options compatibles avec les champs select. */
 function optionsFrom(items, label) {
   return items
@@ -27,7 +28,8 @@ function optionsFrom(items, label) {
     )
 }
 
-/** Retourne le schéma de formulaire correspondant à une ressource administrative. */
+// Retourne les champs du formulaire du référentiel administré. Dépendances utilisées : aucune dépendance importée directe.
+/** Retourne les champs du formulaire correspondant au référentiel administratif demandé. */
 export function getAdminFormFields(resource, collections = {}) {
   const specialityOptions = optionsFrom(
     collections.specialites ?? [],

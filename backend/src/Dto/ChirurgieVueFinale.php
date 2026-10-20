@@ -4,6 +4,7 @@ namespace App\Dto;
 
 final readonly class ChirurgieVueFinale
 {
+    // Initialise le DTO ChirurgieVueFinale avec les valeurs décrivant la chirurgie planifiée. Dépendances utilisées : aucune dépendance de service directe.
     /**
      * @param array<string, mixed>|null  $validePar
      * @param array<string, mixed>       $chirurgien

@@ -23,6 +23,7 @@ const buttonVariant = computed(
     })[props.variant] ?? 'primary',
 )
 
+// Ferme la demande de confirmation tant qu'aucun enregistrement ou suppression n'est en cours. Dépendances utilisées : emit, props.
 function cancel() {
   if (!props.loading) emit('cancel')
 }
@@ -36,6 +37,7 @@ function cancel() {
     close-label="Annuler et fermer"
     @close="cancel"
   >
+    <!-- Contrôle l'affichage conditionnel de la demande de confirmation. -->
     <template #eyebrow>
       <p
         class="mb-1 text-xs font-bold uppercase tracking-wider"
@@ -44,8 +46,10 @@ function cancel() {
         Confirmation requise
       </p>
     </template>
+    <!-- Contrôle l'affichage conditionnel de la demande de confirmation. -->
     <template #title>{{ title }}</template>
 
+    <!-- Regroupe les informations affichées par la demande de confirmation. -->
     <div class="confirmation-content" :class="`confirmation-${variant}`">
       <span class="confirmation-icon" aria-hidden="true">
         <svg
@@ -92,6 +96,7 @@ function cancel() {
       </p>
     </div>
 
+    <!-- Contrôle l'affichage conditionnel de la demande de confirmation. -->
     <template #footer>
       <BaseButton variant="secondary" :disabled="loading" @click="cancel">
         {{ cancelLabel }}

@@ -3,7 +3,8 @@ import { unwrapPaginatedCollection } from '@/api/response'
 
 /** Porte les appels CRUD génériques des référentiels administratifs, sans état d'interface. */
 export const adminApi = {
-  /** Liste une ressource API et normalise les formats de collection API Platform. */
+  // Retourne une page du référentiel administré. Dépendances utilisées : apiClient, unwrapPaginatedCollection.
+  /** Liste les salles, spécialités, chirurgiens, matériels, chirurgies modèles, listes de matériel ou utilisateurs et normalise la collection API Platform. */
   async list(resource, params = {}) {
     const apiResource = resource === 'users' ? 'utilisateurs' : resource
     const { data } = await apiClient.get(`/${apiResource}`, {
@@ -12,6 +13,7 @@ export const adminApi = {
     })
     return unwrapPaginatedCollection(data)
   },
+  // Charge toutes les pages du référentiel administré. Dépendances utilisées : aucune dépendance importée directe.
   /** Charge toutes les pages d'un référentiel destiné à alimenter un sélecteur. */
   async listAll(resource, params = {}) {
     const itemsPerPage = 100
@@ -37,13 +39,15 @@ export const adminApi = {
 
     return items
   },
-  /** Charge une ressource administrative par son identifiant. */
+  // Retourne les référentiels administrés identifié par son identifiant. Dépendances utilisées : apiClient.
+  /** Charge un référentiel administratif par son identifiant. */
   async get(resource, id) {
     const apiResource = resource === 'users' ? 'utilisateurs' : resource
     const { data } = await apiClient.get(`/${apiResource}/${id}`)
     return data
   },
-  /** Crée une ressource administrative à partir d'un payload déjà normalisé. */
+  // Crée les référentiels administrés à partir des valeurs du formulaire. Dépendances utilisées : apiClient.
+  /** Crée un référentiel administratif à partir des données déjà normalisées par le formulaire. */
   async create(resource, payload) {
     const apiResource = resource === 'users' ? 'utilisateurs' : resource
     const { data } = await apiClient.post(`/${apiResource}`, payload, {
@@ -51,7 +55,8 @@ export const adminApi = {
     })
     return data
   },
-  /** Met à jour partiellement une ressource avec le média type API Platform adapté. */
+  // Met à jour les référentiels administrés à partir des valeurs du formulaire. Dépendances utilisées : apiClient.
+  /** Met à jour partiellement un référentiel administratif avec le type de contenu attendu par API Platform. */
   async update(resource, id, payload) {
     const apiResource = resource === 'users' ? 'utilisateurs' : resource
     const { data } = await apiClient.patch(`/${apiResource}/${id}`, payload, {
@@ -59,7 +64,8 @@ export const adminApi = {
     })
     return data
   },
-  /** Supprime une ressource ; les règles de dépendance restent appliquées par l'API. */
+  // Supprime les référentiels administrés après validation des règles métier. Dépendances utilisées : apiClient.
+  /** Supprime un référentiel administratif après application des règles liées aux chirurgies, programmes et matériels par l'API. */
   async remove(resource, id) {
     const apiResource = resource === 'users' ? 'utilisateurs' : resource
     await apiClient.delete(`/${apiResource}/${id}`)

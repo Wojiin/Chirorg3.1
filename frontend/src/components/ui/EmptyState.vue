@@ -10,9 +10,11 @@ defineProps({
 </script>
 
 <template>
+  <!-- Regroupe les informations affichées par l'état sans résultat. -->
   <div class="empty-state">
     <p class="item-title">{{ title }}</p>
     <p class="text-muted mx-auto mt-2 max-w-md">{{ message }}</p>
+    <!-- Regroupe les informations affichées par l'état sans résultat. -->
     <div v-if="$slots.default" class="mt-5"><slot /></div>
   </div>
 </template>

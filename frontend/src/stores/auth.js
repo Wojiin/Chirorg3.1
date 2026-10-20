@@ -27,17 +27,20 @@ export const useAuthStore = defineStore('auth', {
   },
 
   actions: {
+    // Conserve ou efface le JWT d'accès dans le store Pinia. Dépendances utilisées : aucune dépendance importée directe.
     /** Mémorise ou efface le JWT d'accès reçu de l'API. */
     setAccessToken(token) {
       this.token = token || null
     },
 
+    // Efface le JWT d'accès et le profil utilisateur du store Pinia. Dépendances utilisées : aucune dépendance importée directe.
     /** Efface toute identité locale quand le refresh échoue ou après déconnexion. */
     clearSession() {
       this.user = null
       this.token = null
     },
 
+    // Initialise la page de connexion sans appeler le renouvellement. Dépendances utilisées : aucune dépendance importée directe.
     /** Initialise directement l'écran public de connexion sans provoquer un refresh anonyme en 401. */
     initializeGuestSession() {
       this.clearSession()
@@ -45,6 +48,7 @@ export const useAuthStore = defineStore('auth', {
       this.initialized = true
     },
 
+    // Charge le profil de l'utilisateur authentifié depuis l'API. Dépendances utilisées : accountApi.
     /** Récupère le profil associé au JWT courant pour compléter la session en mémoire. */
     async fetchMe() {
       const user = await accountApi.getCurrent()
@@ -52,6 +56,7 @@ export const useAuthStore = defineStore('auth', {
       return user
     },
 
+    // Reconstruit le profil utilisateur depuis les claims du JWT ou l'API. Dépendances utilisées : getUserFromAccessToken.
     /** Utilise les claims signés du JWT et ne sollicite `/me` qu'en solution de repli. */
     async hydrateUser(token) {
       const tokenUser = getUserFromAccessToken(token)
@@ -63,6 +68,7 @@ export const useAuthStore = defineStore('auth', {
       return this.fetchMe()
     },
 
+    // Authentifie l'utilisateur et initialise sa session. Dépendances utilisées : ERROR_MESSAGES, authApi, getApiErrorMessage.
     /** Authentifie l'utilisateur, conserve le token en mémoire puis hydrate son profil. */
     async login(credentials) {
       this.loading = true
@@ -86,6 +92,7 @@ export const useAuthStore = defineStore('auth', {
       }
     },
 
+    // Remplace la session après la modification du mot de passe. Dépendances utilisées : authApi.
     /** Remplace silencieusement la session révoquée après un changement de mot de passe. */
     async renewSession(credentials) {
       try {
@@ -100,6 +107,7 @@ export const useAuthStore = defineStore('auth', {
       }
     },
 
+    // Restaure la session avec le cookie de renouvellement au démarrage de la SPA. Dépendances utilisées : authApi.
     /** Tente une restauration silencieuse de session une seule fois au démarrage de la SPA. */
     initialize() {
       if (this.initialized) return Promise.resolve(this.isAuthenticated)
@@ -126,6 +134,7 @@ export const useAuthStore = defineStore('auth', {
       return initializationPromise
     },
 
+    // Invalide le refresh token et termine la session de l'utilisateur. Dépendances utilisées : authApi.
     /** Invalide côté serveur puis nettoie la session locale même en cas d'indisponibilité réseau. */
     async logout() {
       this.loading = true

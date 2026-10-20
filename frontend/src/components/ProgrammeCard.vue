@@ -37,8 +37,11 @@ const isPartial = computed(
 </script>
 
 <template>
+  <!-- Présente la carte d'une chirurgie planifiée comme une unité autonome. -->
   <article class="programme-card w-full">
+    <!-- Aligne les informations et les commandes de la carte d'une chirurgie planifiée. -->
     <div class="flex items-start justify-between gap-4">
+      <!-- Regroupe les informations affichées par la carte d'une chirurgie planifiée. -->
       <div>
         <h3
           class="mt-2 text-lg font-bold leading-snug text-gray-950 dark:text-white"
@@ -65,6 +68,7 @@ const isPartial = computed(
       Dernière modification par {{ chirurgie.modifiePar ?? 'Non renseigné' }} le
       {{ formattedModificationDate }}
     </p>
+    <!-- Regroupe les informations affichées par la carte d'une chirurgie planifiée. -->
     <div class="my-5">
       <ProgressBar
         :total="progress.total"
@@ -72,6 +76,7 @@ const isPartial = computed(
         danger-remainder
       />
     </div>
+    <!-- Aligne les informations et les commandes de la carte d'une chirurgie planifiée. -->
     <div
       class="mt-auto flex flex-wrap gap-2 border-t border-gray-100 pt-4 dark:border-gray-700"
     >

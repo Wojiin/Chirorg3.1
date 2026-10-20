@@ -93,16 +93,19 @@ class FicheTechnique
     #[Groups(['fiche_technique:list', 'fiche_technique:read', 'fiche_technique:write'])]
     private ?ChirurgieModele $chirurgieModele = null;
 
+    // Retourne l'identifiant de la fiche technique. Dépendances utilisées : aucune dépendance de service directe.
     public function getId(): ?int
     {
         return $this->id;
     }
 
+    // Retourne le titre de la fiche technique. Dépendances utilisées : aucune dépendance de service directe.
     public function getTitre(): ?string
     {
         return $this->titre;
     }
 
+    // Met à jour le titre de la fiche technique. Dépendances utilisées : aucune dépendance de service directe.
     public function setTitre(string $titre): static
     {
         $this->titre = trim($titre);
@@ -110,11 +113,13 @@ class FicheTechnique
         return $this;
     }
 
+    // Retourne la description de la fiche technique. Dépendances utilisées : aucune dépendance de service directe.
     public function getDescription(): ?string
     {
         return $this->description;
     }
 
+    // Met à jour la description de la fiche technique. Dépendances utilisées : aucune dépendance de service directe.
     public function setDescription(?string $description): static
     {
         $description = null === $description ? '' : trim($description);
@@ -123,11 +128,13 @@ class FicheTechnique
         return $this;
     }
 
+    // Retourne le chemin de l'image de la fiche technique. Dépendances utilisées : aucune dépendance de service directe.
     public function getLienImage(): ?string
     {
         return $this->lienImage;
     }
 
+    // Met à jour le chemin de l'image de la fiche technique. Dépendances utilisées : aucune dépendance de service directe.
     public function setLienImage(?string $lienImage): static
     {
         $lienImage = null === $lienImage ? '' : trim($lienImage);
@@ -136,11 +143,13 @@ class FicheTechnique
         return $this;
     }
 
+    // Retourne l'ordre de la fiche technique. Dépendances utilisées : aucune dépendance de service directe.
     public function getOrdre(): ?int
     {
         return $this->ordre;
     }
 
+    // Met à jour l'ordre de la fiche technique. Dépendances utilisées : aucune dépendance de service directe.
     public function setOrdre(int $ordre): static
     {
         $this->ordre = $ordre;
@@ -148,11 +157,13 @@ class FicheTechnique
         return $this;
     }
 
+    // Retourne le modèle de chirurgie de la fiche technique. Dépendances utilisées : ChirurgieModele.
     public function getChirurgieModele(): ?ChirurgieModele
     {
         return $this->chirurgieModele;
     }
 
+    // Met à jour le modèle de chirurgie de la fiche technique. Dépendances utilisées : ChirurgieModele.
     public function setChirurgieModele(?ChirurgieModele $chirurgieModele): static
     {
         $this->chirurgieModele = $chirurgieModele;

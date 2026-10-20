@@ -29,15 +29,18 @@ const { error, goBack, loading, view } = useVueFinaleView(props)
         status="Validée"
         :validated-at="view.chirurgie.valideLe"
       >
+        <!-- Contrôle l'affichage conditionnel de la page consacrée à la chirurgie planifiée. -->
         <template #action>
           <BaseButton variant="secondary" @click="goBack">Retour</BaseButton>
         </template>
       </SurgeryOverview>
 
+      <!-- Délimite la section consacrée à la page consacrée à la chirurgie planifiée. -->
       <section aria-labelledby="validated-materials-title">
         <h2 id="validated-materials-title" class="section-title">
           Matériel validé
         </h2>
+        <!-- Affiche la liste associée à la page consacrée à la chirurgie planifiée. -->
         <ul class="validated-material-list">
           <li
             v-for="item in view.materiels"

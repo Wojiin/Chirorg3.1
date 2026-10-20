@@ -15,10 +15,12 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 /** @implements ProviderInterface<ChirurgiePreparation> */
 final readonly class ChirurgiePreparationProvider implements ProviderInterface
 {
+    // Injecte les services nécessaires au traitement de la préparation du matériel. Dépendances utilisées : ChirurgiePlanifieeRepository, ChirurgieReadModelFactory, EntityManagerInterface, PreparationMaterielInitializer.
     public function __construct(private ChirurgiePlanifieeRepository $repository, private PreparationMaterielInitializer $initializer, private ChirurgieReadModelFactory $factory, private EntityManagerInterface $entityManager)
     {
     }
 
+    // Construit la représentation API de la préparation du matériel. Dépendances utilisées : ChirurgiePlanifieeRepository, ChirurgieReadModelFactory, EntityManagerInterface, ErrorMessage, NotFoundHttpException, Operation, PreparationMaterielInitializer.
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): ChirurgiePreparation
     {
         $id = (int) ($uriVariables['id'] ?? 0);

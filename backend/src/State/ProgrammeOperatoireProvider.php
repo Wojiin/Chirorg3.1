@@ -18,10 +18,12 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 /** @implements ProviderInterface<ProgrammeOperatoire> */
 final readonly class ProgrammeOperatoireProvider implements ProviderInterface
 {
+    // Injecte les services nécessaires au traitement du programme opératoire. Dépendances utilisées : Pagination, ProgrammeOperatoireService, ProgrammeReferenceResolver.
     public function __construct(private ProgrammeOperatoireService $service, private ProgrammeReferenceResolver $referenceResolver, private Pagination $pagination)
     {
     }
 
+    // Construit la représentation API du programme opératoire. Dépendances utilisées : ArrayPaginator, BadRequestHttpException, ErrorMessage, NotFoundHttpException, Operation, Pagination, ProgrammeOperatoireService, ProgrammeReferenceResolver.
     /** @return ProgrammeOperatoire|ArrayPaginator<ProgrammeOperatoireResume> */
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): ProgrammeOperatoire|ArrayPaginator
     {
@@ -48,6 +50,7 @@ final readonly class ProgrammeOperatoireProvider implements ProviderInterface
         return new ArrayPaginator($programmes, $offset, $limit);
     }
 
+    // Lit un paramètre déclaré sur l'opération API Platform. Dépendances utilisées : Operation.
     private function parameter(Operation $operation, string $name): mixed
     {
         $value = $operation->getParameters()?->get($name)?->getValue();
@@ -55,6 +58,7 @@ final readonly class ProgrammeOperatoireProvider implements ProviderInterface
         return $value instanceof ParameterNotFound ? null : $value;
     }
 
+    // Valide qu'un paramètre API est un entier strictement positif. Dépendances utilisées : BadRequestHttpException, ErrorMessage, Operation.
     private function positiveIntegerParameter(Operation $operation, string $name): ?int
     {
         $value = $this->parameter($operation, $name);

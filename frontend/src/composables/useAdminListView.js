@@ -15,6 +15,7 @@ import { useAdminStore } from '@/stores/admin'
 import { useReferenceStore } from '@/stores/references'
 import { notifySuccess } from '@/services/notifications'
 
+// Regroupe l'état réactif et les actions de la page consacrée aux référentiels administrés. Dépendances utilisées : ERROR_MESSAGES, adminStore, computed, getAdminItemDetails, getAdminItemTitle, getAdminResource, groupTechnicalSheets, notifySuccess, ref, referenceStore, storeToRefs, useAdminStore, useReferenceStore, watch.
 /** Orchestre le chargement, les filtres serveur et les suppressions d'une liste administrative. */
 export function useAdminListView(props) {
   const adminStore = useAdminStore()
@@ -63,10 +64,12 @@ export function useAdminListView(props) {
   const paginationTotal = computed(() => totalItems.value)
   const hasDisplayedItems = computed(() => items.value.length > 0)
 
+  // Prépare les informations détaillées du référentiel administré. Dépendances utilisées : getAdminItemDetails.
   function presentAdminItemDetails(item) {
     return getAdminItemDetails(item, referenceCollections.value)
   }
 
+  // Charge la page courante du référentiel administré. Dépendances utilisées : adminStore.
   function loadPage() {
     if (!resource.value) return Promise.resolve([])
 
@@ -81,14 +84,17 @@ export function useAdminListView(props) {
     })
   }
 
+  // Ouvre la confirmation de suppression du référentiel administré. Dépendances utilisées : aucune dépendance importée directe.
   function requestRemoval(item) {
     pendingRemoval.value = item
   }
 
+  // Ferme la confirmation sans supprimer le référentiel administré. Dépendances utilisées : aucune dépendance importée directe.
   function cancelRemoval() {
     pendingRemoval.value = null
   }
 
+  // Supprime le référentiel administré puis actualise la liste. Dépendances utilisées : adminStore, getAdminItemTitle, notifySuccess, referenceStore.
   async function confirmRemoval() {
     if (!pendingRemoval.value) return
     const removed = await adminStore.removeItem(

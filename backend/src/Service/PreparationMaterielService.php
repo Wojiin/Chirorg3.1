@@ -12,10 +12,12 @@ use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
 final readonly class PreparationMaterielService
 {
+    // Injecte les services nécessaires au traitement de la préparation du matériel. Dépendances utilisées : AuthenticatedUserProvider, ChirurgieAuditTrail, EntityManagerInterface.
     public function __construct(private AuthenticatedUserProvider $authenticatedUser, private ChirurgieAuditTrail $auditTrail, private EntityManagerInterface $entityManager)
     {
     }
 
+    // Met à jour la préparation du matériel à partir des valeurs du formulaire. Dépendances utilisées : AuthenticatedUserProvider, ChirurgieAuditTrail, ConflictHttpException, EntityManagerInterface, ErrorMessage, NotFoundHttpException, PreparationMateriel, PreparationMaterielInput, UnprocessableEntityHttpException.
     public function update(int $id, PreparationMaterielInput $input): PreparationMateriel
     {
         $preparation = $this->entityManager->find(PreparationMateriel::class, $id) ?? throw new NotFoundHttpException(ErrorMessage::PREPARATION_NOT_FOUND);

@@ -1,5 +1,6 @@
 const frenchCollator = new Intl.Collator('fr', { sensitivity: 'base' })
 
+// Regroupe les fiches techniques par titre pour leur affichage. Dépendances utilisées : aucune dépendance importée directe.
 /** Filtre par spécialité puis regroupe et ordonne les fiches par chirurgie. */
 export function groupTechnicalSheets(items, specialityId = '') {
   const groups = new Map()

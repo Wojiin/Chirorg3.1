@@ -1,3 +1,4 @@
+// Normalise préparation reçu de l'API pour la préparation du matériel. Dépendances utilisées : aucune dépendance importée directe.
 /** Adapte la réponse de checklist de l'API au modèle attendu par l'interface de préparation. */
 export function normalizePreparation(data) {
   return {
@@ -25,6 +26,7 @@ export function normalizePreparation(data) {
   }
 }
 
+// Normalise technique sheets reçu de l'API pour la préparation du matériel. Dépendances utilisées : aucune dépendance importée directe.
 /** Uniformise les champs texte et image des fiches techniques. */
 export function normalizeTechnicalSheets(technicalSheets = []) {
   return technicalSheets.map((sheet) => ({
@@ -34,6 +36,7 @@ export function normalizeTechnicalSheets(technicalSheets = []) {
   }))
 }
 
+// Normalise finale vue reçu de l'API pour la préparation du matériel. Dépendances utilisées : aucune dépendance importée directe.
 /** Adapte les deux formes historiques de vue finale au même contrat d'affichage. */
 export function normalizeFinalView(data) {
   return {

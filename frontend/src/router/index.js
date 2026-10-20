@@ -121,6 +121,7 @@ const router = createRouter({
 installAccessGuard(router)
 router.afterEach(applyPageMetadata)
 
+// Précharge le composant Vue associé à la route demandée. Dépendances utilisées : router.
 /** Précharge le composant résolu par le routeur pendant la restauration de session. */
 export async function preloadViewForPath(pathname) {
   const target = pathname === '/' ? { name: 'programme' } : pathname

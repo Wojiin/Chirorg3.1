@@ -17,6 +17,7 @@ const draggedId = ref(null)
 const dropTargetId = ref(null)
 const dropPosition = ref('before')
 
+// Mémorise la chirurgie au début du glisser-déposer. Dépendances utilisées : aucune dépendance importée directe.
 /** Initialise le transfert HTML5 avec l'identifiant stable de la chirurgie déplacée. */
 function startDrag(event, surgeryId) {
   draggedId.value = String(surgeryId)
@@ -24,6 +25,7 @@ function startDrag(event, surgeryId) {
   event.dataTransfer.setData('text/plain', String(surgeryId))
 }
 
+// Mémorise la position visée dans le programme opératoire. Dépendances utilisées : aucune dépendance importée directe.
 /** Mémorise la cible et le côté d'insertion pour donner un retour visuel correct. */
 function indicateDrop(event, targetId) {
   const bounds = event.currentTarget.getBoundingClientRect()
@@ -32,6 +34,7 @@ function indicateDrop(event, targetId) {
     event.clientY > bounds.top + bounds.height / 2 ? 'after' : 'before'
 }
 
+// Réinitialise l'état du glisser-déposer des chirurgies. Dépendances utilisées : aucune dépendance importée directe.
 /** Réinitialise l'état visuel du glisser-déposer après abandon ou dépôt. */
 function clearDragState() {
   draggedId.value = null
@@ -39,6 +42,7 @@ function clearDragState() {
   dropPosition.value = 'before'
 }
 
+// Déplace la chirurgie vers la position visée. Dépendances utilisées : aucune dépendance importée directe.
 /** Construit le nouvel ordre complet à partir de la source, de la cible et du côté de dépôt. */
 function drop(event, targetId) {
   event.preventDefault()
@@ -65,6 +69,7 @@ function drop(event, targetId) {
   emit('reorder', ids)
 }
 
+// Émet le nouvel ordre des chirurgies du programme opératoire. Dépendances utilisées : aucune dépendance importée directe.
 /** Produit la même permutation avec les boutons accessibles haut / bas. */
 function move(surgeryId, offset) {
   const ids = props.programme.chirurgies.map((surgery) => surgery.id)
@@ -84,8 +89,11 @@ function move(surgeryId, offset) {
 </script>
 
 <template>
+  <!-- Délimite la section consacrée au groupe de chirurgies d'un programme opératoire. -->
   <section class="programme-group">
+    <!-- Regroupe le titre et les actions du groupe de chirurgies d'un programme opératoire. -->
     <header class="programme-group-header">
+      <!-- Regroupe les informations affichées par le groupe de chirurgies d'un programme opératoire. -->
       <div>
         <p class="page-eyebrow">{{ programme.salle }} · {{ programme.date }}</p>
         <h2 class="section-title">
@@ -106,6 +114,7 @@ function move(surgeryId, offset) {
       <span aria-live="polite">{{ saving ? 'Enregistrement…' : '' }}</span>
     </p>
 
+    <!-- Affiche la liste associée au groupe de chirurgies d'un programme opératoire. -->
     <ol class="programme-surgery-list" aria-describedby="programme-order-help">
       <li
         v-for="(chirurgie, index) in programme.chirurgies"
@@ -124,11 +133,13 @@ function move(surgeryId, offset) {
         @dragover.prevent="indicateDrop($event, chirurgie.id)"
         @drop="drop($event, chirurgie.id)"
       >
+        <!-- Regroupe les informations affichées par le groupe de chirurgies d'un programme opératoire. -->
         <div class="drag-handle">
           <span aria-hidden="true">⋮⋮</span>
           <strong
             ><span class="sr-only">Position </span>{{ chirurgie.ordre }}</strong
           >
+          <!-- Regroupe les informations affichées par le groupe de chirurgies d'un programme opératoire. -->
           <div class="drag-move-actions">
             <button
               type="button"

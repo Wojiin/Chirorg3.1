@@ -10,18 +10,22 @@ defineProps({
 
 const selectedSheet = ref(null)
 
+// Ouvre la fiche technique sélectionnée. Dépendances utilisées : aucune dépendance importée directe.
 function openSheet(sheet) {
   selectedSheet.value = sheet
 }
 
+// Ferme la fiche technique consultée. Dépendances utilisées : aucune dépendance importée directe.
 function closeSheet() {
   selectedSheet.value = null
 }
 </script>
 
 <template>
+  <!-- Délimite la section consacrée à la consultation d'une fiche technique. -->
   <section aria-labelledby="technical-sheet-title">
     <h2 id="technical-sheet-title" class="section-title">Fiche technique</h2>
+    <!-- Affiche la liste associée à la consultation d'une fiche technique. -->
     <ol class="mt-4 grid gap-4 lg:grid-cols-3">
       <li v-for="sheet in sheets" :key="sheet.id">
         <button
@@ -69,6 +73,7 @@ function closeSheet() {
       close-label="Fermer la fiche technique"
       @close="closeSheet"
     >
+      <!-- Contrôle l'affichage conditionnel de la consultation d'une fiche technique. -->
       <template #eyebrow>
         <p
           class="text-xs font-bold uppercase tracking-wider text-chirorg-700 dark:text-chirorg-400"
@@ -76,6 +81,7 @@ function closeSheet() {
           Étape {{ selectedSheet?.ordre }}
         </p>
       </template>
+      <!-- Contrôle l'affichage conditionnel de la consultation d'une fiche technique. -->
       <template #title>{{ selectedSheet?.titre }}</template>
 
       <p

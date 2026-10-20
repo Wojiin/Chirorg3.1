@@ -16,6 +16,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 )]
 final class PurgeProgrammesOperatoiresCommand extends Command
 {
+    // Injecte les services nécessaires à la commande PurgeProgrammesOperatoiresCommand. Dépendances utilisées : ChirurgiePlanifieeRepository, ClockInterface.
     public function __construct(
         private readonly ChirurgiePlanifieeRepository $repository,
         private readonly ClockInterface $clock,
@@ -23,6 +24,7 @@ final class PurgeProgrammesOperatoiresCommand extends Command
         parent::__construct();
     }
 
+    // Exécute la commande concernant le programme opératoire. Dépendances utilisées : ChirurgiePlanifieeRepository, ClockInterface, Command, InputInterface, OutputInterface, SymfonyStyle.
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $dateLimite = \DateTimeImmutable::createFromInterface($this->clock->now())

@@ -27,6 +27,7 @@ const routeDescriptions = {
 const defaultDescription =
   'ChirOrg : planification des programmes opératoires et préparation du matériel chirurgical.'
 
+// Construit le titre de page à partir de la route active. Dépendances utilisées : getAdminResourceLabel.
 /** Produit le titre métier d'une route, y compris pour les référentiels paramétrés. */
 function resolvePageTitle(route) {
   const resourceLabel = getAdminResourceLabel(route.params.resource)
@@ -38,6 +39,7 @@ function resolvePageTitle(route) {
   return route.meta.title ?? 'ChirOrg'
 }
 
+// Détermine le titre et la description associés à la route active. Dépendances utilisées : aucune dépendance importée directe.
 /** Retourne les métadonnées HTML complètes de l'écran courant. */
 export function resolvePageMetadata(route) {
   return {
@@ -46,6 +48,7 @@ export function resolvePageMetadata(route) {
   }
 }
 
+// Applique le titre et la description à la page HTML. Dépendances utilisées : aucune dépendance importée directe.
 /** Applique les métadonnées de la route après chaque navigation réussie. */
 export function applyPageMetadata(route) {
   const metadata = resolvePageMetadata(route)

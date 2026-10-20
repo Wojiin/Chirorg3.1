@@ -45,6 +45,7 @@ const {
       description="Renseignez les informations du référentiel."
     />
 
+    <!-- Regroupe les champs et la soumission de la page consacrée aux référentiels administrés. -->
     <form
       v-if="resource"
       class="form-panel"
@@ -52,9 +53,12 @@ const {
       @submit.prevent="submit"
     >
       <ErrorMessage v-if="displayedError" :message="displayedError" />
+      <!-- Regroupe les champs métier de la page consacrée aux référentiels administrés. -->
       <fieldset class="form-grid" :disabled="loading">
         <legend class="sr-only">Informations de la ressource</legend>
+        <!-- Contrôle l'affichage conditionnel de la page consacrée aux référentiels administrés. -->
         <template v-for="field in fields" :key="field.key">
+          <!-- Regroupe les informations affichées par la page consacrée aux référentiels administrés. -->
           <div v-if="field.type === 'file'" class="md:col-span-2">
             <label :for="field.key" class="field-label">{{
               field.label
@@ -74,6 +78,7 @@ const {
             <p v-if="form.imageFile" class="mt-3 text-sm font-medium">
               Nouvelle image : {{ form.imageFile.name }}
             </p>
+            <!-- Regroupe les informations affichées par la page consacrée aux référentiels administrés. -->
             <div
               v-if="form.lienImage"
               class="mt-3 rounded-xl border border-gray-200 p-3 dark:border-gray-700"
@@ -135,6 +140,7 @@ const {
           />
         </template>
       </fieldset>
+      <!-- Regroupe les informations affichées par la page consacrée aux référentiels administrés. -->
       <div class="form-actions">
         <BaseButton type="button" variant="secondary" @click="goBack">
           Retour

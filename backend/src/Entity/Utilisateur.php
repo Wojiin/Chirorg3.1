@@ -92,6 +92,7 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: PreparationMateriel::class, mappedBy: 'cochePar')]
     private Collection $preparationsCochees;
 
+    // Initialise l'entité Utilisateur représentant l'utilisateur. Dépendances utilisées : ArrayCollection, Collection.
     public function __construct()
     {
         $now = new \DateTimeImmutable();
@@ -101,16 +102,19 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
         $this->preparationsCochees = new ArrayCollection();
     }
 
+    // Retourne l'identifiant de l'utilisateur. Dépendances utilisées : aucune dépendance de service directe.
     public function getId(): ?int
     {
         return $this->id;
     }
 
+    // Retourne l'adresse électronique de l'utilisateur. Dépendances utilisées : aucune dépendance de service directe.
     public function getEmail(): string
     {
         return $this->email;
     }
 
+    // Met à jour l'adresse électronique de l'utilisateur. Dépendances utilisées : aucune dépendance de service directe.
     public function setEmail(string $email): static
     {
         $this->email = mb_strtolower(trim($email));
@@ -118,6 +122,7 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    // Retourne l'identifiant de connexion de l'utilisateur. Dépendances utilisées : ErrorMessage.
     /**
      * A visual identifier that represents this user.
      *
@@ -132,6 +137,7 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->email;
     }
 
+    // Retourne les rôles de l'utilisateur. Dépendances utilisées : aucune dépendance de service directe.
     /**
      * @see UserInterface
      */
@@ -144,6 +150,7 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
         return array_unique($roles);
     }
 
+    // Met à jour les rôles de l'utilisateur. Dépendances utilisées : aucune dépendance de service directe.
     /**
      * @param list<string> $roles
      */
@@ -154,6 +161,7 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    // Retourne le mot de passe haché de l'utilisateur. Dépendances utilisées : aucune dépendance de service directe.
     /**
      * @see PasswordAuthenticatedUserInterface
      */
@@ -162,6 +170,7 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->password;
     }
 
+    // Met à jour le mot de passe haché de l'utilisateur. Dépendances utilisées : aucune dépendance de service directe.
     public function setPassword(string $password): static
     {
         $this->password = $password;
@@ -169,6 +178,7 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    // Retire le mot de passe haché des données sérialisées de l'utilisateur. Dépendances utilisées : aucune dépendance de service directe.
     /**
      * Ensure the session doesn't contain actual password hashes by CRC32C-hashing them, as supported since Symfony 7.3.
      */
@@ -180,11 +190,13 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
         return $data;
     }
 
+    // Indique si le compte utilisateur est actif. Dépendances utilisées : aucune dépendance de service directe.
     public function isActif(): bool
     {
         return $this->actif;
     }
 
+    // Active ou désactive le compte utilisateur. Dépendances utilisées : aucune dépendance de service directe.
     public function setActif(bool $actif): static
     {
         $this->actif = $actif;
@@ -192,11 +204,13 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    // Retourne la date de création de l'utilisateur. Dépendances utilisées : aucune dépendance de service directe.
     public function getCreatedAt(): \DateTimeImmutable
     {
         return $this->createdAt;
     }
 
+    // Met à jour la date de création de l'utilisateur. Dépendances utilisées : aucune dépendance de service directe.
     public function setCreatedAt(\DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
@@ -204,11 +218,13 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    // Retourne la date de mise à jour de l'utilisateur. Dépendances utilisées : aucune dépendance de service directe.
     public function getUpdatedAt(): \DateTimeImmutable
     {
         return $this->updatedAt;
     }
 
+    // Met à jour la date de mise à jour de l'utilisateur. Dépendances utilisées : aucune dépendance de service directe.
     public function setUpdatedAt(\DateTimeImmutable $updatedAt): static
     {
         $this->updatedAt = $updatedAt;
@@ -217,17 +233,20 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     #[ORM\PreUpdate]
+    // Actualise la date de mise à jour de l'utilisateur. Dépendances utilisées : aucune dépendance de service directe.
     public function touch(): void
     {
         $this->updatedAt = new \DateTimeImmutable();
     }
 
+    // Retourne chirurgies validees de l'utilisateur. Dépendances utilisées : Collection.
     /** @return Collection<int, ChirurgiePlanifiee> */
     public function getChirurgiesValidees(): Collection
     {
         return $this->chirurgiesValidees;
     }
 
+    // Retourne preparations cochees de l'utilisateur. Dépendances utilisées : Collection.
     /** @return Collection<int, PreparationMateriel> */
     public function getPreparationsCochees(): Collection
     {

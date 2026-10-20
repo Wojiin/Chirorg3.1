@@ -47,16 +47,19 @@ class PreparationMateriel
     #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
     private ?Utilisateur $cochePar = null;
 
+    // Retourne l'identifiant de la préparation du matériel. Dépendances utilisées : aucune dépendance de service directe.
     public function getId(): ?int
     {
         return $this->id;
     }
 
+    // Indique si le matériel a été contrôlé pendant la préparation. Dépendances utilisées : aucune dépendance de service directe.
     public function isCoche(): bool
     {
         return $this->coche;
     }
 
+    // Met à jour l'état contrôlé du matériel préparé. Dépendances utilisées : aucune dépendance de service directe.
     public function setCoche(bool $value): static
     {
         $this->coche = $value;
@@ -64,11 +67,13 @@ class PreparationMateriel
         return $this;
     }
 
+    // Indique si le matériel est signalé absent pendant la préparation. Dépendances utilisées : aucune dépendance de service directe.
     public function isAbsent(): bool
     {
         return $this->absent;
     }
 
+    // Met à jour l'état absent du matériel préparé. Dépendances utilisées : aucune dépendance de service directe.
     public function setAbsent(bool $value): static
     {
         $this->absent = $value;
@@ -76,11 +81,13 @@ class PreparationMateriel
         return $this;
     }
 
+    // Retourne la date de contrôle du matériel de la préparation du matériel. Dépendances utilisées : aucune dépendance de service directe.
     public function getCocheLe(): ?\DateTimeImmutable
     {
         return $this->cocheLe;
     }
 
+    // Met à jour la date de contrôle du matériel de la préparation du matériel. Dépendances utilisées : aucune dépendance de service directe.
     public function setCocheLe(?\DateTimeImmutable $value): static
     {
         $this->cocheLe = $value;
@@ -88,11 +95,13 @@ class PreparationMateriel
         return $this;
     }
 
+    // Retourne la chirurgie planifiée de la préparation du matériel. Dépendances utilisées : ChirurgiePlanifiee.
     public function getChirurgiePlanifiee(): ?ChirurgiePlanifiee
     {
         return $this->chirurgiePlanifiee;
     }
 
+    // Met à jour la chirurgie planifiée de la préparation du matériel. Dépendances utilisées : ChirurgiePlanifiee.
     public function setChirurgiePlanifiee(?ChirurgiePlanifiee $value): static
     {
         $this->chirurgiePlanifiee = $value;
@@ -100,11 +109,13 @@ class PreparationMateriel
         return $this;
     }
 
+    // Retourne le matériel chirurgical de la préparation du matériel. Dépendances utilisées : Materiel.
     public function getMateriel(): ?Materiel
     {
         return $this->materiel;
     }
 
+    // Met à jour le matériel chirurgical de la préparation du matériel. Dépendances utilisées : Materiel.
     public function setMateriel(?Materiel $value): static
     {
         $this->materiel = $value;
@@ -112,11 +123,13 @@ class PreparationMateriel
         return $this;
     }
 
+    // Retourne l'utilisateur ayant contrôlé le matériel de la préparation du matériel. Dépendances utilisées : Utilisateur.
     public function getCochePar(): ?Utilisateur
     {
         return $this->cochePar;
     }
 
+    // Met à jour l'utilisateur ayant contrôlé le matériel de la préparation du matériel. Dépendances utilisées : Utilisateur.
     public function setCochePar(?Utilisateur $value): static
     {
         $this->cochePar = $value;

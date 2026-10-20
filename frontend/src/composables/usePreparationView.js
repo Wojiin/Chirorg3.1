@@ -3,6 +3,7 @@ import { storeToRefs } from 'pinia'
 import { useRouter } from 'vue-router'
 import { usePreparationStore } from '@/stores/preparation'
 
+// Regroupe l'état réactif et les actions de la page consacrée à la préparation du matériel. Dépendances utilisées : computed, preparationStore, router, storeToRefs, usePreparationStore, useRouter, watch.
 /** Orchestre la checklist, ses transitions et la navigation après validation. */
 export function usePreparationView(props) {
   const router = useRouter()
@@ -27,6 +28,7 @@ export function usePreparationView(props) {
     { immediate: true },
   )
 
+  // Valide la préparation du matériel selon les règles métier. Dépendances utilisées : preparationStore, router.
   async function validate() {
     const result = await preparationStore.validateSurgery()
     if (result === 'final') {
@@ -42,10 +44,12 @@ export function usePreparationView(props) {
     }
   }
 
+  // Enregistre l'état coché ou absent du matériel préparé. Dépendances utilisées : preparationStore.
   function setMaterialState(item, state) {
     return preparationStore.setMaterialState(item, state)
   }
 
+  // Revient à la page précédente depuis la vue consacrée à la préparation du matériel. Dépendances utilisées : router.
   function goBack() {
     router.back()
   }

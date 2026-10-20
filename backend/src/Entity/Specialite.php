@@ -93,6 +93,7 @@ class Specialite
     #[ORM\OneToMany(targetEntity: ChirurgieModele::class, mappedBy: 'specialite')]
     private Collection $chirurgiesModeles;
 
+    // Initialise l'entité Specialite représentant la spécialité. Dépendances utilisées : ArrayCollection, Collection.
     public function __construct()
     {
         $this->chirurgiens = new ArrayCollection();
@@ -100,16 +101,19 @@ class Specialite
         $this->chirurgiesModeles = new ArrayCollection();
     }
 
+    // Retourne l'identifiant de la spécialité. Dépendances utilisées : aucune dépendance de service directe.
     public function getId(): ?int
     {
         return $this->id;
     }
 
+    // Retourne l'intitulé de la spécialité. Dépendances utilisées : aucune dépendance de service directe.
     public function getIntitule(): ?string
     {
         return $this->intitule;
     }
 
+    // Met à jour l'intitulé de la spécialité. Dépendances utilisées : aucune dépendance de service directe.
     public function setIntitule(string $intitule): static
     {
         $this->intitule = trim($intitule);
@@ -117,6 +121,7 @@ class Specialite
         return $this;
     }
 
+    // Retourne les chirurgiens de la spécialité. Dépendances utilisées : Collection.
     /**
      * @return Collection<int, Chirurgien>
      */
@@ -125,6 +130,7 @@ class Specialite
         return $this->chirurgiens;
     }
 
+    // Ajoute le chirurgien à la spécialité. Dépendances utilisées : Chirurgien, Collection.
     public function addChirurgien(Chirurgien $chirurgien): static
     {
         if (!$this->chirurgiens->contains($chirurgien)) {
@@ -135,10 +141,11 @@ class Specialite
         return $this;
     }
 
+    // Retire le chirurgien de la spécialité. Dépendances utilisées : Chirurgien, Collection.
     public function removeChirurgien(Chirurgien $chirurgien): static
     {
         if ($this->chirurgiens->removeElement($chirurgien)) {
-            // set the owning side to null (unless already changed)
+            // Détache le chirurgien de la spécialité si cette relation est encore active.
             if ($chirurgien->getSpecialite() === $this) {
                 $chirurgien->setSpecialite(null);
             }
@@ -147,6 +154,7 @@ class Specialite
         return $this;
     }
 
+    // Retourne les matériels chirurgicaux de la spécialité. Dépendances utilisées : Collection.
     /**
      * @return Collection<int, Materiel>
      */
@@ -155,6 +163,7 @@ class Specialite
         return $this->materiels;
     }
 
+    // Ajoute le matériel chirurgical à la spécialité. Dépendances utilisées : Collection, Materiel.
     public function addMateriel(Materiel $materiel): static
     {
         if (!$this->materiels->contains($materiel)) {
@@ -165,10 +174,11 @@ class Specialite
         return $this;
     }
 
+    // Retire le matériel chirurgical de la spécialité. Dépendances utilisées : Collection, Materiel.
     public function removeMateriel(Materiel $materiel): static
     {
         if ($this->materiels->removeElement($materiel)) {
-            // set the owning side to null (unless already changed)
+            // Détache le matériel de la spécialité si cette relation est encore active.
             if ($materiel->getSpecialite() === $this) {
                 $materiel->setSpecialite(null);
             }
@@ -177,6 +187,7 @@ class Specialite
         return $this;
     }
 
+    // Retourne les modèles de chirurgie de la spécialité. Dépendances utilisées : Collection.
     /**
      * @return Collection<int, ChirurgieModele>
      */
@@ -185,6 +196,7 @@ class Specialite
         return $this->chirurgiesModeles;
     }
 
+    // Ajoute le modèle de chirurgie à la spécialité. Dépendances utilisées : ChirurgieModele, Collection.
     public function addChirurgieModele(ChirurgieModele $chirurgieModele): static
     {
         if (!$this->chirurgiesModeles->contains($chirurgieModele)) {
@@ -195,10 +207,11 @@ class Specialite
         return $this;
     }
 
+    // Retire le modèle de chirurgie de la spécialité. Dépendances utilisées : ChirurgieModele, Collection.
     public function removeChirurgieModele(ChirurgieModele $chirurgieModele): static
     {
         if ($this->chirurgiesModeles->removeElement($chirurgieModele)) {
-            // set the owning side to null (unless already changed)
+            // Détache le modèle de chirurgie de la spécialité si cette relation est encore active.
             if ($chirurgieModele->getSpecialite() === $this) {
                 $chirurgieModele->setSpecialite(null);
             }

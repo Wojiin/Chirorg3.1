@@ -13,10 +13,12 @@ import AdminResourceCard from '@/components/AdminResourceCard.vue'
       title="Administration"
       description="Gérez les référentiels et les comptes utilisateurs de ChirOrg."
     />
+    <!-- Délimite la section consacrée à la page consacrée aux référentiels administrés. -->
     <section aria-labelledby="admin-resources-title">
       <h2 id="admin-resources-title" class="sr-only">
         Référentiels administrables
       </h2>
+      <!-- Organise les informations de la page consacrée aux référentiels administrés dans une grille responsive. -->
       <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         <AdminResourceCard
           v-for="resource in resources"

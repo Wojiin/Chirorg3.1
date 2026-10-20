@@ -8,6 +8,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 final readonly class UtilisateurInput
 {
+    // Initialise le DTO UtilisateurInput avec les valeurs décrivant la session de l'utilisateur. Dépendances utilisées : aucune dépendance de service directe.
     /** @param list<string>|null $roles */
     public function __construct(
         #[Assert\Email(message: ErrorMessage::EMAIL_INVALID)]

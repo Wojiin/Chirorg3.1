@@ -21,6 +21,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 )]
 final class UtilisateurCreateCommand extends Command
 {
+    // Injecte les services nécessaires à la commande UtilisateurCreateCommand. Dépendances utilisées : EntityManagerInterface, UserPasswordHasherInterface, UtilisateurRepository.
     public function __construct(
         private readonly UtilisateurRepository $utilisateurRepository,
         private readonly UserPasswordHasherInterface $passwordHasher,
@@ -29,6 +30,7 @@ final class UtilisateurCreateCommand extends Command
         parent::__construct();
     }
 
+    // Déclare les arguments et options de la commande liée à la session de l'utilisateur. Dépendances utilisées : InputArgument, InputOption.
     protected function configure(): void
     {
         $this
@@ -37,6 +39,7 @@ final class UtilisateurCreateCommand extends Command
         ;
     }
 
+    // Exécute la commande concernant la session de l'utilisateur. Dépendances utilisées : Command, EntityManagerInterface, InputInterface, OutputInterface, SymfonyStyle, UserPasswordHasherInterface, Utilisateur, UtilisateurRepository.
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
@@ -80,6 +83,7 @@ final class UtilisateurCreateCommand extends Command
         return Command::SUCCESS;
     }
 
+    // Vérifie que le mot de passe du nouvel utilisateur respecte la longueur et la complexité imposées par ChirOrg. Dépendances utilisées : PasswordRequirements.
     private function isPasswordStrong(string $password): bool
     {
         $length = mb_strlen($password);

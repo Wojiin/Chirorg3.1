@@ -8,6 +8,7 @@ import { getApiErrorMessage } from '@/api/response'
 import { getProgrammeDetailRoute } from '@/config/navigation'
 import { ERROR_MESSAGES } from '@/config/errorMessages'
 
+// Orchestre la déclaration des matériels auparavant absents, le chargement des fiches techniques et la validation finale de la chirurgie. Dépendances utilisées : ERROR_MESSAGES, computed, getApiErrorMessage, getProgrammeDetailRoute, normalizeTechnicalSheets, preparationStore, ref, router, storeToRefs, technicalSheetApi, usePreparationStore, useRouter, watch.
 /** Orchestre la régularisation des matériels absents et la clôture automatique. */
 export function useValidationPartielleView(props) {
   let viewLoadId = 0
@@ -60,6 +61,7 @@ export function useValidationPartielleView(props) {
     { immediate: true },
   )
 
+  // Marque un matériel absent comme prêt puis valide la chirurgie lorsque toute la préparation est terminée. Dépendances utilisées : preparationStore, router.
   async function markReady(item) {
     if (!(await preparationStore.setMaterialState(item, 'ready'))) return
     if (!isComplete.value) return
@@ -70,6 +72,7 @@ export function useValidationPartielleView(props) {
     }
   }
 
+  // Revient au détail du programme opératoire de la chirurgie, ou à la liste des programmes si la chirurgie est indisponible. Dépendances utilisées : getProgrammeDetailRoute, router.
   function goBack() {
     if (surgery.value)
       return router.push(getProgrammeDetailRoute(surgery.value))

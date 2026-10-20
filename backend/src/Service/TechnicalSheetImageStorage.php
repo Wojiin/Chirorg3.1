@@ -21,6 +21,7 @@ final readonly class TechnicalSheetImageStorage
         'image/webp' => 'webp',
     ];
 
+    // Injecte les services nécessaires au traitement de la fiche technique. Dépendances utilisées : Filesystem.
     public function __construct(
         #[Autowire('%kernel.project_dir%')]
         private string $projectDir,
@@ -28,6 +29,7 @@ final readonly class TechnicalSheetImageStorage
     ) {
     }
 
+    // Valide puis enregistre l'image d'une fiche technique. Dépendances utilisées : ErrorMessage, Filesystem, HttpException, UnprocessableEntityHttpException.
     public function store(mixed $image): string
     {
         if (!$image instanceof UploadedFile || !$image->isValid()) {

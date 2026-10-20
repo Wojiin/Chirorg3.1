@@ -26,11 +26,14 @@ const accessibleLabel = computed(
 </script>
 
 <template>
+  <!-- Regroupe les informations affichées par la progression de préparation du matériel. -->
   <div>
+    <!-- Regroupe les informations affichées par la progression de préparation du matériel. -->
     <div class="progress-caption">
       <span>{{ accessibleLabel }}</span>
       <span>{{ percent }} %</span>
     </div>
+    <!-- Regroupe les informations affichées par la progression de préparation du matériel. -->
     <div
       role="progressbar"
       :aria-label="accessibleLabel"
@@ -40,6 +43,7 @@ const accessibleLabel = computed(
       class="progress-track"
       :class="{ 'progress-track-danger': dangerRemainder && total > 0 }"
     >
+      <!-- Regroupe les informations affichées par la progression de préparation du matériel. -->
       <div class="progress-value" :style="{ width: `${percent}%` }"></div>
     </div>
   </div>

@@ -3,11 +3,13 @@ import { unwrapPaginatedCollection } from '@/api/response'
 
 /** Encapsule les contrats API de consultation, création et réordonnancement des programmes. */
 export const programmeApi = {
+  // Retourne les programmes opératoires correspondant à la date, à la salle et au chirurgien demandés. Dépendances utilisées : apiClient, unwrapPaginatedCollection.
   /** Liste les résumés de programmes avec les filtres optionnels fournis. */
   async list(params = {}) {
     const { data } = await apiClient.get('/programmes-operatoires', { params })
     return unwrapPaginatedCollection(data)
   },
+  // Retourne programme opératoire du programme opératoire. Dépendances utilisées : apiClient.
   /** Charge le détail d'un programme identifié par date, salle et chirurgien. */
   async getProgramme({ date, salle, chirurgien }) {
     const { data } = await apiClient.get(
@@ -15,6 +17,7 @@ export const programmeApi = {
     )
     return data
   },
+  // Envoie à l'API la demande de planification des chirurgies. Dépendances utilisées : apiClient.
   /** Crée plusieurs chirurgies dans un même programme opératoire. */
   async planProgram(payload) {
     const { data } = await apiClient.post('/programmes-operatoires', payload, {
@@ -22,6 +25,7 @@ export const programmeApi = {
     })
     return data
   },
+  // Réordonne les chirurgies au sein du programme opératoire. Dépendances utilisées : apiClient.
   /** Envoie la permutation complète des chirurgies afin que l'API recalcule les ordres. */
   async reorder({ date, salle, chirurgien, chirurgieIds }) {
     const { data } = await apiClient.patch(
@@ -31,6 +35,7 @@ export const programmeApi = {
     )
     return data
   },
+  // Supprime une chirurgie non validée du programme opératoire. Dépendances utilisées : apiClient.
   /** Supprime une chirurgie planifiée lorsque son état métier l'autorise. */
   async deleteSurgery(id) {
     await apiClient.delete(`/chirurgies-planifiees/${id}`)

@@ -7,7 +7,9 @@ const { links } = useAppNavigation()
 </script>
 
 <template>
+  <!-- Affiche les informations complémentaires de la navigation latérale. -->
   <aside class="app-sidebar">
+    <!-- Regroupe les informations affichées par la navigation latérale. -->
     <div class="px-7 pb-7 pt-8">
       <RouterLink to="/programme" class="block rounded-md">
         <span
@@ -21,6 +23,7 @@ const { links } = useAppNavigation()
         >
       </RouterLink>
     </div>
+    <!-- Propose les liens de la navigation latérale. -->
     <nav aria-label="Navigation principale" class="flex-1 space-y-1 px-4">
       <RouterLink
         v-for="link in links"
@@ -38,6 +41,7 @@ const { links } = useAppNavigation()
         {{ link.label }}
       </RouterLink>
     </nav>
+    <!-- Regroupe les informations affichées par la navigation latérale. -->
     <div
       class="m-4 rounded-xl bg-gray-50 p-4 text-xs leading-5 text-gray-500 dark:bg-gray-900/60 dark:text-gray-400"
     >

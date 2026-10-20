@@ -27,6 +27,7 @@ configureApiAuth({
   onSessionExpired,
 })
 
+// Initialise le thème, la session et le routeur avant le montage de la SPA. Dépendances utilisées : authStore, router.
 async function bootstrap() {
   if (window.location.pathname === '/login') {
     authStore.initializeGuestSession()

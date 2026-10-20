@@ -1,5 +1,6 @@
 import { useAuthStore } from '@/stores/auth'
 
+// Installe la garde de navigation qui protège les routes authentifiées. Dépendances utilisées : authStore, router, useAuthStore.
 /**
  * Installe uniquement les décisions d'accès liées à la navigation.
  * La restauration de session est terminée par Pinia avant l'installation du routeur.

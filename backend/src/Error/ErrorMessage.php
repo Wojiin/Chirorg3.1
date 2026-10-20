@@ -75,15 +75,18 @@ final class ErrorMessage
     private const string CHIRURGIE_MODELE_NOT_FOUND_PATTERN = 'Chirurgie modèle %d introuvable.';
     private const string UNSUPPORTED_USER_PATTERN = 'Instances of "%s" are not supported.';
 
+    // Empêche l'instanciation du catalogue statique des messages d'erreur métier et de validation. Dépendances utilisées : aucune dépendance de service directe.
     private function __construct()
     {
     }
 
+    // Construit le message signalant un modèle de chirurgie introuvable. Dépendances utilisées : aucune dépendance de service directe.
     public static function chirurgieModeleNotFound(int $id): string
     {
         return sprintf(self::CHIRURGIE_MODELE_NOT_FOUND_PATTERN, $id);
     }
 
+    // Construit le message signalant un type d'utilisateur non pris en charge. Dépendances utilisées : aucune dépendance de service directe.
     public static function unsupportedUser(string $class): string
     {
         return sprintf(self::UNSUPPORTED_USER_PATTERN, $class);

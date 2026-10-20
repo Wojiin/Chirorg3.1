@@ -9,6 +9,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 final readonly class ProgrammePlanificationInput
 {
+    // Initialise le DTO ProgrammePlanificationInput avec les valeurs décrivant le programme opératoire. Dépendances utilisées : aucune dépendance de service directe.
     /** @param list<int> $chirurgieModeleIds */
     public function __construct(
         #[Context([DateTimeNormalizer::FORMAT_KEY => 'Y-m-d'])]

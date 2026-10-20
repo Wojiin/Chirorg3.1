@@ -15,6 +15,7 @@ const { isDark, toggleTheme } = useTheme()
 </script>
 
 <template>
+  <!-- Présente le contenu principal de la page consacrée à la session de l'utilisateur. -->
   <main class="login-page">
     <button
       type="button"
@@ -27,14 +28,19 @@ const { isDark, toggleTheme } = useTheme()
       <span aria-hidden="true">{{ isDark ? '☀' : '☾' }}</span>
       {{ isDark ? 'Thème clair' : 'Thème sombre' }}
     </button>
+    <!-- Regroupe les informations affichées par la page consacrée à la session de l'utilisateur. -->
     <div class="login-container">
+      <!-- Regroupe le titre et les actions de la page consacrée à la session de l'utilisateur. -->
       <header class="login-brand">
+        <!-- Regroupe les informations affichées par la page consacrée à la session de l'utilisateur. -->
         <div aria-hidden="true" class="login-logo">C</div>
         <h1 class="login-title">Chir<span>Org</span></h1>
         <p class="text-muted mt-3">Connexion à l’espace bloc opératoire</p>
       </header>
 
+      <!-- Regroupe les champs et la soumission de la page consacrée à la session de l'utilisateur. -->
       <form class="login-panel" novalidate @submit.prevent="submit">
+        <!-- Regroupe les informations affichées par la page consacrée à la session de l'utilisateur. -->
         <div>
           <h2 class="section-title">Connexion</h2>
           <p class="text-muted mt-1">

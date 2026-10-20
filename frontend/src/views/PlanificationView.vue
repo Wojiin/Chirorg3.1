@@ -33,11 +33,14 @@ const {
       description="Choisissez une spécialité pour filtrer le chirurgien et les interventions, puis définissez leur ordre initial."
     />
 
+    <!-- Regroupe les champs et la soumission de la page consacrée au programme opératoire. -->
     <form class="form-panel" novalidate @submit.prevent="submit">
       <ErrorMessage v-if="displayedError" :message="displayedError" />
 
+      <!-- Regroupe les champs métier de la page consacrée au programme opératoire. -->
       <fieldset class="programme-form-section">
         <legend class="section-title">Informations du programme</legend>
+        <!-- Organise les informations de la page consacrée au programme opératoire dans une grille responsive. -->
         <div class="form-grid mt-5">
           <BaseSelect
             v-model="form.specialiteId"
@@ -74,12 +77,14 @@ const {
         </div>
       </fieldset>
 
+      <!-- Regroupe les champs métier de la page consacrée au programme opératoire. -->
       <fieldset class="programme-form-section">
         <legend class="section-title">Chirurgies du programme</legend>
         <p class="text-muted mt-2">
           L’ordre de cette liste devient l’ordre initial du programme.
         </p>
 
+        <!-- Affiche la liste associée à la page consacrée au programme opératoire. -->
         <ol class="surgery-model-list">
           <li
             v-for="(_, index) in form.chirurgieModeleIds"
@@ -121,6 +126,7 @@ const {
         </BaseButton>
       </fieldset>
 
+      <!-- Regroupe les informations affichées par la page consacrée au programme opératoire. -->
       <div class="form-actions">
         <BaseButton type="button" variant="secondary" @click="cancel"
           >Annuler</BaseButton

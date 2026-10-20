@@ -55,7 +55,9 @@ const {
       :title="resource?.label ?? 'Référentiel'"
       :description="resource?.description"
     >
+      <!-- Contrôle l'affichage conditionnel de la page consacrée aux référentiels administrés. -->
       <template #action>
+        <!-- Aligne les informations et les commandes de la page consacrée aux référentiels administrés. -->
         <div v-if="resource" class="flex flex-wrap gap-3">
           <RouterLink
             :to="{ name: 'admin' }"
@@ -73,6 +75,7 @@ const {
       </template>
     </PageHeading>
 
+    <!-- Organise les informations de la page consacrée aux référentiels administrés dans une grille responsive. -->
     <div
       v-if="resource"
       class="grid max-w-6xl gap-4 md:grid-cols-2 lg:grid-cols-3"
@@ -93,7 +96,9 @@ const {
           placeholder="Toutes les spécialités"
           allow-empty
         />
+        <!-- Contrôle l'affichage conditionnel de la page consacrée aux référentiels administrés. -->
         <template #fallback>
+          <!-- Regroupe les informations affichées par la page consacrée aux référentiels administrés. -->
           <div
             class="h-[70px] animate-pulse rounded-xl bg-gray-100 dark:bg-gray-800"
           />
@@ -107,7 +112,9 @@ const {
           placeholder="Tous les chirurgiens"
           allow-empty
         />
+        <!-- Contrôle l'affichage conditionnel de la page consacrée aux référentiels administrés. -->
         <template #fallback>
+          <!-- Regroupe les informations affichées par la page consacrée aux référentiels administrés. -->
           <div
             class="h-[70px] animate-pulse rounded-xl bg-gray-100 dark:bg-gray-800"
           />
@@ -127,8 +134,11 @@ const {
         Fiches techniques regroupées par chirurgie
       </h2>
 
+      <!-- Présente la page consacrée aux référentiels administrés comme une unité autonome. -->
       <article v-for="group in technicalSheetGroups" :key="group.id">
+        <!-- Regroupe le titre et les actions de la page consacrée aux référentiels administrés. -->
         <header class="mb-3 flex flex-wrap items-center justify-between gap-2">
+          <!-- Regroupe les informations affichées par la page consacrée aux référentiels administrés. -->
           <div>
             <p
               class="text-xs font-semibold uppercase tracking-wide text-chirorg-700 dark:text-chirorg-300"
@@ -146,8 +156,10 @@ const {
           </span>
         </header>
 
+        <!-- Affiche la liste associée à la page consacrée aux référentiels administrés. -->
         <ul class="admin-mobile-list">
           <li v-for="item in group.items" :key="item.id">
+            <!-- Présente la page consacrée aux référentiels administrés comme une unité autonome. -->
             <article class="admin-mobile-card">
               <p
                 class="text-xs font-semibold text-chirorg-700 dark:text-chirorg-300"
@@ -169,7 +181,9 @@ const {
           </li>
         </ul>
 
+        <!-- Regroupe les informations affichées par la page consacrée aux référentiels administrés. -->
         <div class="admin-table-shell">
+          <!-- Affiche la page consacrée aux référentiels administrés sous forme de tableau. -->
           <table class="w-full text-left text-sm">
             <caption class="sr-only">
               Fiches techniques de
@@ -215,8 +229,10 @@ const {
 
     <section v-else-if="resource" aria-labelledby="resource-list-title">
       <h2 id="resource-list-title" class="sr-only">Liste des éléments</h2>
+      <!-- Affiche la liste associée à la page consacrée aux référentiels administrés. -->
       <ul class="admin-mobile-list">
         <li v-for="item in items" :key="item.id">
+          <!-- Présente la page consacrée aux référentiels administrés comme une unité autonome. -->
           <article class="admin-mobile-card">
             <h3 class="item-title">{{ getAdminItemTitle(item) }}</h3>
             <p class="text-muted mt-1 line-clamp-2">
@@ -233,7 +249,9 @@ const {
         </li>
       </ul>
 
+      <!-- Regroupe les informations affichées par la page consacrée aux référentiels administrés. -->
       <div class="admin-table-shell">
+        <!-- Affiche la page consacrée aux référentiels administrés sous forme de tableau. -->
         <table class="w-full text-left text-sm">
           <caption class="sr-only">
             Éléments du référentiel

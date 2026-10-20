@@ -33,6 +33,7 @@ const {
       title="Programme opératoire"
       description="Retrouvez les programmes par chirurgien, date et salle."
     >
+      <!-- Contrôle l'affichage conditionnel de la page consacrée au programme opératoire. -->
       <template #action>
         <RouterLink :to="{ name: 'planification' }" class="primary-link">
           + Planifier un programme
@@ -40,6 +41,7 @@ const {
       </template>
     </PageHeading>
 
+    <!-- Regroupe les champs et la soumission de la page consacrée au programme opératoire. -->
     <form
       aria-label="Filtrer les programmes"
       class="programme-filters"
@@ -74,6 +76,7 @@ const {
       message="Modifiez les filtres ou planifiez un nouveau programme."
     />
     <section v-else aria-label="Programmes opératoires">
+      <!-- Affiche la liste associée à la page consacrée au programme opératoire. -->
       <ol class="programme-summary-list">
         <li v-for="programme in filteredProgrammes" :key="programme.id">
           <ProgrammeSummaryCard :programme="programme" />

@@ -1,3 +1,4 @@
+// Construit le traitement exécuté lorsque la session expire. Dépendances utilisées : router.
 /**
  * Crée le traitement de fin de session partagé par les erreurs 401. La promesse
  * mémorisée évite plusieurs redirections lorsque plusieurs requêtes échouent ensemble.

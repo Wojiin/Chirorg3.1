@@ -26,6 +26,7 @@ const sizes = {
   wide: 'h-[min(94vh,70rem)] w-[min(96vw,90rem)]',
 }
 
+// Synchronise l'ouverture de la fenêtre modale avec le verrouillage du défilement. Dépendances utilisées : aucune dépendance importée directe.
 function handleOpenChange(open) {
   if (!open) emit('close')
 }
@@ -41,9 +42,11 @@ function handleOpenChange(open) {
         class="fixed left-1/2 top-1/2 z-50 flex max-h-[94vh] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-2xl focus:outline-none dark:border-gray-700 dark:bg-gray-900"
         :class="sizes[size] ?? sizes.md"
       >
+        <!-- Regroupe le titre et les actions de la fenêtre modale. -->
         <header
           class="flex shrink-0 items-start justify-between gap-5 border-b border-gray-200 px-5 py-4 dark:border-gray-700 sm:px-7"
         >
+          <!-- Regroupe les informations affichées par la fenêtre modale. -->
           <div>
             <slot name="eyebrow" />
             <DialogTitle
@@ -65,10 +68,12 @@ function handleOpenChange(open) {
           </button>
         </header>
 
+        <!-- Aligne les informations et les commandes de la fenêtre modale. -->
         <div class="min-h-0 flex-1 overflow-y-auto p-5 sm:p-7">
           <slot />
         </div>
 
+        <!-- Regroupe les actions finales de la fenêtre modale. -->
         <footer
           v-if="$slots.footer"
           class="flex shrink-0 flex-col-reverse gap-3 border-t border-gray-200 px-5 py-4 sm:flex-row sm:justify-end sm:px-7 dark:border-gray-700"

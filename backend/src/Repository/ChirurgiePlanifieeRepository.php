@@ -14,11 +14,13 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class ChirurgiePlanifieeRepository extends ServiceEntityRepository
 {
+    // Configure le repository Doctrine chargé de la chirurgie planifiée. Dépendances utilisées : ChirurgiePlanifiee, ManagerRegistry.
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, ChirurgiePlanifiee::class);
     }
 
+    // Recherche la chirurgie planifiée selon programmes. Dépendances utilisées : Types.
     /** @return list<ChirurgiePlanifiee> */
     public function findProgrammes(?\DateTimeInterface $date = null, ?string $salle = null, ?int $chirurgienId = null, ?\DateTimeInterface $dateDebut = null, ?\DateTimeInterface $dateFin = null): array
     {
@@ -44,12 +46,14 @@ class ChirurgiePlanifieeRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    // Charge une chirurgie planifiée avec son chirurgien, son modèle et chaque préparation de matériel nécessaire à l'écran de préparation. Dépendances utilisées : QueryBuilder.
     public function findPreparationData(int $id): ?ChirurgiePlanifiee
     {
         return $this->baseDataQuery()->where('c.id = :id')->setParameter('id', $id)
             ->getQuery()->getOneOrNullResult();
     }
 
+    // Charge une chirurgie validée avec sa préparation de matériel et les fiches techniques du modèle pour la vue finale. Dépendances utilisées : QueryBuilder.
     public function findVueFinaleData(int $id): ?ChirurgiePlanifiee
     {
         $qb = $this->baseDataQuery()->leftJoin('modele.fichesTechniques', 'fiches')->addSelect('fiches')
@@ -58,6 +62,7 @@ class ChirurgiePlanifieeRepository extends ServiceEntityRepository
         return $qb->getQuery()->getOneOrNullResult();
     }
 
+    // Retourne le prochain ordre disponible dans le programme opératoire. Dépendances utilisées : Chirurgien.
     public function nextOrder(\DateTimeInterface $date, string $salle, Chirurgien $chirurgien): int
     {
         $maximum = $this->createQueryBuilder('c')->select('MAX(c.ordre)')
@@ -68,6 +73,7 @@ class ChirurgiePlanifieeRepository extends ServiceEntityRepository
         return ((int) $maximum) + 1;
     }
 
+    // Compte les chirurgies d'un programme opératoire. Dépendances utilisées : ChirurgiePlanifiee, Types.
     public function countProgrammeSurgeries(ChirurgiePlanifiee $chirurgie): int
     {
         return (int) $this->createQueryBuilder('programme')
@@ -82,6 +88,7 @@ class ChirurgiePlanifieeRepository extends ServiceEntityRepository
             ->getSingleScalarResult();
     }
 
+    // Supprime les programmes opératoires antérieurs à la date de conservation. Dépendances utilisées : Types.
     /** Supprime toutes les chirurgies appartenant aux programmes antérieurs à la date limite. */
     public function deleteProgrammesBefore(\DateTimeInterface $dateLimite): int
     {
@@ -93,6 +100,7 @@ class ChirurgiePlanifieeRepository extends ServiceEntityRepository
             ->execute();
     }
 
+    // Répercute le nouvel intitulé de salle sur les chirurgies planifiées. Dépendances utilisées : aucune dépendance de service directe.
     /** Répercute le renommage d'une salle sur tous les programmes associés. */
     public function renameSalle(string $ancienIntitule, string $nouvelIntitule): int
     {
@@ -106,6 +114,7 @@ class ChirurgiePlanifieeRepository extends ServiceEntityRepository
             ->execute();
     }
 
+    // Construit la requête Doctrine commune aux lectures de chirurgie. Dépendances utilisées : aucune dépendance de service directe.
     private function baseDataQuery(): QueryBuilder
     {
         return $this->createQueryBuilder('c')

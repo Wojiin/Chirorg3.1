@@ -23,6 +23,7 @@ const normalizedOptions = computed(() =>
 </script>
 
 <template>
+  <!-- Regroupe les informations affichées par la liste de sélection. -->
   <div>
     <label :for="id" class="field-label">
       {{ label }}

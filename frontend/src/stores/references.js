@@ -17,6 +17,7 @@ export const useReferenceStore = defineStore('references', {
   },
 
   actions: {
+    // Charge le référentiel métier depuis l'API ou la base. Dépendances utilisées : ERROR_MESSAGES, adminApi, getApiErrorMessage.
     /** Charge uniquement les collections absentes, sauf si un rechargement forcé est demandé. */
     async load(resources, { force = false } = {}) {
       const requested = [...new Set(resources)]
@@ -50,6 +51,7 @@ export const useReferenceStore = defineStore('references', {
       }
     },
 
+    // Invalide le cache Pinia du référentiel métier. Dépendances utilisées : aucune dépendance importée directe.
     /** Invalide une collection après une mutation administrative afin d'éviter les valeurs périmées. */
     invalidate(resource) {
       const collections = { ...this.collections }

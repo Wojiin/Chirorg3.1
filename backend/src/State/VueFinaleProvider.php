@@ -14,10 +14,12 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 /** @implements ProviderInterface<ChirurgieVueFinale> */
 final readonly class VueFinaleProvider implements ProviderInterface
 {
+    // Injecte les services nécessaires au traitement de la chirurgie planifiée. Dépendances utilisées : ChirurgiePlanifieeRepository, ChirurgieReadModelFactory.
     public function __construct(private ChirurgiePlanifieeRepository $repository, private ChirurgieReadModelFactory $factory)
     {
     }
 
+    // Construit la représentation API de la chirurgie planifiée. Dépendances utilisées : ChirurgiePlanifieeRepository, ChirurgieReadModelFactory, ConflictHttpException, ErrorMessage, NotFoundHttpException, Operation.
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): ChirurgieVueFinale
     {
         $chirurgie = $this->repository->findVueFinaleData((int) ($uriVariables['id'] ?? 0)) ?? throw new NotFoundHttpException(ErrorMessage::CHIRURGIE_PLANIFIEE_NOT_FOUND);

@@ -13,10 +13,12 @@ use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
 final readonly class ProgrammeOrderingService
 {
+    // Injecte les services nécessaires au traitement du programme opératoire. Dépendances utilisées : ChirurgieAuditTrail, ChirurgiePlanifieeRepository, EntityManagerInterface, ProgrammeOperatoireService, ProgrammeReferenceResolver.
     public function __construct(private ChirurgiePlanifieeRepository $repository, private ProgrammeOperatoireService $programmes, private ProgrammeReferenceResolver $referenceResolver, private ChirurgieAuditTrail $auditTrail, private EntityManagerInterface $entityManager)
     {
     }
 
+    // Réordonne les chirurgies au sein du programme opératoire. Dépendances utilisées : ChirurgieAuditTrail, ChirurgiePlanifieeRepository, ConflictHttpException, EntityManagerInterface, ErrorMessage, NotFoundHttpException, ProgrammeOperatoireService, ProgrammeOrdreInput, ProgrammeReferenceResolver, UnprocessableEntityHttpException.
     /** @param array<string, mixed> $uriVariables */
     public function reorder(ProgrammeOrdreInput $input, array $uriVariables): ProgrammeOperatoire
     {

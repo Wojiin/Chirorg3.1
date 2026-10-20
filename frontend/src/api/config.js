@@ -3,6 +3,7 @@ export const apiBaseUrl = (
   import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api'
 ).replace(/\/+$/, '')
 
+// Transforme le chemin d'une image de fiche technique renvoyé par l'API en URL absolue affichable par le navigateur. Dépendances utilisées : URL, window.
 /** Convertit un chemin de média renvoyé par l'API en URL affichable par la SPA. */
 export function resolveApiAssetUrl(path) {
   if (!path || typeof path !== 'string') return ''
